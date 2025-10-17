@@ -124,6 +124,9 @@ struct InvertedLists {
     virtual void resize(size_t list_no, size_t new_size) = 0;
 
     virtual void reset();
+#ifdef __aarch64__
+    virtual size_t initialize_tmp_buffer(size_t batchsize);
+#endif
 
     /*************************
      * high level functions  */
@@ -263,6 +266,9 @@ struct ArrayInvertedLists : InvertedLists {
     void permute_invlists(const idx_t* map);
 
     ~ArrayInvertedLists() override;
+#ifdef __aarch64__
+    size_t initialize_tmp_buffer(size_t batchsize) override;
+#endif
 };
 
 /*****************************************************************

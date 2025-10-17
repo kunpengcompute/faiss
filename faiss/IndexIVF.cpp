@@ -29,6 +29,12 @@
 #include <faiss/impl/FaissAssert.h>
 #include <faiss/impl/IDSelector.h>
 
+#ifdef __aarch64__
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+#endif
+
 namespace faiss {
 
 using ScopedIds = InvertedLists::ScopedIds;
@@ -83,6 +89,7 @@ void Level1Quantizer::train_q1(
         } else {
             clus.train(n, x, *quantizer);
         }
+        quantizer->train(-1, x);
         quantizer->is_trained = true;
     } else if (quantizer_trains_alone == 2) {
         if (verbose) {
@@ -457,6 +464,7 @@ void IndexIVF::search_preassigned(
     {
         std::unique_ptr<InvertedListScanner> scanner(
                 get_InvertedListScanner(store_pairs, sel));
+        krl_create_LUT8b_handle(&(scanner->klh),(int)(sel != nullptr), tmp_buffer_size);
 
         /*****************************************************
          * Depending on parallel_mode, there are two possible ways

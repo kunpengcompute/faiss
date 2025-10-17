@@ -234,6 +234,38 @@ IndexRefineFlat::IndexRefineFlat() : IndexRefine() {
     own_refine_index = true;
 }
 
+#ifdef __aarch64__
+void IndexRefineFlat::add(idx_t n, const float* x) {
+    FAISS_THROW_IF_NOT(is_trained);
+    base_index->add(n, x);
+    if(!kdh) {
+        krl_create_reorder_handle(
+            &kdh, accu_level, full_level, n, d, base_index->metric_type, (const uint8_t *)x, n * d * 4);
+    } else {
+        krl_clean_distance_handle(&kdh);
+        krl_create_reorder_handle(
+            &kdh, accu_level, full_level, n, d, base_index->metric_type, (const uint8_t *)x, n * d * 4);
+    }
+    ntotal = base_index->ntotal;
+}
+
+void IndexRefineFlat::reset() {
+    base_index->reset();
+    if(kdh) {
+        krl_clean_distance_handle(&kdh);
+        kdh = nullptr;
+    }
+    ntotal = 0;
+}
+
+IndexRefineFlat::~IndexRefineFlat(){
+    if(kdh) {
+        krl_clean_distance_handle(&kdh);
+        kdh = nullptr;
+    }
+}
+#endif
+
 void IndexRefineFlat::search(
         idx_t n,
         const float* x,
@@ -275,6 +307,16 @@ void IndexRefineFlat::search(
     base_index->search(
             n, x, k_base, base_distances, base_labels, base_index_params);
 
+#ifdef __aarch64__
+    if(kdh) {
+#pragma omp parallel for if(n > 1)
+	    for (int i = 0; i < n; i++) {
+	        krl_reorder_2_vector(kdh, k_base, base_distances + i * k_base, base_labels + i * k_base,
+	        x + i * d, k, distances + i * k, labels + i * k, d);
+	    }
+    return;
+    }
+#endif
     for (int i = 0; i < n * k_base; i++)
         assert(base_labels[i] >= -1 && base_labels[i] < ntotal);
 

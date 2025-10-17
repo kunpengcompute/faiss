@@ -11,6 +11,10 @@
 #include <faiss/impl/LookupTableScaler.h>
 #include <faiss/impl/simd_result_handlers.h>
 
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+
 namespace faiss {
 
 using namespace simd_result_handlers;
@@ -134,6 +138,65 @@ void accumulate_fixed_blocks(
     }
 }
 
+template <class ResultHandler>
+inline void accumulate_fixed_blocks64(
+        size_t nb,
+        int nsq,
+        const uint8_t* codes,
+        const uint8_t* LUT,
+        ResultHandler& res) {
+    const bool keep_min = res.get_keepmin();
+    ALIGNED(32) uint16_t distance[64];
+    uint32_t lt_mask[2];
+    if(keep_min) {
+        for (size_t j0 = 0; j0 < nb; j0 += 64) {
+            const uint16_t threshold = res.get_threshold(0);
+            krl_L2_table_lookup_fast_scan_bs64(
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 32, nsq * 16, 64, 2);
+            res.handle_generic2(j0, distance, lt_mask);
+            codes += 32 * nsq;
+            
+        }
+    } else {
+        for (size_t j0 = 0; j0 < nb; j0 += 64) {
+            const uint16_t threshold = res.get_threshold(0);
+            krl_IP_table_lookup_fast_scan_bs64(
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 32, nsq * 16, 64, 2);
+            res.handle_generic2(j0, distance, lt_mask);
+            codes += 32 * nsq;
+        }
+    }
+}
+
+template <class ResultHandler>
+inline void accumulate_fixed_blocks96(
+        size_t nb,
+        int nsq,
+        const uint8_t* codes,
+        const uint8_t* LUT,
+        ResultHandler& res) {
+    const bool keep_min = res.get_keepmin();
+    ALIGNED(32) uint16_t distance[96];
+    uint32_t lt_mask[3];
+    if(keep_min) {
+        for (size_t j0 = 0; j0 < nb; j0 += 96) {
+            const uint16_t threshold = res.get_threshold(0);
+            krl_L2_table_lookup_fast_scan_bs96(
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 48, nsq * 16, 96, 3);
+            res.handle_generic3(j0, distance, lt_mask);
+            codes += 48 * nsq;
+        }
+    } else {
+        for (size_t j0 = 0; j0 < nb; j0 += 96) {
+            const uint16_t threshold = res.get_threshold(0);
+            krl_IP_table_lookup_fast_scan_bs96(
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 48, nsq * 16, 96, 3);
+            res.handle_generic3(j0, distance, lt_mask);
+            codes += 48 * nsq;
+        }
+    }
+}
+
 template <class ResultHandler, class Scaler>
 void pq4_accumulate_loop_fixed_scaler(
         int nq,
@@ -144,6 +207,16 @@ void pq4_accumulate_loop_fixed_scaler(
         const uint8_t* LUT,
         ResultHandler& res,
         const Scaler& scaler) {
+
+    switch (bbs) {
+        case 64:
+        accumulate_fixed_blocks64(nb, nsq, codes, LUT, res);
+        return;
+        case 96:
+        accumulate_fixed_blocks96(nb, nsq, codes, LUT, res);
+        return;
+
+    }
     FAISS_THROW_IF_NOT(is_aligned_pointer(codes));
     FAISS_THROW_IF_NOT(is_aligned_pointer(LUT));
     FAISS_THROW_IF_NOT(bbs % 32 == 0);

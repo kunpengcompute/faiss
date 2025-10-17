@@ -78,6 +78,12 @@ void InvertedLists::reset() {
     }
 }
 
+#ifdef __aarch64__
+size_t InvertedLists::initialize_tmp_buffer(size_t batchsize) {
+    return 0;
+}
+#endif
+
 InvertedListsIterator* InvertedLists::get_iterator(
         size_t /*list_no*/,
         void* /*inverted_list_context*/) const {
@@ -304,6 +310,18 @@ void ArrayInvertedLists::permute_invlists(const idx_t* map) {
     std::swap(codes, new_codes);
     std::swap(ids, new_ids);
 }
+
+#ifdef __aarch64__
+size_t ArrayInvertedLists::initialize_tmp_buffer(size_t batchsize) {
+    size_t tmp_buffer_size = 0;
+    for(int i = 0; i < nlist; ++i) {
+        size_t n = ids[i].size();
+        tmp_buffer_size = (n > tmp_buffer_size) ? n : tmp_buffer_size; 
+    }
+    tmp_buffer_size = ((tmp_buffer_size + batchsize - 1) & (-batchsize));
+    return tmp_buffer_size;
+}
+#endif
 
 ArrayInvertedLists::~ArrayInvertedLists() {}
 

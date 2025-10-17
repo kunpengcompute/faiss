@@ -52,7 +52,11 @@ int sgemm_(
         float* beta,
         float* c,
         FINTEGER* ldc);
+#ifdef __aarch64__
+#include <faiss/sra_krl/include/krl.h>
+#endif
 }
+
 
 namespace faiss {
 
@@ -104,6 +108,14 @@ struct NegativeDistanceComputer : DistanceComputer {
         dis3 = -dis3;
     }
 
+#ifdef __aarch64__
+    void distances_multi_codes(const int64_t* idx, float* dis, int ny) {
+        basedis->distances_multi_codes(idx, dis, ny);
+        for(int i = 0; i < ny; ++i) {
+            dis[i] = -dis[i];
+        }
+    }
+#endif
     /// compute distance between two stored vectors
     float symmetric_dis(idx_t i, idx_t j) override {
         return -basedis->symmetric_dis(i, j);
@@ -121,7 +133,50 @@ DistanceComputer* storage_distance_computer(const Index* storage) {
         return storage->get_distance_computer();
     }
 }
+#ifdef __aarch64__
+// *** add for reordering ***
+void graphBFSPerm(faiss::IndexHNSW *index, faiss::idx_t* perm)
+{
+    size_t permInd = 0;
+    const auto hnsw = index->hnsw;
+    const size_t nV = hnsw.levels.size();
+    std::vector<bool> visited(nV, false);
+    
+    std::queue<faiss::idx_t> BFSQueue;
+    for (size_t v = 0; v < nV; ++v) {
+        if (hnsw.levels[v] > 1) {
+            BFSQueue.push(v);
+            perm[permInd++] = v;
+            visited[v] = true;
+        }
+    }
 
+    while (!BFSQueue.empty()) {
+        const auto v = BFSQueue.front();
+        BFSQueue.pop();
+
+        size_t begin, end;
+        hnsw.neighbor_range(v, 0, &begin, &end);
+        for (size_t v = begin; v < end; ++v) {
+            const auto vNeighbor = hnsw.neighbors[v];
+            if (vNeighbor < 0) {
+                break;
+            }
+            if (!visited[vNeighbor]) {
+                BFSQueue.push(vNeighbor);
+                perm[permInd++] = vNeighbor;
+                visited[vNeighbor] = true;
+            }   
+        }
+    }
+
+    for(int i = 0; i < nV; ++i) {
+        if(visited[i] == false) {
+            perm[permInd++] = i;
+        }
+    }
+}
+#endif
 void hnsw_add_vertices(
         IndexHNSW& index_hnsw,
         size_t n0,
@@ -257,6 +312,27 @@ void hnsw_add_vertices(
     for (int i = 0; i < ntotal; i++) {
         omp_destroy_lock(&locks[i]);
     }
+#ifdef __aarch64__
+    // *** add for reordering ***
+    if (index_hnsw.apply_reorder) {
+        index_hnsw.perm_size = ntotal;
+        index_hnsw.perm = new faiss::idx_t[ntotal];
+        faiss::graphBFSPerm(&index_hnsw, index_hnsw.perm);
+        index_hnsw.permute_entries(index_hnsw.perm);
+
+        for (size_t vi = 0; vi < ntotal; ++vi) {
+            for (size_t level = 0; level < hnsw.levels[vi]; level++) {
+                size_t begin, end;
+                hnsw.neighbor_range(vi, level, &begin, &end);
+                while(hnsw.neighbors[end - 1] == -1 && begin < end) {
+                    end--;
+                }
+                auto hnswNeigborsStart = hnsw.neighbors.begin();
+                std::sort(hnswNeigborsStart + begin, hnswNeigborsStart + end);
+            }
+        }
+    }
+#endif
 }
 
 } // namespace
@@ -272,9 +348,20 @@ IndexHNSW::IndexHNSW(Index* storage, int M)
         : Index(storage->d, storage->metric_type), hnsw(M), storage(storage) {}
 
 IndexHNSW::~IndexHNSW() {
+#ifdef __aarch64__
     if (own_fields) {
         delete storage;
+        own_fields = false;
     }
+    if (apply_reorder && perm != nullptr) {
+        delete[] perm;
+        perm = nullptr;
+    }
+#else
+	if (own_fields) {
+        delete storage;
+    }
+#endif
 }
 
 void IndexHNSW::train(idx_t n, const float* x) {
@@ -285,9 +372,218 @@ void IndexHNSW::train(idx_t n, const float* x) {
     storage->train(n, x);
     is_trained = true;
 }
+#ifdef __aarch64__
+#include<arm_neon.h>
+struct FlatL2DisSQ8 : DistanceComputer {
+    const uint8_t* q8;
+    const uint8_t* b8;
+    size_t d;
+
+    explicit FlatL2DisSQ8(size_t dim) : d(dim) {};
+
+    void set_query(const float* x) final override{
+        q8 = (uint8_t*)x;
+    };
+
+    void set_base(const float* x) final override {
+        b8 = (uint8_t*)x;
+    }
+
+    float operator()(idx_t i) override {
+		uint32_t ret;
+		krl_L2sqr_u8u32(q8, b8 + i * d, d, &ret, 1);
+        return (float)ret;
+    }
+
+    float symmetric_dis(idx_t i, idx_t j) override {
+		uint32_t ret;
+		krl_L2sqr_u8u32(q8 + i * d, q8 + j * d, d, &ret, 1);
+        return (float)ret;
+    }
+
+    // compute with krl
+    void distances_multi_codes(const int64_t* idx, float* dis, int ny) final override {
+        krl_L2sqr_by_idx_u8f32(dis, q8, b8, idx, d, ny, ny);
+    }
+
+    virtual ~FlatL2DisSQ8() { };
+};
+
+struct FlatL2DisSQ16 : DistanceComputer {
+    const float16_t* q16;
+    const float16_t* b16;
+    size_t d;
+
+    explicit FlatL2DisSQ16(size_t dim) : d(dim){};
+
+    void set_query(const float* x) final override {
+        q16 = (float16_t*)x;
+    }
+
+    void set_base(const float* x) final override {
+        b16 = (float16_t*)x;
+    }
+
+    float operator()(idx_t i) override {
+		float ret;
+		krl_L2sqr_f16f32((const uint16_t*)q16, (const uint16_t*)b16 + i * d, d, &ret, 1);
+        return ret;
+    }
+
+    float symmetric_dis(idx_t i, idx_t j) override {
+		float ret;
+		krl_L2sqr_f16f32((const uint16_t*)b16 + i * d, (const uint16_t*)b16 + j * d, d, &ret, 1);
+        return ret;
+    }
+
+    // compute with krl
+    void distances_multi_codes(const int64_t* idx, float* dis, int ny) final override {
+        krl_L2sqr_by_idx_f16f32(dis, (const uint16_t*)q16, (const uint16_t*)b16, idx, d, ny, ny);
+    }
+
+    virtual ~FlatL2DisSQ16() {};
+};
+
+struct FlatIPDisSQ16 : DistanceComputer {
+    const float16_t* q16;
+    const float16_t* b16;
+    size_t d;
+
+    explicit FlatIPDisSQ16(size_t dim) : d(dim){ };
+
+    void set_query(const float* x) final override {
+        q16 = (float16_t*)x;
+    }
+
+    void set_base(const float* x) final override {
+        b16 = (float16_t*)x;
+    }
+
+    float operator()(idx_t i) override {
+		float ret;
+		krl_negative_ipdis_f16f32((const uint16_t*)q16, (const uint16_t*)b16 + i * d, d, &ret, 1);
+        return ret;
+    }
+
+    float symmetric_dis(idx_t i, idx_t j) override {
+		float ret;
+		krl_negative_ipdis_f16f32((const uint16_t*)b16 + i * d, (const uint16_t*)b16 + j * d, d, &ret, 1);
+        return ret;
+    }
+
+    // compute with krl
+    void distances_multi_codes(const int64_t* idx, float* dis, int ny) final override {
+        krl_negative_inner_product_by_idx_f16f32(dis, (const uint16_t*)q16, (const uint16_t*)b16, idx, d, ny, ny);
+    }
+
+    virtual ~FlatIPDisSQ16() { };
+};
+
+
+void quant_f16_noscale(const float* src, idx_t d, float16_t* out) {
+    idx_t l = 0;
+    constexpr idx_t single_loop = 4;
+    constexpr idx_t multi_loop = 16;
+    for(; l + multi_loop <= d; l += multi_loop) {
+        float32x4_t neon_a1 = vld1q_f32(src + l);
+        float32x4_t neon_a2 = vld1q_f32(src + l + 4);
+        float32x4_t neon_a3 = vld1q_f32(src + l + 8);
+        float32x4_t neon_a4 = vld1q_f32(src + l + 12);
+        const float16x4_t neon_c1 = vcvt_f16_f32(neon_a1);
+        const float16x4_t neon_c2 = vcvt_f16_f32(neon_a2);
+        const float16x4_t neon_c3 = vcvt_f16_f32(neon_a3);
+        const float16x4_t neon_c4 = vcvt_f16_f32(neon_a4);
+        vst1_f16(out + l, neon_c1);
+        vst1_f16(out + l + 4, neon_c2);
+        vst1_f16(out + l + 8, neon_c3);
+        vst1_f16(out + l + 12, neon_c4);
+    } 
+    for(; l + single_loop <= d; l += single_loop) {
+        float32x4_t neon_a1 = vld1q_f32(src + l);
+        const float16x4_t neon_c1 = vcvt_f16_f32(neon_a1);
+        vst1_f16(out + l, neon_c1);
+    }
+    for(; l < d; ++l) {
+        out[l] = (float16_t)(src[l]);
+    }
+}
+
+void quant_u8_noscale(const float* src, idx_t d, uint8_t* out) {
+    idx_t l = 0;    
+    constexpr idx_t multi_loop = 32;
+    constexpr idx_t double_loop = 16;
+    constexpr idx_t single_loop = 8;
+    for(; l + multi_loop <= d; l += multi_loop) {
+        float32x4_t neon_a1 = vld1q_f32(src + l);
+        float32x4_t neon_a2 = vld1q_f32(src + l + 4);
+        float32x4_t neon_a3 = vld1q_f32(src + l + 8);
+        float32x4_t neon_a4 = vld1q_f32(src + l + 12);
+        float32x4_t neon_a5 = vld1q_f32(src + l + 16);
+        float32x4_t neon_a6 = vld1q_f32(src + l + 20);
+        float32x4_t neon_a7 = vld1q_f32(src + l + 24);
+        float32x4_t neon_a8 = vld1q_f32(src + l + 28);
+
+        const uint32x4_t neon_b1 = vcvtnq_u32_f32(neon_a1);
+        const uint32x4_t neon_b2 = vcvtnq_u32_f32(neon_a2);
+        const uint32x4_t neon_b3 = vcvtnq_u32_f32(neon_a3);
+        const uint32x4_t neon_b4 = vcvtnq_u32_f32(neon_a4);
+        const uint32x4_t neon_b5 = vcvtnq_u32_f32(neon_a5);
+        const uint32x4_t neon_b6 = vcvtnq_u32_f32(neon_a6);
+        const uint32x4_t neon_b7 = vcvtnq_u32_f32(neon_a7);
+        const uint32x4_t neon_b8 = vcvtnq_u32_f32(neon_a8);
+
+        const uint8x16_t neon_c1 = vpaddq_u8(vreinterpretq_u8_u32(neon_b1), vreinterpretq_u8_u32(neon_b2));
+        const uint8x16_t neon_c2 = vpaddq_u8(vreinterpretq_u8_u32(neon_b3), vreinterpretq_u8_u32(neon_b4));
+        const uint8x16_t neon_c3 = vpaddq_u8(vreinterpretq_u8_u32(neon_b5), vreinterpretq_u8_u32(neon_b6));
+        const uint8x16_t neon_c4 = vpaddq_u8(vreinterpretq_u8_u32(neon_b7), vreinterpretq_u8_u32(neon_b8));
+        
+        const uint8x16_t neon_d1 = vpaddq_u8(neon_c1, neon_c2);
+        const uint8x16_t neon_d2 = vpaddq_u8(neon_c3, neon_c4);
+
+        vst1q_u8(out + l, neon_d1);
+        vst1q_u8(out + l + 16, neon_d2);
+    } 
+    if(d & double_loop) {
+        float32x4_t neon_a1 = vld1q_f32(src + l);
+        float32x4_t neon_a2 = vld1q_f32(src + l + 4);
+        float32x4_t neon_a3 = vld1q_f32(src + l + 8);
+        float32x4_t neon_a4 = vld1q_f32(src + l + 12);
+
+        const uint32x4_t neon_b1 = vcvtnq_u32_f32(neon_a1);
+        const uint32x4_t neon_b2 = vcvtnq_u32_f32(neon_a2);
+        const uint32x4_t neon_b3 = vcvtnq_u32_f32(neon_a3);
+        const uint32x4_t neon_b4 = vcvtnq_u32_f32(neon_a4);
+
+        const uint8x16_t neon_c1 = vpaddq_u8(vreinterpretq_u8_u32(neon_b1), vreinterpretq_u8_u32(neon_b2));
+        const uint8x16_t neon_c2 = vpaddq_u8(vreinterpretq_u8_u32(neon_b3), vreinterpretq_u8_u32(neon_b4));
+
+        const uint8x16_t neon_d1 = vpaddq_u8(neon_c1, neon_c2);
+
+        vst1q_u8(out + l, neon_d1);
+        l += double_loop;
+    }
+    if(d & single_loop) {
+        float32x4_t neon_a1 = vld1q_f32(src + l);
+        float32x4_t neon_a2 = vld1q_f32(src + l + 4);
+
+        const uint32x4_t neon_b1 = vcvtnq_u32_f32(neon_a1);
+        const uint32x4_t neon_b2 = vcvtnq_u32_f32(neon_a2);
+
+        const uint16x4_t neon_c1 = vmovn_u32(neon_b1);
+        const uint16x4_t neon_c2 = vmovn_u32(neon_b2);
+
+        const uint8x8_t neon_d1 = vpadd_u8(vreinterpret_u8_u16(neon_c1), vreinterpret_u8_u16(neon_c2));
+
+        vst1_u8(out + l, neon_d1);
+        l += single_loop;
+    }
+    for(; l < d; ++l) {
+        out[l] = (uint8_t)(src[l] + 0.5);
+    }
+}
+#endif
 
 namespace {
-
 template <class BlockResultHandler>
 void hnsw_search(
         const IndexHNSW* index,
@@ -314,7 +610,59 @@ void hnsw_search(
 
     for (idx_t i0 = 0; i0 < n; i0 += check_period) {
         idx_t i1 = std::min(i0 + check_period, n);
-
+    
+#ifdef __aarch64__
+#pragma omp parallel
+        {
+            VisitedTable vt(index->ntotal);
+            typename BlockResultHandler::SingleResultHandler res(bres);
+            DistanceComputer* dis = nullptr;
+            if(index->quant_bits == 16) {
+                float16_t* f16_x = new float16_t[index->d];
+                if(index->metric_type == METRIC_L2) {
+                    dis = new FlatL2DisSQ16(index->d);
+                } else {
+                    dis = new FlatIPDisSQ16(index->d);
+                }
+                dis->set_base((float*)index->storage->get_codes_pointer());
+            
+                for (idx_t i = i0; i < i1; i++) {
+                    res.begin(i);
+                    quant_f16_noscale(x + i * index->d, index->d, f16_x);
+                    dis->set_query((float*)f16_x);
+                    hnsw.search(*dis, res, vt, params);
+                    res.end();
+                }
+                delete[] f16_x;
+            } else if (index->quant_bits == 8) {
+                dis = new FlatL2DisSQ8(index->d);
+                dis->set_base((float*)index->storage->get_codes_pointer());
+                uint8_t* u8_x = new uint8_t[index->d];
+            
+                for (idx_t i = i0; i < i1; i++) {
+                    quant_u8_noscale(x + i * index->d, index->d, u8_x);
+                    res.begin(i);
+                    dis->set_query((float*)u8_x);
+                    hnsw.search(*dis, res, vt, params);
+                    res.end();
+                }
+                delete[] u8_x;
+            } else {
+                dis = storage_distance_computer(index->storage);
+            
+                for (idx_t i = i0; i < i1; i++) {
+                    res.begin(i);
+                    dis->set_query(x + i * index->d);
+                    hnsw.search(*dis, res, vt, params);
+                    res.end();
+                }
+            }
+            delete dis;
+        }
+        InterruptCallback::check();
+        
+    }
+#else
 #pragma omp parallel
         {
             VisitedTable vt(index->ntotal);
@@ -341,6 +689,7 @@ void hnsw_search(
     }
 
     hnsw_stats.combine({n1, n2, n3, ndis, nreorder});
+#endif
 }
 
 } // anonymous namespace
@@ -365,6 +714,16 @@ void IndexHNSW::search(
             distances[i] = -distances[i];
         }
     }
+#ifdef __aarch64__
+    // *** add for reordering ***
+    if (apply_reorder) {
+        std::vector<idx_t> labels_permuted(n * k);
+        for (size_t i = 0; i < n * k; ++i) {
+            labels_permuted[i] = perm[labels[i]];
+        }
+        std::copy_n(labels_permuted.cbegin(), n * k, labels);
+    }
+#endif
 }
 
 void IndexHNSW::range_search(
@@ -396,6 +755,13 @@ void IndexHNSW::add(idx_t n, const float* x) {
     ntotal = storage->ntotal;
 
     hnsw_add_vertices(*this, n0, n, x, verbose, hnsw.levels.size() == ntotal);
+#ifdef __aarch64__
+    if(quant_bits == 16) {
+        storage->quant_entries_f16(storage->get_codes_pointer(), n * d, quant_scale);
+    } else if(quant_bits == 8) {
+        storage->quant_entries_u8(storage->get_codes_pointer(), n * d, quant_scale);
+    }
+#endif
 }
 
 void IndexHNSW::reset() {

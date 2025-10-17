@@ -25,8 +25,12 @@ namespace faiss {
 struct DistanceComputer {
     /// called before computing distances. Pointer x should remain valid
     /// while operator () is called
-    virtual void set_query(const float* x) = 0;
-
+    virtual void set_query(const float* x) {
+        printf("TypeError, struct DistanceComputer can't use set_query func!\n");
+    };
+    virtual void set_base(const float* x) {
+        printf("TypeError, struct DistanceComputer can't use set_base func!\n");
+    };
     /// compute distance of vector i to current query
     virtual float operator()(idx_t i) = 0;
 
@@ -51,6 +55,12 @@ struct DistanceComputer {
         dis1 = d1;
         dis2 = d2;
         dis3 = d3;
+    }
+
+    virtual void distances_multi_codes(const int64_t* idx, float* dis, int ny) {
+        for(int i = 0; i < ny; ++i) {
+            dis[i] = this->operator()(idx[i]);
+        }
     }
 
     /// compute distance between two stored vectors

@@ -39,6 +39,11 @@ struct SIMDResultHandler {
             simd16uint16 d0,
             simd16uint16 d1) = 0;
 
+    virtual bool get_keepmin(){return true;};
+    virtual uint16_t get_threshold(const size_t q){return 0;};
+    virtual void handle_generic(const size_t nq, const size_t q, const uint16_t* distance, uint32_t* lt_mask){};
+    virtual void handle_generic2(const size_t b, const uint16_t* distance, uint32_t* lt_mask){};
+    virtual void handle_generic3(const size_t b, const uint16_t* distance, uint32_t* lt_mask){};
     /// set the sub-matrix that is being computed
     virtual void set_block_origin(size_t i0, size_t j0) = 0;
 
@@ -430,6 +435,109 @@ struct ReservoirHandler : ResultHandlerCompare<C, with_id_map> {
             T dis = d32tab[j];
             res.add(dis, this->adjust_id(b, j));
         }
+    }
+
+    bool get_keepmin(){
+        return C::is_max;
+    }
+    uint16_t get_threshold(const size_t q){
+        size_t q2 = q + this->i0;
+        if (with_id_map) { // FIXME test on q_map instead
+            q2 = this->q_map[q2];
+        }
+        return reservoirs[q2].threshold;
+    }
+
+    inline void add2reservec(uint32_t mask, int64_t idx, const uint16_t* distance, ReservoirTopN<C>& res) {
+        while (mask) {
+            // find first non-zero
+            int j = __builtin_ctz(mask);
+            mask &= (mask - 1);
+            int64_t ix = idx + j;
+            if constexpr (with_id_map) {
+                ix = this->id_map[ix];
+            }
+            res.add(distance[j], ix);
+        }
+    }
+
+    void handle_generic(const size_t nq, const size_t q, const uint16_t* distance, uint32_t* lt_mask) final {
+        assert(this->q_map == nullptr);
+        uint64_t idx = this->j0;
+        if (idx + 32 > this->ntotal) {
+            if (idx >= this->ntotal) {
+                return;
+            } else {
+                int nbit = (this->ntotal - idx);
+                for(int i = 0; i < nq; ++i) {
+                    lt_mask[i] &= (uint32_t(1) << nbit) - 1;
+                }
+            }
+        }
+        for(int i = 0; i < nq; ++i) {
+            uint32_t mask = lt_mask[i];
+            if(!mask) {
+                continue;
+            }
+            size_t q2 = q + this->i0 + i;
+            if (with_id_map) { 
+                q2 = this->q_map[q2];
+            }
+            ReservoirTopN<C>& res = reservoirs[q2];
+            add2reservec(mask, idx, distance, res);
+        }
+    }
+
+    void handle_generic2(const size_t b, const uint16_t* distance, uint32_t* lt_mask) final {
+        const int64_t idx = b;
+        size_t q2 = this->i0;
+        if constexpr (with_id_map) { 
+            q2 = this->q_map[q2];
+        }
+        ReservoirTopN<C>& res = reservoirs[q2];
+        if (idx + 64 > this->ntotal) {
+            const int nbits = this->ntotal - idx;
+            if(nbits >= 32) {
+                add2reservec(lt_mask[0], idx, distance, res);
+                uint32_t mask = lt_mask[1] & ((uint32_t(1) << (nbits - 32)) - 1);
+                add2reservec(mask, idx + 32, distance + 32, res);
+            } else if(nbits > 0) {
+                uint32_t mask = lt_mask[0] & ((uint32_t(1) << nbits) - 1);
+                add2reservec(mask, idx, distance, res);
+            } 
+            return;
+        }
+        add2reservec(lt_mask[0], idx, distance, res);
+        add2reservec(lt_mask[1], idx + 32, distance + 32, res);
+    }
+
+    void handle_generic3(const size_t b, const uint16_t* distance, uint32_t* lt_mask) final {
+        const int64_t idx = b;
+        size_t q2 = this->i0;
+        if constexpr (with_id_map) { 
+            q2 = this->q_map[q2];
+        }
+        ReservoirTopN<C>& res = reservoirs[q2];
+        if (idx + 96 > this->ntotal) {
+            const int nbits = this->ntotal - idx;
+            if(nbits >= 64) {
+                add2reservec(lt_mask[0], idx, distance, res);
+                add2reservec(lt_mask[1], idx + 32, distance + 32, res);
+                uint32_t mask = lt_mask[2] & ((uint32_t(1) << (nbits - 64)) - 1);
+                add2reservec(mask, idx + 64, distance + 64, res);
+            } else if(nbits >= 32) {
+                add2reservec(lt_mask[0], idx, distance, res);
+                uint32_t mask =  lt_mask[1] & ((uint32_t(1) << (nbits - 32)) - 1);
+                add2reservec(mask, idx + 32, distance + 32, res);
+            } else if(nbits > 0) {
+                uint32_t mask = lt_mask[0] & ((uint32_t(1) << nbits) - 1);
+                add2reservec(mask, idx, distance, res);
+            } 
+            return;
+        }
+        add2reservec(lt_mask[0], idx, distance, res);
+        add2reservec(lt_mask[1], idx + 32, distance + 32, res);
+        add2reservec(lt_mask[2], idx + 64, distance + 64, res);
     }
 
     void end() override {

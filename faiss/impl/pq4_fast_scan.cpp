@@ -11,6 +11,11 @@
 
 #include <array>
 
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+#include "math.h"
+}
+
 namespace faiss {
 
 using namespace simd_result_handlers;
@@ -93,35 +98,9 @@ void pq4_pack_codes_range(
         size_t bbs,
         size_t nsq,
         uint8_t* blocks) {
-    const uint8_t perm0[16] = {
-            0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15};
-
-    // range of affected blocks
-    size_t block0 = i0 / bbs;
-    size_t block1 = ((i1 - 1) / bbs) + 1;
-
-    for (size_t b = block0; b < block1; b++) {
-        uint8_t* codes2 = blocks + b * bbs * nsq / 2;
-        int64_t i_base = b * bbs - i0;
-        for (int sq = 0; sq < nsq; sq += 2) {
-            for (size_t i = 0; i < bbs; i += 32) {
-                std::array<uint8_t, 32> c, c0, c1;
-                get_matrix_column(
-                        codes, i1 - i0, (M + 1) / 2, i_base + i, sq / 2, c);
-                for (int j = 0; j < 32; j++) {
-                    c0[j] = c[j] & 15;
-                    c1[j] = c[j] >> 4;
-                }
-                for (int j = 0; j < 16; j++) {
-                    uint8_t d0, d1;
-                    d0 = c0[perm0[j]] | (c0[perm0[j] + 16] << 4);
-                    d1 = c1[perm0[j]] | (c1[perm0[j] + 16] << 4);
-                    codes2[j] |= d0;
-                    codes2[j + 16] |= d1;
-                }
-                codes2 += 32;
-            }
-        }
+    if(bbs % 32 == 0) {
+        krl_pack_codes_4b(
+			codes, i1 - i0, M, blocks + i0 / 32 * 16 * nsq, bbs, 1, (i0 - i1) * M / 2, ceil((i0 - i1) / bbs) * bbs * M);
     }
 }
 
@@ -245,10 +224,7 @@ void pq4_pack_LUT(int nq, int nsq, const uint8_t* src, uint8_t* dest) {
         for (int sq = 0; sq < nsq; sq += 2) {
             memcpy(dest + (sq / 2 * nq + q) * 32,
                    src + (q * nsq + sq) * 16,
-                   16);
-            memcpy(dest + (sq / 2 * nq + q) * 32 + 16,
-                   src + (q * nsq + sq + 1) * 16,
-                   16);
+                   32);
         }
     }
 }

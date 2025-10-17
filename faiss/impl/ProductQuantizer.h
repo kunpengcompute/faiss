@@ -18,6 +18,11 @@
 #include <faiss/impl/Quantizer.h>
 #include <faiss/impl/platform_macros.h>
 #include <faiss/utils/Heap.h>
+#ifdef __aarch64__
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+#endif
 
 namespace faiss {
 
@@ -46,6 +51,23 @@ struct ProductQuantizer : Quantizer {
     /// if non-NULL, use this index for assignment (should be of size
     /// d / M)
     Index* assign_index;
+#ifdef __aarch64__
+    bool use_transpose = false;
+    KRLDistanceHandle* kdh = nullptr; 
+    void initialize_krl_transpose_centroids(size_t batchsize, int metric_type) {
+        if(!use_transpose) {
+            use_transpose = true;
+            krl_create_distance_handle(
+                &kdh, 3, batchsize, ksub, dsub, M, metric_type, (const uint8_t *)centroids.data(), M * ksub * dsub * 4);
+        }
+    }
+    ~ProductQuantizer() {
+        if(use_transpose) {
+            use_transpose = false;
+            krl_clean_distance_handle(&kdh);
+        }
+    }
+#endif
 
     /// Centroid table, size M * ksub * dsub.
     /// Layout: (M, ksub, dsub)

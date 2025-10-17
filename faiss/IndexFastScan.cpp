@@ -68,7 +68,7 @@ void IndexFastScan::add(idx_t n, const float* x) {
     FAISS_THROW_IF_NOT(is_trained);
 
     // do some blocking to avoid excessive allocs
-    constexpr idx_t bs = 65536;
+    constexpr idx_t bs = 65280;
     if (n > bs) {
         for (idx_t i0 = 0; i0 < n; i0 += bs) {
             idx_t i1 = std::min(n, i0 + bs);

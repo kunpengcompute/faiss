@@ -18,6 +18,11 @@ namespace faiss {
 IndexFlatCodes::IndexFlatCodes(size_t code_size, idx_t d, MetricType metric)
         : Index(d, metric), code_size(code_size) {}
 
+#ifdef __aarch64__
+uint8_t* IndexFlatCodes::get_codes_pointer() {
+     return codes.data(); 
+}
+#endif
 IndexFlatCodes::IndexFlatCodes() : code_size(0) {}
 
 void IndexFlatCodes::add(idx_t n, const float* x) {
@@ -104,8 +109,11 @@ CodePacker* IndexFlatCodes::get_CodePacker() const {
 }
 
 void IndexFlatCodes::permute_entries(const idx_t* perm) {
+#ifdef __aarch64__
+    std::vector<uint8_t, AlignedAllocator<uint8_t>> new_codes(codes.size());
+#else
     std::vector<uint8_t> new_codes(codes.size());
-
+#endif
     for (idx_t i = 0; i < ntotal; i++) {
         memcpy(new_codes.data() + i * code_size,
                codes.data() + perm[i] * code_size,
@@ -113,5 +121,45 @@ void IndexFlatCodes::permute_entries(const idx_t* perm) {
     }
     std::swap(codes, new_codes);
 }
+#ifdef __aarch64__
+#include <arm_neon.h>
+void IndexFlatCodes::dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) {
+    std::vector<uint8_t, AlignedAllocator<uint8_t>> new_codes(4 * num_entries);
+    float* c = (float*)new_codes.data();
+    if(quant_bit == 16) {
+        float16_t* e = (float16_t*)(entries);
+        for (size_t i = 0; i < num_entries; ++i) {
+            c[i] = (float)e[i];
+        }
+    } else if(quant_bit == 8) {
+        uint8_t* e = (uint8_t*)(entries);
+        for (size_t i = 0; i < num_entries; ++i) {
+            c[i] = (float)e[i];
+        }
+    }
+    std::swap(codes, new_codes);
+    ntotal = num_entries;
+}
 
+void IndexFlatCodes::quant_entries_f16(const uint8_t* entries, idx_t num_entries, float scale) {
+    std::vector<uint8_t, AlignedAllocator<uint8_t>> new_codes(sizeof(float16_t) * num_entries);
+    float16_t* c = (float16_t*)(new_codes.data());
+    float* e = (float*)entries;
+    for (size_t i = 0; i < num_entries; ++i) {
+        c[i] = (float16_t)(scale * e[i]);
+    }
+    std::swap(codes, new_codes);
+    ntotal = num_entries;
+}
+void IndexFlatCodes::quant_entries_u8(const uint8_t* entries, idx_t num_entries, float scale) {
+    std::vector<uint8_t, AlignedAllocator<uint8_t>> new_codes(sizeof(uint8_t) * num_entries);
+    uint8_t* c = (uint8_t*)(new_codes.data());
+    float* e = (float*)entries;
+    for (size_t i = 0; i < num_entries; ++i) {
+        c[i] = (uint8_t)(scale * e[i] + 0.5);
+    }
+    std::swap(codes, new_codes);
+    ntotal = num_entries;
+}
+#endif
 } // namespace faiss

@@ -13,6 +13,10 @@
 #include <faiss/impl/DistanceComputer.h>
 #include <vector>
 
+#ifdef __aarch64__
+#include <faiss/sra_krl/include/krl.h>
+#endif
+
 namespace faiss {
 
 struct CodePacker;
@@ -23,8 +27,12 @@ struct IndexFlatCodes : Index {
     size_t code_size;
 
     /// encoded dataset, size ntotal * code_size
+#ifdef __aarch64__
+    std::vector<uint8_t, AlignedAllocator<uint8_t>> codes;
+    uint8_t* get_codes_pointer() override;
+#else
     std::vector<uint8_t> codes;
-
+#endif
     IndexFlatCodes();
 
     IndexFlatCodes(size_t code_size, idx_t d, MetricType metric = METRIC_L2);
@@ -61,6 +69,26 @@ struct IndexFlatCodes : Index {
 
     // permute_entries. perm of size ntotal maps new to old positions
     void permute_entries(const idx_t* perm);
+#ifdef __aarch64__
+    bool use_handle = false;
+    KRLDistanceHandle* kdh = nullptr;
+    void train(idx_t n, const float* x) override {
+        if (ntotal > 0 && n == -1 && !use_handle) {
+            use_handle = true;
+            krl_create_reorder_handle(
+                &kdh, 1, 3, ntotal, d, metric_type, (const uint8_t *)codes.data(), ntotal * d * 4);
+        }
+    }
+    ~IndexFlatCodes() {
+        if(use_handle) {
+            use_handle = false;
+            krl_clean_distance_handle(&kdh);
+        }
+    }
+    void dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) override;
+    void quant_entries_f16(const uint8_t* entries, idx_t num_entries, float scale)   override;
+    void quant_entries_u8(const uint8_t* entries, idx_t num_entries, float scale)    override;
+#endif
 };
 
 } // namespace faiss

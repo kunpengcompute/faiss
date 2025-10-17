@@ -44,6 +44,32 @@ struct IDSelector;
 struct RangeSearchResult;
 struct DistanceComputer;
 
+template<typename T, int N = 64>
+struct AlignedAllocator {
+
+    using value_type = T;
+
+    value_type* allocate (std::size_t n) {
+        return (value_type*)aligned_alloc(N, n * sizeof(T));
+    }
+
+    void deallocate (value_type *p, std::size_t) {
+        free(p);
+    }
+
+    template <typename T2> struct rebind {    
+        using other = AlignedAllocator<T2, N>;
+    };
+
+    bool operator!=(const AlignedAllocator& other) const  {
+        return !(*this == other);
+    }
+
+    bool operator==(const AlignedAllocator& other) const {
+        return true;
+    }
+};
+
 /** Parent class for the optional search paramenters.
  *
  * Sub-classes with additional search parameters should inherit this class.
@@ -103,6 +129,8 @@ struct Index {
      * @param x      input matrix, size n * d
      */
     virtual void add(idx_t n, const float* x) = 0;
+
+    virtual uint8_t* get_codes_pointer() { return nullptr; };
 
     /** Same as add, but stores xids instead of sequential ids.
      *
@@ -292,6 +320,10 @@ struct Index {
      * trained in the same way and have the same
      * parameters). Otherwise throw. */
     virtual void check_compatible_for_merge(const Index& otherIndex) const;
+
+    virtual void dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) {};
+    virtual void quant_entries_f16(const uint8_t* entries, idx_t num_entries, float scale) {};
+    virtual void quant_entries_u8(const uint8_t* entries, idx_t num_entries, float scale) {};
 };
 
 } // namespace faiss

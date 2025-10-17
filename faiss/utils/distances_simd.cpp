@@ -29,6 +29,9 @@
 
 #ifdef __aarch64__
 #include <arm_neon.h>
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
 #endif
 
 namespace faiss {
@@ -85,6 +88,10 @@ void fvec_L2sqr_ny_ref(
         const float* y,
         size_t d,
         size_t ny) {
+#ifdef __aarch64__
+    krl_L2sqr_ny(dis, x, y, ny, d, ny);
+    return;
+#endif
     for (size_t i = 0; i < ny; i++) {
         dis[i] = fvec_L2sqr(x, y, d);
         y += d;
@@ -174,6 +181,10 @@ void fvec_inner_products_ny_ref(
         FINTEGER onei = 1;
         sgemv_ ("T", &di, &nyi, &one, y, &di, x, &onei, &zero, ip, &onei);
     }
+#endif
+#ifdef __aarch64__
+    krl_inner_product_ny(ip, x, y, ny, d, ny);
+    return;
 #endif
     for (size_t i = 0; i < ny; i++) {
         ip[i] = fvec_inner_product(x, y, d);

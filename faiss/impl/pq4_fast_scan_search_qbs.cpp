@@ -12,6 +12,13 @@
 #include <faiss/impl/simd_result_handlers.h>
 #include <faiss/utils/simdlib.h>
 
+#ifdef __aarch64__
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+#endif
+
+
 namespace faiss {
 
 // declared in simd_result_handlers.h
@@ -125,7 +132,22 @@ void accumulate_q_4step(
     constexpr int Q3 = (QBS >> 8) & 15;
     constexpr int Q4 = (QBS >> 12) & 15;
     constexpr int SQ = Q1 + Q2 + Q3 + Q4;
-
+#ifdef __aarch64__
+    bool keep_min = res.get_keepmin();
+    for (size_t j0 = 0; j0 < ntotal2; j0 += 32) {
+        res.set_block_origin(0, j0);
+        uint16_t distance[32 * SQ];
+        uint32_t lt_mask[SQ];
+        uint16_t threshold[SQ];
+        for (int i = 0; i < SQ; ++i) {
+            threshold[i] = res.get_threshold(i);
+        }
+        krl_fast_table_lookup_step(SQ, nsq, codes, LUT0, distance, threshold, lt_mask, keep_min, nsq * 16, 
+								   SQ * nsq * 16, SQ * 32, SQ, SQ / 32);
+        res.handle_generic(SQ, 0, distance, lt_mask);
+        codes += 16 * nsq;
+    }
+#else
     for (size_t j0 = 0; j0 < ntotal2; j0 += 32) {
         FixedStorageHandler<SQ, 2> res2;
         const uint8_t* LUT = LUT0;
@@ -149,6 +171,7 @@ void accumulate_q_4step(
         res2.to_other_handler(res);
         codes += 32 * nsq / 2;
     }
+#endif
 }
 
 template <int NQ, class ResultHandler, class Scaler>

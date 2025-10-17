@@ -20,6 +20,7 @@
 
 cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)
 
+set(CMAKE_CXX_FLAGS "-O3 -march=armv8.2-a+fp16fml+dotprod -fpermissive")
 set(FAISS_LANGUAGES CXX)
 
 if(FAISS_ENABLE_GPU)

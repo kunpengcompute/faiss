@@ -86,6 +86,8 @@ struct NegativeDistanceComputer : DistanceComputer {
         basedis->set_query(x);
     }
 
+	void set_base(const float* x) override {}
+
     /// compute distance of vector i to current query
     float operator()(idx_t i) override {
         return -(*basedis)(i);
@@ -327,8 +329,8 @@ void hnsw_add_vertices(
                 while(hnsw.neighbors[end - 1] == -1 && begin < end) {
                     end--;
                 }
-                auto hnswNeigborsStart = hnsw.neighbors.begin();
-                std::sort(hnswNeigborsStart + begin, hnswNeigborsStart + end);
+                auto hnswNeighborsStart = hnsw.neighbors.begin();
+                std::sort(hnswNeighborsStart + begin, hnswNeighborsStart + end);
             }
         }
     }
@@ -618,7 +620,7 @@ void hnsw_search(
             typename BlockResultHandler::SingleResultHandler res(bres);
             DistanceComputer* dis = nullptr;
             if(index->quant_bits == 16) {
-                float16_t* f16_x = new float16_t[index->d];
+                auto f16_x = std::make_unique<float16_t[]>(index->d);
                 if(index->metric_type == METRIC_L2) {
                     dis = new FlatL2DisSQ16(index->d);
                 } else {
@@ -628,25 +630,23 @@ void hnsw_search(
             
                 for (idx_t i = i0; i < i1; i++) {
                     res.begin(i);
-                    quant_f16_noscale(x + i * index->d, index->d, f16_x);
-                    dis->set_query((float*)f16_x);
+                    quant_f16_noscale(x + i * index->d, index->d, f16_x.get());
+                    dis->set_query((float*)f16_x.get());
                     hnsw.search(*dis, res, vt, params);
                     res.end();
                 }
-                delete[] f16_x;
             } else if (index->quant_bits == 8) {
                 dis = new FlatL2DisSQ8(index->d);
                 dis->set_base((float*)index->storage->get_codes_pointer());
-                uint8_t* u8_x = new uint8_t[index->d];
+                auto u8_x = std::make_unique<uint8_t[]>(index->d);
             
                 for (idx_t i = i0; i < i1; i++) {
-                    quant_u8_noscale(x + i * index->d, index->d, u8_x);
+                    quant_u8_noscale(x + i * index->d, index->d, u8_x.get());
                     res.begin(i);
-                    dis->set_query((float*)u8_x);
+                    dis->set_query((float*)u8_x.get());
                     hnsw.search(*dis, res, vt, params);
                     res.end();
                 }
-                delete[] u8_x;
             } else {
                 dis = storage_distance_computer(index->storage);
             

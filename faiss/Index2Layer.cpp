@@ -160,6 +160,8 @@ struct Distance2Level : DistanceComputer {
     void set_query(const float* x) override {
         q = x;
     }
+
+	void set_base(const float* x) override {}
 };
 
 // well optimized for xNN+PQNN

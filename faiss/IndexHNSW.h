@@ -42,7 +42,7 @@ struct IndexHNSW : Index {
     // *** add for reordering ***
     bool apply_reorder = true;
     size_t perm_size = 0;
-    faiss::idx_t* perm; 
+    faiss::idx_t* perm = nullptr; 
 #endif
     explicit IndexHNSW(int d = 0, int M = 32, MetricType metric = METRIC_L2);
     explicit IndexHNSW(Index* storage, int M = 32);

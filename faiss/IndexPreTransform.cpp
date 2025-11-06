@@ -315,6 +315,8 @@ struct PreTransformDistanceComputer : DistanceComputer {
         }
     }
 
+	void set_base(const float* x) override {}
+
     float symmetric_dis(idx_t i, idx_t j) override {
         return sub_dc->symmetric_dis(i, j);
     }

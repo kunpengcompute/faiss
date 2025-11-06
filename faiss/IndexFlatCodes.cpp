@@ -124,7 +124,7 @@ void IndexFlatCodes::permute_entries(const idx_t* perm) {
 #ifdef __aarch64__
 #include <arm_neon.h>
 void IndexFlatCodes::dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) {
-    std::vector<uint8_t, AlignedAllocator<uint8_t>> new_codes(4 * num_entries);
+    std::vector<uint8_t, AlignedAllocator<uint8_t>> new_codes(sizeof(float) * num_entries);
     float* c = (float*)new_codes.data();
     if(quant_bit == 16) {
         float16_t* e = (float16_t*)(entries);

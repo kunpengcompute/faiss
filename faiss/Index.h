@@ -15,6 +15,9 @@
 #include <sstream>
 #include <string>
 #include <typeinfo>
+#ifdef __aarch64__
+#include <iostream>
+#endif
 
 #define FAISS_VERSION_MAJOR 1
 #define FAISS_VERSION_MINOR 8
@@ -50,8 +53,13 @@ struct AlignedAllocator {
     using value_type = T;
 
     value_type* allocate (std::size_t n) {
-        return (value_type*)aligned_alloc(N, n * sizeof(T));
-    }
+		void* ptr = nullptr;
+		if (posix_memalign(&ptr, N, n * sizeof(T)) != 0) {
+			std::cerr << "Memory allocation failed!" << std::endl;
+			return nullptr;
+		}
+		return static_cast<value_type*>(ptr);
+	}
 
     void deallocate (value_type *p, std::size_t) {
         free(p);

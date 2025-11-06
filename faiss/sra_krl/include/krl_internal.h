@@ -160,9 +160,6 @@ void krl_negative_inner_product_by_idx_s8f32(float *dis, const int8_t *x, const 
 
 /* -------------------------------------- 8bits lookup table -------------------------------------- */
 
-#ifdef __cplusplus
-}
-#endif
 /*
  * @brief Matrix block transpose function.
  * @param src Input matrix.
@@ -319,3 +316,7 @@ idx_t Adapt_reorder_asce(float *dis, idx_t *label, idx_t n, float target);
  * @return idx_t Index of the target value.
  */
 idx_t Adapt_reorder_desc(float *dis, idx_t *label, idx_t n, float target);
+
+#ifdef __cplusplus
+}
+#endif

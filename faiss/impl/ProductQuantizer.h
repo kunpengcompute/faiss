@@ -58,7 +58,7 @@ struct ProductQuantizer : Quantizer {
         if(!use_transpose) {
             use_transpose = true;
             krl_create_distance_handle(
-                &kdh, 3, batchsize, ksub, dsub, M, metric_type, (const uint8_t *)centroids.data(), M * ksub * dsub * 4);
+                &kdh, 3, batchsize, ksub, dsub, M, metric_type, (const uint8_t *)centroids.data(), M * ksub * dsub * sizeof(float));
         }
     }
     ~ProductQuantizer() {

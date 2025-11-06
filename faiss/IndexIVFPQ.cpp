@@ -84,7 +84,7 @@ void IndexIVFPQ::train_encoder(idx_t n, const float* x, const idx_t* assign) {
     if (by_residual) {
         precompute_table();
     }
-    #ifdef __aarch64__
+#ifdef __aarch64__
     if (pq.nbits == 8 && pq.dsub <= 64) {
         if(metric_type == METRIC_L2) {
             pq.initialize_krl_transpose_centroids(64, metric_type);
@@ -92,7 +92,7 @@ void IndexIVFPQ::train_encoder(idx_t n, const float* x, const idx_t* assign) {
             pq.initialize_krl_transpose_centroids(32, metric_type);
         }
     }
-    #endif
+#endif
 }
 
 idx_t IndexIVFPQ::train_encoder_num_vectors() const {

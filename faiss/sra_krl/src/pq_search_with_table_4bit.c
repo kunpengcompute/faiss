@@ -1174,7 +1174,8 @@ static int krl_IVFPQ_code_packer_4b(
     const size_t nb = ((ntotal + blocksize - 1) & (-blocksize));
     size_t ceil_nsq = nsq + nsq % 2;
     int ret = SafeMemory::CheckAndMemset(blocks, blocks_size, 0, nb * ceil_nsq / 2);
-    const uint8_t convertdict[32] = {0,
+    const uint8_t convertdict[32] = {
+		0,
         8,
         1,
         9,
@@ -1205,7 +1206,8 @@ static int krl_IVFPQ_code_packer_4b(
         38,
         46,
         39,
-        47};
+        47
+		};
     const uint8_t offset = 16;
     uint8_t *codes2 = blocks;
     uint8_t c[blocksize], c0[blocksize], c1[blocksize];

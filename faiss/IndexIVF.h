@@ -208,9 +208,9 @@ struct IndexIVF : Index, IndexIVFInterface {
     /// centroids?
     bool by_residual = true;
 
-    #ifdef __aarch64__
+#ifdef __aarch64__
     size_t tmp_buffer_size = 0;
-    #endif
+#endif
 
     /** The Inverted file takes a quantizer (an Index) on input,
      * which implements the function mapping a vector to a list

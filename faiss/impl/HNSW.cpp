@@ -412,8 +412,7 @@ void greedy_update_nearest(
             storage_idx_t v = hnsw.neighbors[i];
             if (v < 0){
                 break;
-            }
-            else {
+            } else {
                 *(p_saved + nv) = v;
                 nv++;
             }

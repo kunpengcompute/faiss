@@ -52,11 +52,11 @@ struct AlignedAllocator {
 
     using value_type = T;
 
-    value_type* allocate (std::size_t n) {
+	value_type* allocate(std::size_t n) {
 		void* ptr = nullptr;
-		if (posix_memalign(&ptr, N, n * sizeof(T)) != 0) {
-			std::cerr << "Memory allocation failed!" << std::endl;
-			return nullptr;
+		std::size_t size = n * sizeof(T);
+		if (posix_memalign(&ptr, N, size) != 0) {
+			throw std::bad_alloc();
 		}
 		return static_cast<value_type*>(ptr);
 	}

@@ -72,22 +72,45 @@ struct IndexFlatCodes : Index {
 #ifdef __aarch64__
     bool use_handle = false;
     KRLDistanceHandle* kdh = nullptr;
+
+    IndexFlatCodes(const IndexFlatCodes& other)
+	        : Index(other),
+			  code_size(other.code_size),
+			  codes(other.codes),
+			  use_handle(false),
+			  kdh(nullptr) {}
+
+	IndexFlatCodes& operator=(const IndexFlatCodes& other) {
+		if (this != &other) {
+			Index::operator=(other);
+			code_size = other.code_size;
+			codes = other.codes;
+			if (kdh) {
+				krl_clean_distance_handle(&kdh);
+				kdh = nullptr;
+			}
+			use_handle = false;
+		}
+		return *this;
+	}
+
     void train(idx_t n, const float* x) override {
-        if (ntotal > 0 && n == -1 && !use_handle) {
-            use_handle = true;
+        if (ntotal > 0 && n == -1 && !kdh) {
             krl_create_reorder_handle(
-                &kdh, 1, 3, ntotal, d, metric_type, (const uint8_t *)codes.data(), ntotal * d * 4);
-        }
+                &kdh, 1, 3, ntotal, d, metric_type, (const uint8_t *)codes.data(), ntotal * d * sizeof(float));
+        	use_handle = (kdh != nullptr);
+		}
     }
     ~IndexFlatCodes() {
-        if(use_handle) {
-            use_handle = false;
+        if(kdh) {
             krl_clean_distance_handle(&kdh);
+			kdh = nullptr;
+			use_handle = false;
         }
     }
     void dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) override;
-    void quant_entries_f16(const uint8_t* entries, idx_t num_entries, float scale)   override;
-    void quant_entries_u8(const uint8_t* entries, idx_t num_entries, float scale)    override;
+    void quant_entries_f16(const uint8_t* entries, idx_t num_entries, float scale) override;
+    void quant_entries_u8(const uint8_t* entries, idx_t num_entries, float scale) override;
 #endif
 };
 

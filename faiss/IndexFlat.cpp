@@ -18,10 +18,13 @@
 #include <faiss/utils/sorting.h>
 #include <faiss/utils/utils.h>
 #include <cstring>
+#ifdef __aarch64__
+#include <iostream>
 #include <arm_neon.h>
 extern "C" {
 #include <faiss/sra_krl/include/krl.h>
 }
+#endif
 
 namespace faiss {
 
@@ -208,7 +211,7 @@ struct FlatIPDis : FlatCodesDistanceComputer {
     }
 
     void set_base(const float* x) override {
-        printf("TypeError, struct FlatIPDis can't use set_base func!\n");
+        std::cerr << "TypeError, struct FlatIPDis can't use set_base func!\n" << std::endl;
     }
 
     // compute four distances

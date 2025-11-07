@@ -1537,6 +1537,10 @@ int krl_inner_product_ny_with_handle(
         }
     } else if (kdh->data_bits == 16) {
         float16_t *quant_x = (float16_t *)malloc(M * dim * sizeof(float16_t));
+        if (quant_x == NULL) {
+            printf("Error: FAILALLOC in krl_inner_product_ny_with_handle\n");
+            return FAILALLOC;
+        }
         const float16_t *y = (const float16_t *)kdh->quanted_codes;
         quant_f16(x, M * dim, quant_x);
         for (size_t m = 0; m < M; ++m) {
@@ -1547,6 +1551,10 @@ int krl_inner_product_ny_with_handle(
     } else {
         const int8_t *y = (const int8_t *)kdh->quanted_codes;
         int8_t *quant_x = (int8_t *)malloc(M * dim * sizeof(int8_t));
+        if (quant_x == NULL) {
+            printf("Error: FAILALLOC in krl_inner_product_ny_with_handle\n");
+            return FAILALLOC;
+        }
         quant_s8(x, M * dim, quant_x);
         for (size_t m = 0; m < M; ++m) {
             krl_inner_product_ny_s8f32(dis + m * ny, quant_x + m * dim, y + m * dim * ny, ny, dim, ny);

@@ -84,7 +84,7 @@ void IndexIVFPQ::train_encoder(idx_t n, const float* x, const idx_t* assign) {
     if (by_residual) {
         precompute_table();
     }
-    #ifdef __aarch64__
+#ifdef __aarch64__
     if (pq.nbits == 8 && pq.dsub <= 64) {
         if(metric_type == METRIC_L2) {
             pq.initialize_krl_transpose_centroids(64, metric_type);
@@ -92,7 +92,7 @@ void IndexIVFPQ::train_encoder(idx_t n, const float* x, const idx_t* assign) {
             pq.initialize_krl_transpose_centroids(32, metric_type);
         }
     }
-    #endif
+#endif
 }
 
 idx_t IndexIVFPQ::train_encoder_num_vectors() const {
@@ -1263,8 +1263,8 @@ struct IVFPQScanner : IVFPQScannerT<idx_t, METRIC_TYPE, PQDecoder>,
             this->scan_list_polysemous(ncode, codes, res);
         } else if (precompute_mode == 2) {
 #ifdef __aarch64__
-            if constexpr (use_sel) {
-                if (this->pq.nbits == 8) {
+            if (this->pq.nbits == 8 && this->klh) {
+				if constexpr (use_sel) {
                     size_t j = 0;
                     size_t* idx_tmp_buffer = krl_get_idx_pointer(klh);
                     float* distance_tmp_buffer = krl_get_dist_pointer(klh);
@@ -1281,25 +1281,23 @@ struct IVFPQScanner : IVFPQScannerT<idx_t, METRIC_TYPE, PQDecoder>,
                         res.add(idx_tmp_buffer[i],distance_tmp_buffer[i]);
                     }
                 } else {
-                    this->scan_list_with_table(ncode, codes, res);
-                }
-            } else if (this->pq.nbits == 8) {
-                float* distance_tmp_buffer = krl_get_dist_pointer(klh);
-                krl_table_lookup_8b_f32(
-					this->pq.M, ncode, codes, this->sim_table, distance_tmp_buffer, this->dis0, this->pq.M * ncode, 
-					this->pq.M * 256, ncode);
-                size_t i = 0;
-                for(; i + 4 <= ncode; i+=4) {
-                    res.add(i, distance_tmp_buffer[i]);
-                    res.add(i + 1, distance_tmp_buffer[i + 1]);
-                    res.add(i + 2, distance_tmp_buffer[i + 2]);
-                    res.add(i + 3, distance_tmp_buffer[i + 3]);
-                }
-                for(; i < ncode; ++i) {
-                    res.add(i, distance_tmp_buffer[i]);
+					float* distance_tmp_buffer = krl_get_dist_pointer(klh);
+					krl_table_lookup_8b_f32(
+						this->pq.M, ncode, codes, this->sim_table, distance_tmp_buffer, this->dis0, this->pq.M * ncode, 
+						this->pq.M * 256, ncode);
+					size_t i = 0;
+					for(; i + 4 <= ncode; i+=4) {
+						res.add(i, distance_tmp_buffer[i]);
+						res.add(i + 1, distance_tmp_buffer[i + 1]);
+						res.add(i + 2, distance_tmp_buffer[i + 2]);
+						res.add(i + 3, distance_tmp_buffer[i + 3]);
+					}
+					for(; i < ncode; ++i) {
+						res.add(i, distance_tmp_buffer[i]);
+					}
                 }
             } else {
-                this->scan_list_with_table(ncode, codes, res);
+				this->scan_list_with_table(ncode, codes, res);
             }
 #else 
             this->scan_list_with_table(ncode, codes, res);

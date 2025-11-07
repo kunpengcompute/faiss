@@ -54,17 +54,60 @@ struct ProductQuantizer : Quantizer {
 #ifdef __aarch64__
     bool use_transpose = false;
     KRLDistanceHandle* kdh = nullptr; 
+
+    ProductQuantizer(const ProductQuantizer& other)
+            : Quantizer(other),
+              M(other.M),
+              nbits(other.nbits),
+              dsub(other.dsub),
+              ksub(other.ksub),
+              verbose(other.verbose),
+              train_type(other.train_type),
+              cp(other.cp),
+              assign_index(other.assign_index),
+              use_transpose(false),
+              kdh(nullptr),
+              centroids(other.centroids),
+              transposed_centroids(other.transposed_centroids),
+              centroids_sq_lengths(other.centroids_sq_lengths),
+              sdc_table(other.sdc_table) {}
+
+    ProductQuantizer& operator=(const ProductQuantizer& other) {
+        if (this != &other) {
+            Quantizer::operator=(other);
+            M = other.M;
+            nbits = other.nbits;
+            dsub = other.dsub;
+            ksub = other.ksub;
+            verbose = other.verbose;
+            train_type = other.train_type;
+            cp = other.cp;
+            assign_index = other.assign_index;
+            centroids = other.centroids;
+            transposed_centroids = other.transposed_centroids;
+            centroids_sq_lengths = other.centroids_sq_lengths;
+            sdc_table = other.sdc_table;
+            if (kdh) {
+                krl_clean_distance_handle(&kdh);
+                kdh = nullptr;
+            }
+            use_transpose = false;
+        }
+        return *this;
+    }
+
     void initialize_krl_transpose_centroids(size_t batchsize, int metric_type) {
-        if(!use_transpose) {
-            use_transpose = true;
+        if(!kdh && !centroids.empty()) {
             krl_create_distance_handle(
-                &kdh, 3, batchsize, ksub, dsub, M, metric_type, (const uint8_t *)centroids.data(), M * ksub * dsub * 4);
+                &kdh, 3, batchsize, ksub, dsub, M, metric_type, (const uint8_t *)centroids.data(), M * ksub * dsub * sizeof(float));
+			use_transpose = (kdh != nullptr);
         }
     }
     ~ProductQuantizer() {
-        if(use_transpose) {
-            use_transpose = false;
+        if(kdh) {
             krl_clean_distance_handle(&kdh);
+            kdh = nullptr;
+			use_transpose = false;			
         }
     }
 #endif

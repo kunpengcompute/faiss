@@ -257,14 +257,14 @@ static void read_ProductQuantizer(ProductQuantizer* pq, IOReader* f) {
     READ1(pq->nbits);
     pq->set_derived_values();
     READVECTOR(pq->centroids);
-    #ifdef __aarch64__
+#ifdef __aarch64__
     READ1(pq->use_transpose);
     if (pq->use_transpose) {
         krl_build_distanceHandle_fromfile((dynamic_cast<FileIOReader*>(f))->f, &pq->kdh);
     } else {
         pq->kdh = nullptr;
     }
-    #endif
+#endif
 }
 
 static void read_ResidualQuantizer_old(ResidualQuantizer* rq, IOReader* f) {
@@ -486,9 +486,9 @@ static void read_ivf_header(
             READVECTOR((*ids)[i]);
     }
     read_direct_map(&ivf->direct_map, f);
-    #ifdef __aarch64__
+#ifdef __aarch64__
     READ1(ivf->tmp_buffer_size);
-    #endif
+#endif
 }
 
 // used for legacy formats
@@ -563,14 +563,14 @@ Index* read_index(IOReader* f, int io_flags) {
         READXBVECTOR(idxf->codes);
         FAISS_THROW_IF_NOT(
                 idxf->codes.size() == idxf->ntotal * idxf->code_size);
-        #ifdef __aarch64__
+#ifdef __aarch64__
         READ1(idxf->use_handle);
         if (idxf->use_handle) {
             krl_build_distanceHandle_fromfile((dynamic_cast<FileIOReader*>(f))->f, &idxf->kdh);
         } else {
             idxf->kdh = nullptr;
         }
-        #endif
+#endif
         // leak!
         idx = idxf;
     } else if (h == fourcc("IxHE") || h == fourcc("IxHe")) {
@@ -945,12 +945,12 @@ Index* read_index(IOReader* f, int io_flags) {
             idxrf = new IndexRefineFlat();
             *idxrf = *idxrf_old;
             delete idxrf_old;
-            #ifdef __aarch64__
+#ifdef __aarch64__
             IndexRefineFlat* idxrft = dynamic_cast<IndexRefineFlat*>(idxrf);
             READ1(idxrft->full_level);
             READ1(idxrft->accu_level);
             krl_build_distanceHandle_fromfile((dynamic_cast<FileIOReader*>(f))->f, &idxrft->kdh);
-            #endif
+#endif
         }
         idxrf->own_fields = true;
         idxrf->own_refine_index = true;
@@ -997,7 +997,7 @@ Index* read_index(IOReader* f, int io_flags) {
         if (h == fourcc("IHNp")) {
             dynamic_cast<IndexPQ*>(idxhnsw->storage)->pq.compute_sdc_table();
         }
-        #ifdef __aarch64__
+#ifdef __aarch64__
         READ1(idxhnsw->quant_bits);
         READ1(idxhnsw->quant_scale);
         READ1(idxhnsw->apply_reorder);
@@ -1009,7 +1009,7 @@ Index* read_index(IOReader* f, int io_flags) {
             idxhnsw->perm_size = 0;
             idxhnsw->perm = nullptr;
         }
-        #endif
+#endif
         idx = idxhnsw;
     } else if (
             h == fourcc("INSf") || h == fourcc("INSp") || h == fourcc("INSs")) {

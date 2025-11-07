@@ -3128,6 +3128,10 @@ int krl_L2sqr_ny_with_handle(const KRLDistanceHandle *kdh, float *dis, const flo
         }
     } else if (kdh->data_bits == 16) {
         float16_t *quant_x = (float16_t *)malloc(M * dim * sizeof(float16_t));
+        if (quant_x == NULL) {
+            printf("Error: FAILALLOC in krl_L2sqr_ny_with_handle\n");
+            return FAILALLOC;
+        }
         const float16_t *y = (const float16_t *)kdh->quanted_codes;
         quant_f16(x, M * dim, quant_x);
         for (size_t m = 0; m < M; ++m) {
@@ -3138,6 +3142,10 @@ int krl_L2sqr_ny_with_handle(const KRLDistanceHandle *kdh, float *dis, const flo
     } else {
         const uint8_t *y = (const uint8_t *)kdh->quanted_codes;
         uint8_t *quant_x = (uint8_t *)malloc(M * dim * sizeof(uint8_t));
+        if (quant_x == NULL) {
+            printf("Error: FAILALLOC in krl_L2sqr_ny_with_handle\n");
+            return FAILALLOC;
+        }
         quant_u8(x, M * dim, quant_x);
         for (size_t m = 0; m < M; ++m) {
             krl_L2sqr_ny_u8f32(dis + m * ny, quant_x + m * dim, y + m * ny * dim, ny, dim, ny);

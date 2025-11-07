@@ -278,6 +278,8 @@ struct FlatHammingDis : DistanceComputer {
         hc.set((uint8_t*)x, code_size);
     }
 
+	void set_base(const float* x) override {}
+
     ~FlatHammingDis() override {
 #pragma omp critical
         { hnsw_stats.ndis += ndis; }

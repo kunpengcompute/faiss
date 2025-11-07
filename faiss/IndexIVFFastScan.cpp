@@ -340,9 +340,7 @@ ResultHandlerCompare<C, true>* make_knn_handler_fixC(
 
     if (k == 1) {
         return new SingleResultHC(n, 0, distances, labels);
-    // } else if (impl % 2 == 0) {
-    //     return new HeapHC(n, 0, k, distances, labels);
-    } else /* if (impl % 2 == 1) */ {
+    } else {
         return new ReservoirHC(n, 0, k, 2 * k, distances, labels);
     }
 }

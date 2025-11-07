@@ -100,6 +100,10 @@ int krl_reorder_2_vector(const KRLDistanceHandle *kdh, int64_t base_k, float *ba
     if (compute_bits == 8) {
         if (metric_type == METRIC_L2) {
             uint8_t *quant_x = (uint8_t *)malloc(d * sizeof(uint8_t));
+            if (quant_x == NULL) {
+                printf("Error: FAILALLOC in krl_reorder_2_vector\n");
+                return FAILALLOC;
+            }
             if (use_parm != 0) {
                 const size_t full_data_bits = kdh->full_data_bits;
                 const float qscale = kdh->quanted_scale;
@@ -126,6 +130,10 @@ int krl_reorder_2_vector(const KRLDistanceHandle *kdh, int64_t base_k, float *ba
             free(quant_x);
         } else {
             int8_t *quant_x = (int8_t *)malloc(d * sizeof(int8_t));
+            if (quant_x == NULL) {
+                printf("Error: FAILALLOC in krl_reorder_2_vector\n");
+                return FAILALLOC;
+            }
             if (use_parm != 0) {
                 const size_t full_data_bits = kdh->full_data_bits;
                 const float qscale = kdh->quanted_scale;
@@ -155,6 +163,10 @@ int krl_reorder_2_vector(const KRLDistanceHandle *kdh, int64_t base_k, float *ba
         }
     } else if (compute_bits == 16) {
         float16_t *quant_x = (float16_t *)malloc(d * sizeof(float16_t));
+        if (quant_x == NULL) {
+            printf("Error: FAILALLOC in krl_reorder_2_vector\n");
+            return FAILALLOC;
+        }
         quant_f16(query_vector, d, quant_x);
         if (metric_type == METRIC_L2) {
             krl_L2sqr_by_idx_f16f32(
@@ -198,11 +210,26 @@ int krl_reorder_2_vector_continuous(const KRLDistanceHandle *kdh, int64_t base_k
     const uint8_t *quanted_index = kdh->quanted_codes + begin_id * d;
     const size_t codes_num = kdh->ny;
     float *base_dis = (float *)malloc(base_k * sizeof(float));
+    if (base_dis == NULL) {
+        printf("Error: FAILALLOC in krl_reorder_2_vector_continuous\n");
+        return FAILALLOC;
+    }
     int64_t *base_idx = (int64_t *)malloc(base_k * sizeof(int64_t));
+    if (base_idx == NULL) {
+        printf("Error: FAILALLOC in krl_reorder_2_vector_continuous\n");
+        free(base_dis);
+        return FAILALLOC;
+    }
     create_continuous_idx(base_idx, base_k, begin_id);
     if (compute_bits == 8) {
         if (metric_type == METRIC_L2) {
             uint8_t *quant_x = (uint8_t *)malloc(d * sizeof(uint8_t));
+            if (quant_x == NULL) {
+                printf("Error: FAILALLOC in krl_reorder_2_vector_continuous\n");
+                free(base_dis);
+                free(base_idx);
+                return FAILALLOC;
+            }
             if (use_parm != 0) {
                 quant_u8_with_parm(query_vector, d, quant_x, kdh->quanted_scale, kdh->quanted_bias);
                 /* First rough calculation */
@@ -223,6 +250,12 @@ int krl_reorder_2_vector_continuous(const KRLDistanceHandle *kdh, int64_t base_k
             free(quant_x);
         } else {
             int8_t *quant_x = (int8_t *)malloc(d * sizeof(int8_t));
+            if (quant_x == NULL) {
+                printf("Error: FAILALLOC in krl_reorder_2_vector_continuous\n");
+                free(base_dis);
+                free(base_idx);
+                return FAILALLOC;
+            }
             if (use_parm != 0) {
                 quant_s8_with_parm(query_vector, d, quant_x, kdh->quanted_scale);
                 krl_inner_product_ny_s8f32(base_dis, quant_x, (const int8_t *)quanted_index, base_k, d, base_k);
@@ -240,6 +273,12 @@ int krl_reorder_2_vector_continuous(const KRLDistanceHandle *kdh, int64_t base_k
         }
     } else if (compute_bits == 16) {
         float16_t *quant_x = (float16_t *)malloc(d * sizeof(float16_t));
+        if (quant_x == NULL) {
+            printf("Error: FAILALLOC in krl_reorder_2_vector_continuous\n");
+            free(base_dis);
+            free(base_idx);
+            return FAILALLOC;
+        }
         quant_f16(query_vector, d, quant_x);
         if (metric_type == METRIC_L2) {
             krl_L2sqr_by_idx_f16f32(base_dis,

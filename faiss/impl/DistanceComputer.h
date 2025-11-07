@@ -8,6 +8,9 @@
 #pragma once
 
 #include <faiss/Index.h>
+#ifdef __aarch64__
+#include <iostream>
+#endif
 
 namespace faiss {
 
@@ -25,12 +28,8 @@ namespace faiss {
 struct DistanceComputer {
     /// called before computing distances. Pointer x should remain valid
     /// while operator () is called
-    virtual void set_query(const float* x) {
-        printf("TypeError, struct DistanceComputer can't use set_query func!\n");
-    };
-    virtual void set_base(const float* x) {
-        printf("TypeError, struct DistanceComputer can't use set_base func!\n");
-    };
+    virtual void set_query(const float* x) = 0;
+    virtual void set_base(const float* x) = 0;
     /// compute distance of vector i to current query
     virtual float operator()(idx_t i) = 0;
 
@@ -85,6 +84,10 @@ struct FlatCodesDistanceComputer : DistanceComputer {
     float operator()(idx_t i) override {
         return distance_to_code(codes + i * code_size);
     }
+
+    void set_query(const float* x) override {}
+
+	void set_base(const float* x) override {}
 
     /// compute distance of current query to an encoded vector
     virtual float distance_to_code(const uint8_t* code) = 0;

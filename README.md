@@ -1,39 +1,155 @@
-# faiss
+# 项目介绍<a name="ZH-CN_TOPIC_0000002442478428"></a>
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+本仓库用于存放针对鲲鹏平台进行优化的补丁，补丁文件可应用于由Facebook研发的Faiss开源代码。
 
-#### 软件架构
-软件架构说明
+# 环境部署<a name="ZH-CN_TOPIC_0000002442489280"></a>
+
+## 已验证环境<a name="ZH-CN_TOPIC_0000002476009237"></a>
+
+<a name="table11553123194615"></a>
+<table><thead align="left"><tr id="row1955333144612"><th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.1"><p id="p145531431174615"><a name="p145531431174615"></a><a name="p145531431174615"></a>操作系统</p>
+</th>
+<th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.2"><p id="p455313316464"><a name="p455313316464"></a><a name="p455313316464"></a>CPU类型</p>
+</th>
+<th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.3"><p id="p2055318318466"><a name="p2055318318466"></a><a name="p2055318318466"></a>内存</p>
+</th>
+<th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.4"><p id="p25531231134616"><a name="p25531231134616"></a><a name="p25531231134616"></a>编译器</p>
+</th>
+<th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.5"><p id="p12553153118462"><a name="p12553153118462"></a><a name="p12553153118462"></a>其他依赖</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row13553153110469"><td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.1 "><p id="p631524754610"><a name="p631524754610"></a><a name="p631524754610"></a>openEuler 24.03 LTS SP3</p>
+</td>
+<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.2 "><p id="p18315184774614"><a name="p18315184774614"></a><a name="p18315184774614"></a>鲲鹏920 7592C处理器</p>
+</td>
+<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.3 "><p id="p83151347184614"><a name="p83151347184614"></a><a name="p83151347184614"></a>24 * 64G</p>
+</td>
+<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.4 "><p id="p831564711465"><a name="p831564711465"></a><a name="p831564711465"></a>GCC 12.3.1</p>
+</td>
+<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.5 "><p id="p13315124713463"><a name="p13315124713463"></a><a name="p13315124713463"></a>CMake&gt;=3.22.0</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+# 快速上手<a name="ZH-CN_TOPIC_0000002442649136"></a>
 
 
-#### 安装教程
+## Faiss编译<a name="ZH-CN_TOPIC_0000002476009241"></a>
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  获取开源Faiss代码，假设代码存放于“/path/to/faiss-1.8.0“。
 
-#### 使用说明
+    ```
+    git clone --branch v1.8.0 --single-branch https://github.com/facebookresearch/faiss.git
+    ```
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+2.  安装Make、CMake、GCC。
 
-#### 参与贡献
+    ```
+    yum install make cmake gcc-toolset-12-gcc*
+    export PATH=/opt/openEuler/gcc-toolset-12/root/usr/bin/:$PATH
+    export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
+    ```
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+3.  Faiss依赖数学库，从Github仓下载开源OpenBLAS源代码，标签为v0.3.29。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
 
+    ```
+    git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
+    cd OpenBLAS
+    make
+    make install
+    # 可通过make install PREFIX=/path/to/openblas/install设置/path/to/openblas/install以指定安装路径，默认安装路径为/opt/OpenBLAS。
+    ```
 
-#### 特技
+4.  安装补丁文件0001-boostsra-faiss-1.8.0.patch。
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+    ```
+    cd /path/to/faiss-1.8.0/faiss
+    patch -p1 < 0001-boostsra-faiss-1.8.0.patch
+    ```
+
+5.  编译Faiss代码获取libfaiss.so。
+
+    ```
+    cd /path/to/faiss-1.8.0/faiss
+    cmake -B build . \
+      -DFAISS_ENABLE_GPU=OFF \
+      -DBUILD_TESTING=OFF \
+      -DBUILD_SHARED_LIBS=ON \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DFAISS_OPT_LEVEL=generic \
+      -DFAISS_ENABLE_PYTHON=OFF \
+      -DMKL_LIBRARIES=/opt/OpenBLAS/lib/libopenblas.so
+    make -C build -j faiss
+    make -C build install
+    # 可通过在编译时添加编译选项-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install设置/path/to/faiss/install以指定安装路径，默认安装路径为/usr/local。
+    # 编译选项-DMKL_LIBRARIES需指定为OpenBLAS的实际安装路径。
+    ```
+
+## 测试示例<a name="ZH-CN_TOPIC_0000002475969077"></a>
+
+下方使用示例以使用sift-128-euclidean.hdf5数据集，Faiss\(HNSW\)算法，线程数32为例。
+
+1.  获取数据集。
+
+    ```
+    wget http://ann-benchmarks.com/sift-128-euclidean.hdf5 --no-check-certificate
+    ```
+
+2.  获取测试程序。
+
+    ```
+    git clone --branch v1.4.0 --single-branch https://gitee.com/openeuler/sra_test.git
+    ```
+
+    完整的目录结构应如下所示：
+
+    ```
+    ├── configs                                                   // 存放对应算法、对应数据集配置文件
+          └── hnsw
+                └── hnsw_sift-128-euclidean.config
+    ├── include                                                   // 存放测试框架对应的头文件
+    ├── src                                                       // 存放测试框架对应的源文件
+    ├── Makefile                                                  // 编译脚本文件
+    ├── test.sh                                                   // 测试脚本
+    ├── data                                                      // 存放数据集
+          └── sift-128-euclidean.hdf5
+    ├── indexes
+          └── hnsw                                                // 存放构建好的索引，需手动创建。
+                └── sift.faiss                                    // 构建好的索引，运行可执行文件hnsw_test后（对应数据集配置文件“save_or_load”为save）时生成
+    └── hnsw_test                                                 // 编译后生成的可执行文件
+    ```
+
+3.  安装相关依赖。
+
+    ```
+    yum install hdf5 hdf5-devel numactl numactl-devel
+    ```
+
+4.  编译运行程序。请根据实际安装Faiss的路径，修改Makefile中FAISSROOT项。
+
+    ```
+    export KRL_PATH=/path/to/KRL/out
+    make hnsw_test
+    # 目前可通过安装patch的形式对Faiss原生的HNSW、PQFS、IVFPQ、IVFPQFS、IVFFLAT等算法进行加速，测试时选择不同的编译指令：
+    # HNSW：make hnsw
+    # PQFS：make pqfs
+    # IVFPQ：make ivfpq
+    # IVFPQFS：make ivfpqfs
+	# IVFFLAT: make ivfflat
+    ```
+
+5.  执行测试。
+
+    ```
+    numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
+    ```
+
+# 贡献指南<a name="ZH-CN_TOPIC_0000002442489288"></a>
+
+如果使用过程中有任何问题，或者需要反馈特性需求和bug报告，可以提交issues联系我们，具体贡献方法可参考[这里](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md)。
+
+# 许可证书<a name="ZH-CN_TOPIC_0000002476009245"></a>
+
+采用 MIT License 许可证授权，支持修改代码和再开源。

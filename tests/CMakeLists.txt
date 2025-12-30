@@ -34,6 +34,18 @@ set(FAISS_TEST_SRC
   test_fastscan_perf.cpp
 )
 
+if(OPTI_IVFPQ OR KRL)
+  list(APPEND FAISS_TEST_SRC test_index_refine.cpp)
+endif()
+
+if(OPTI_IVFPQ)
+  target_compile_definitions(faiss PUBLIC OPTI_IVFPQ)
+endif()
+
+if(KRL)
+  target_compile_definitions(faiss PUBLIC KRL)
+endif()
+
 add_executable(faiss_test ${FAISS_TEST_SRC})
 
 if(NOT FAISS_OPT_LEVEL STREQUAL "avx2" AND NOT FAISS_OPT_LEVEL STREQUAL "avx512")

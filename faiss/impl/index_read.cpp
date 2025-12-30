@@ -485,9 +485,6 @@ static void read_ivf_header(
             READVECTOR((*ids)[i]);
     }
     read_direct_map(&ivf->direct_map, f);
-#ifdef KRL
-    READ1(ivf->tmp_buffer_size);
-#endif
 }
 
 // used for legacy formats
@@ -539,6 +536,9 @@ static IndexIVFPQ* read_ivfpq(IOReader* f, uint32_t h, int io_flags) {
             READ1(ivfpqr->k_factor);
         }
     }
+#if defined(KRL) || defined(OPTI_IVFPQ)
+    ivpq->tmp_buffer_size = ivpq->invlists->initialize_tmp_buffer(64);
+#endif
     return ivpq;
 }
 

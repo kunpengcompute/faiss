@@ -112,7 +112,7 @@ CodePacker* IndexFlatCodes::get_CodePacker() const {
 }
 
 void IndexFlatCodes::permute_entries(const idx_t* perm) {
-#ifdef __aarch64__
+#if defined(KRL) || defined(OPTI_IVFPQ)
     std::vector<uint8_t, AlignedAllocator<uint8_t>> new_codes(codes.size());
 #else
     std::vector<uint8_t> new_codes(codes.size());

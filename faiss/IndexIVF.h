@@ -22,8 +22,9 @@
 #include <faiss/invlists/DirectMap.h>
 #include <faiss/invlists/InvertedLists.h>
 #include <faiss/utils/Heap.h>
-
-#ifdef KRL
+#if defined(OPTI_IVFPQ)
+#include <faiss/utils/arm/asm/distances_simd.h>
+#elif defined(KRL)
 extern "C" {
     typedef struct KRLLookupTable8bitHandle KRLLUT8bHandle;
     void krl_clean_LUT8b_handle(KRLLUT8bHandle** klh);
@@ -208,7 +209,7 @@ struct IndexIVF : Index, IndexIVFInterface {
     /// centroids?
     bool by_residual = true;
 
-#ifdef KRL
+#if defined(KRL) || defined(OPTI_IVFPQ)
     size_t tmp_buffer_size = 0;
 #endif
 
@@ -527,7 +528,19 @@ struct InvertedListScanner {
             RangeQueryResult& result,
             size_t& list_size) const;
 
-#ifdef KRL
+#if defined(OPTI_IVFPQ)
+    LUT8bHandle* lut_8b_handle = nullptr;
+    virtual ~InvertedListScanner() {
+        if(lut_8b_handle){
+            if (lut_8b_handle->distance_buffer) {
+                free(lut_8b_handle->distance_buffer);
+                lut_8b_handle->distance_buffer = nullptr;
+            }
+            free(lut_8b_handle);
+            lut_8b_handle = nullptr;
+        }
+    }
+#elif defined(KRL)
     KRLLUT8bHandle* klh = nullptr;
     virtual ~InvertedListScanner() {
         if(klh){

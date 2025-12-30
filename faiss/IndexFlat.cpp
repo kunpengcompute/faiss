@@ -18,7 +18,11 @@
 #include <faiss/utils/sorting.h>
 #include <faiss/utils/utils.h>
 #include <cstring>
-#ifdef KRL
+#if defined(OPTI_IVFPQ)
+#include <iostream>
+#include <arm_neon.h>
+#include <faiss/utils/arm/asm/distances_simd.h>
+#elif defined(KRL)
 #include <iostream>
 #include <arm_neon.h>
 extern "C" {
@@ -39,7 +43,42 @@ void IndexFlat::search(
         idx_t* labels,
         const SearchParameters* params) const {
     IDSelector* sel = params ? params->sel : nullptr;
-#ifdef KRL
+#if defined(OPTI_IVFPQ)
+    if (!sel &&
+        (metric_type == METRIC_L2 || metric_type == METRIC_INNER_PRODUCT) &&
+		__builtin_expect(k <= ntotal, 1)) {
+
+        const float* xb = get_xb();
+
+        std::vector<int64_t> base_idx((size_t)ntotal);
+        for (int64_t j = 0; j < (int64_t)ntotal; ++j) {
+            base_idx[(size_t)j] = j;
+        }
+
+#pragma omp parallel if (n > 1)
+        {
+            std::vector<float> base_dis((size_t)ntotal);
+
+#pragma omp for
+            for (idx_t i = 0; i < n; ++i) {
+                const float* q = x + (size_t)i * d;
+                float* dist_i = distances + (size_t)i * k;
+                idx_t* lab_i = labels + (size_t)i * k;
+
+                if (metric_type == METRIC_L2) {
+                    L2sqrNy(base_dis.data(), q, xb, (size_t)ntotal, (size_t)d);
+                    SelectL2Topk((int64_t)k, (int64_t*)lab_i, dist_i,
+                                (int64_t)ntotal, base_idx.data(), base_dis.data());
+                } else {
+                    IPNy(base_dis.data(), q, xb, (size_t)ntotal, (size_t)d);
+                    SelectIPTopk((int64_t)k, (int64_t*)lab_i, dist_i,
+                                 (int64_t)ntotal, base_idx.data(), base_dis.data());
+                }
+            }
+        }
+        return;
+    }
+#elif defined(KRL)
     if(use_handle && 4 * k < ntotal && !sel) {
         #pragma omp parallel for if (n > 1)
         for (int i = 0; i < n; ++i) {

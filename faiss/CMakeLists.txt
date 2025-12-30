@@ -96,6 +96,10 @@ set(FAISS_SRC
   utils/distances_fused/simdlib_based.cpp
 )
 
+if(OPTI_IVFPQ)
+  list(APPEND FAISS_SRC  utils/arm/asm/distances_simd.cpp)
+endif()
+
 set(FAISS_HEADERS
   AutoTune.h
   Clustering.h
@@ -221,12 +225,19 @@ set(FAISS_HEADERS
   utils/hamming_distance/avx2-inl.h
 )
 
+option(KRL "Enable sra_krl" OFF)
+option(OPTI_IVFPQ "Enable optimized_ivfpq" OFF)
+
+if(OPTI_IVFPQ)
+  add_compile_definitions(OPTI_IVFPQ)
+  list(APPEND FAISS_HEADERS utils/arm/asm/distances_simd.h)
+  enable_language(ASM)
+endif()
+
 if(NOT WIN32)
   list(APPEND FAISS_SRC invlists/OnDiskInvertedLists.cpp)
   list(APPEND FAISS_HEADERS invlists/OnDiskInvertedLists.h)
 endif()
-
-option(KRL "Enable sra_krl" OFF)
 
 if(KRL AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
   message(STATUS "AArch64 detected: enabling sra_krl")
@@ -283,6 +294,35 @@ if(KRL AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/sra_krl/include/
           DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/faiss/sra_krl/include
           FILES_MATCHING PATTERN "*.h")
+endif()
+
+if(OPTI_IVFPQ)
+  if(MSVC)
+    target_compile_options(faiss PRIVATE
+      $<$<COMPILE_LANGUAGE:C,CXX>:/O2>
+    )
+  else()
+    target_compile_options(faiss PRIVATE
+      $<$<COMPILE_LANGUAGE:C,CXX>:-O3 -ffp-contract=fast -fno-math-errno -fpermissive>
+      $<$<AND:$<COMPILE_LANGUAGE:C,CXX>,$<CONFIG:Release>>:-fomit-frame-pointer>
+    )
+
+    target_compile_options(faiss PRIVATE
+      $<$<COMPILE_LANGUAGE:C,CXX>:-march=armv9-a+fp16fml+dotprod+sve>
+    )
+  endif()
+
+  set(FAISS_ARM_ASM
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/arm/asm/scan_list_with_table.S
+  )
+
+  target_sources(faiss PRIVATE ${FAISS_ARM_ASM})
+
+  set_source_files_properties(${FAISS_ARM_ASM} PROPERTIES LANGUAGE ASM)
+
+  set_source_files_properties(${FAISS_ARM_ASM} PROPERTIES
+    COMPILE_OPTIONS "-O3;-march=armv9-a+fp16fml+dotprod+sve"
+  )
 endif()
 
 add_library(faiss_avx2 ${FAISS_SRC})

@@ -403,9 +403,6 @@ static void write_ivf_header(const IndexIVF* ivf, IOWriter* f) {
     // by_residual).
     write_index(ivf->quantizer, f);
     write_direct_map(&ivf->direct_map, f);
-#ifdef KRL
-    WRITE1(ivf->tmp_buffer_size);
-#endif
 }
 
 void write_index(const Index* idx, IOWriter* f) {

@@ -462,13 +462,45 @@ void IndexIVF::search_preassigned(
     void* inverted_list_context =
             params ? params->inverted_list_context : nullptr;
 
+#ifdef OPTI_IVFPQ
+    int omp_fail = 0;
+
+#pragma omp parallel if (do_parallel) reduction(+ : nlistv, ndis, nheap) shared(omp_fail)
+#else
 #pragma omp parallel if (do_parallel) reduction(+ : nlistv, ndis, nheap)
+#endif
     {
         std::unique_ptr<InvertedListScanner> scanner(
                 get_InvertedListScanner(store_pairs, sel));
-#ifdef KRL
+#ifdef OPTI_IVFPQ
+        if (!omp_fail) {
+            LUT8bHandle **lut_8b_handle = &(scanner->lut_8b_handle);
+            (*lut_8b_handle) = (LUT8bHandle *)malloc(sizeof(LUT8bHandle));
+            if ((*lut_8b_handle) == nullptr) {
+                printf("Error: FAILALLOC(lut_8b_handle) in IndexIVF::search_preassigned\n");
+#pragma omp atomic write
+                omp_fail = 1;
+            } else {
+                (*lut_8b_handle)->capacity = (tmp_buffer_size + 15) & ((size_t)-16);
+                (*lut_8b_handle)->distance_buffer = (float *)aligned_alloc(
+                                                    64, (size_t)(*lut_8b_handle)->capacity * sizeof(float));
+                if ((*lut_8b_handle)->distance_buffer == nullptr) {
+                    printf("Error: FAILALLOC((*lut_8b_handle)->distance_buffer) in IndexIVF::search_preassigned\n");
+                    free(*lut_8b_handle);
+                    (*lut_8b_handle) = nullptr;
+#pragma omp atomic write
+                    omp_fail = 1;
+                }
+            }
+        }
+
+        if (!omp_fail)
+#elif defined(KRL)
         krl_create_LUT8b_handle(&(scanner->klh),(int)(sel != nullptr), tmp_buffer_size);
 #endif
+
+        {
+
         /*****************************************************
          * Depending on parallel_mode, there are two possible ways
          * to organize the search. Here we define local functions
@@ -704,7 +736,15 @@ void IndexIVF::search_preassigned(
         } else {
             FAISS_THROW_FMT("parallel_mode %d not supported\n", pmode);
         }
+
+        }
     } // parallel section
+
+#ifdef OPTI_IVFPQ
+    if (omp_fail) {
+        return;
+    }
+#endif
 
     if (interrupt) {
         if (!exception_string.empty()) {

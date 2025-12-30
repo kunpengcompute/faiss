@@ -42,6 +42,75 @@ extern "C" {
 #endif
 namespace faiss {
 
+#ifdef OPTI_IVFPQ
+extern "C" void DistanceCodesN8x8S(
+    size_t M,
+    const float* sim_table,
+    const uint8_t* __restrict codes,
+    float* result,
+    float dis);
+
+static inline void DistanceCodesN8x8(
+    size_t M,
+    const float* sim_table,
+    const uint8_t* __restrict codes,
+    float* result,
+    float dis)
+{
+    DistanceCodesN8x8S(M, sim_table, codes, result, dis);
+}
+
+
+extern "C" void DistanceCodesN8x4S(
+    size_t M,
+    const float* sim_table,
+    const uint8_t* __restrict codes,
+    float* result,
+    float dis);
+
+static inline void DistanceCodesN8x4(
+    size_t M,
+    const float* sim_table,
+    const uint8_t* __restrict codes,
+    float* result,
+    float dis)
+{
+    DistanceCodesN8x4S(M, sim_table, codes, result, dis);
+}
+
+extern "C" void DistanceCodesN8x2S(
+    size_t M,
+    const float* sim_table,
+    const uint8_t* __restrict codes,
+    float* result,
+    float dis);
+
+static inline void DistanceCodesN8x2(
+    size_t M,
+    const float* sim_table,
+    const uint8_t* __restrict codes,
+    float* result,
+    float dis)
+{
+    DistanceCodesN8x2S(M, sim_table, codes, result, dis);
+}
+
+extern "C" float DistanceCodesN8x1S(
+    size_t M,
+    const float* __restrict sim_table,
+    const uint8_t* __restrict code,
+    float dis);
+
+static inline float DistanceCodesN8x1(
+    size_t M,
+    const float* __restrict sim_table,
+    const uint8_t* __restrict code,
+    float dis)
+{
+    return DistanceCodesN8x1S(M, sim_table, code, dis);
+}
+#endif
+
 /*****************************************
  * IndexIVFPQ implementation
  ******************************************/
@@ -152,7 +221,7 @@ void IndexIVFPQ::add_core(
         const idx_t* coarse_idx,
         void* inverted_list_context) {
     add_core_o(n, x, xids, nullptr, coarse_idx, inverted_list_context);
-#ifdef KRL
+#if defined(KRL) || defined(OPTI_IVFPQ)
     if(pq.nbits == 8) {
         tmp_buffer_size = invlists->initialize_tmp_buffer(64);
     }
@@ -522,8 +591,12 @@ struct QueryTables {
     float *sim_table, *sim_table_2;
     float *residual_vec, *decoded_vec;
 
+#ifdef OPTI_IVFPQ
+    std::unique_ptr<float, void(*)(float*)> mem_vector;
+#else
     // single data buffer
     std::vector<float> mem;
+#endif
 
     // for table pointers
     std::vector<const float*> sim_table_ptrs;
@@ -536,9 +609,38 @@ struct QueryTables {
               pq(ivfpq.pq),
               metric_type(ivfpq.metric_type),
               by_residual(ivfpq.by_residual),
+#ifdef OPTI_IVFPQ
+              use_precomputed_table(ivfpq.use_precomputed_table),
+              mem_vector(nullptr, [](float* ptr) { if (ptr) free(ptr); }) {
+        const size_t table_elems  = (size_t)pq.ksub * (size_t)pq.M;
+        const size_t table_stride = (table_elems + 7) & ~size_t(7);
+
+        const size_t total_elems = table_stride * 2 + (size_t)d * 2;
+
+        auto round_up = [](size_t x, size_t a) -> size_t {
+            return (x + a - 1) & ~(a - 1);
+        };
+
+        const size_t align = 32;
+        size_t bytes = total_elems * sizeof(float);
+        bytes = round_up(bytes, align);
+
+        void* p = nullptr;
+        if (posix_memalign(&p, align, bytes) != 0 || !p) {
+            throw std::bad_alloc();
+        }
+        mem_vector.reset(static_cast<float*>(p));
+
+        sim_table    = mem_vector.get();
+        sim_table_2  = sim_table + table_stride;
+        residual_vec = sim_table_2 + table_stride;
+        decoded_vec  = residual_vec + d;
+
+#else
               use_precomputed_table(ivfpq.use_precomputed_table) {
         mem.resize(pq.ksub * pq.M * 2 + d * 2);
         sim_table = mem.data();
+#endif
         sim_table_2 = sim_table + pq.ksub * pq.M;
         residual_vec = sim_table_2 + pq.ksub * pq.M;
         decoded_vec = residual_vec + d;
@@ -786,10 +888,49 @@ struct KnnSearchResults {
     idx_t* heap_ids;
 
     size_t nup;
+#ifdef OPTI_IVFPQ
+    const uint8_t* codes;
+    size_t code_stride;
+    size_t n;
+    
+    void init(idx_t key, const idx_t* ids, const IDSelector* sel,
+              size_t k, float* heap_sim, idx_t* heap_ids,
+              const uint8_t* codes, size_t code_stride, size_t n) {
+        this->key = key;
+        this->ids = ids;
+        this->sel = sel;
+        this->k = k;
+        this->heap_sim = heap_sim;
+        this->heap_ids = heap_ids;
+        this->nup = 0;
+        this->codes = codes;
+        this->code_stride = code_stride;
+        this->n = n;
+    }
+#endif
 
     inline bool skip_entry(idx_t j) {
         return use_sel && !sel->is_member(ids[j]);
     }
+
+#ifdef OPTI_IVFPQ
+    inline void prefetch_data(size_t j) {
+        static constexpr size_t prefetch_distance = 16;
+        
+        if (j + prefetch_distance < n) {
+            if (ids) {
+                __builtin_prefetch(ids + j + prefetch_distance, 0, 3);
+            }
+            
+            __builtin_prefetch(codes + (j + prefetch_distance) * code_stride, 0, 3);
+            
+            if (nup > 0) {
+                __builtin_prefetch(heap_sim, 1, 1);
+                __builtin_prefetch(heap_ids, 1, 1);
+            }
+        }
+    }
+#endif
 
     inline void add(idx_t j, float dis) {
         if (C::cmp(heap_sim[0], dis)) {
@@ -797,7 +938,32 @@ struct KnnSearchResults {
             heap_replace_top<C>(k, heap_sim, heap_ids, dis, id);
             nup++;
         }
+#ifdef OPTI_IVFPQ
+        prefetch_data(j);
+#endif
     }
+
+#ifdef OPTI_IVFPQ
+    inline void add_batch_optimized(size_t start_idx, size_t count, const float* distances) {
+        float current_heap_top = heap_sim[0];
+        
+        for (size_t i = 0; i < count; i++) {
+            size_t idx = start_idx + i;
+            float dis = distances[i];
+            
+            if (C::cmp(current_heap_top, dis)) {
+                idx_t id = ids ? ids[idx] : lo_build(key, idx);
+                heap_replace_top<C>(k, heap_sim, heap_ids, dis, id);
+                nup++;
+                current_heap_top = heap_sim[0];
+            }
+            
+            if ((i % 16) == 0 && start_idx + i + 64 < n) {
+                prefetch_data(start_idx + i + 64);
+            }
+        }
+    }
+#endif
 };
 
 template <class C, bool use_sel>
@@ -1249,6 +1415,28 @@ struct IVFPQScanner : IVFPQScannerT<idx_t, METRIC_TYPE, PQDecoder>,
             float* heap_sim,
             idx_t* heap_ids,
             size_t k) const override {
+#ifdef OPTI_IVFPQ
+        if (ncode > 0) {
+            __builtin_prefetch(codes, 0, 0);
+            if (ids) {
+                __builtin_prefetch(ids, 0, 0);
+            }
+            __builtin_prefetch(heap_sim, 1, 0);
+            __builtin_prefetch(heap_ids, 1, 0);
+        }
+        KnnSearchResults<C, use_sel> res;
+        res.init(
+            this->key,
+            this->store_pairs ? nullptr : ids,
+            this->sel,
+            k,
+            heap_sim,
+            heap_ids,
+            codes,
+            this->pq.M,
+            ncode
+        );
+#else
         KnnSearchResults<C, use_sel> res = {
                 /* key */ this->key,
                 /* ids */ this->store_pairs ? nullptr : ids,
@@ -1257,12 +1445,44 @@ struct IVFPQScanner : IVFPQScannerT<idx_t, METRIC_TYPE, PQDecoder>,
                 /* heap_sim */ heap_sim,
                 /* heap_ids */ heap_ids,
                 /* nup */ 0};
-
+#endif
         if (this->polysemous_ht > 0) {
             assert(precompute_mode == 2);
             this->scan_list_polysemous(ncode, codes, res);
         } else if (precompute_mode == 2) {
-#ifdef KRL
+#if defined(OPTI_IVFPQ)
+            float* distance_tmp_buffer = nullptr;
+            if constexpr (!use_sel) {
+                if (lut_8b_handle) {
+                    distance_tmp_buffer = lut_8b_handle->distance_buffer;
+
+                    const size_t nsq = this->pq.M;
+                    const float dis0 = this->dis0;
+                    const float* sim_table = this->sim_table;
+                    size_t l = 0;
+                    for (; l + 8 <= ncode; l += 8) {
+                        DistanceCodesN8x8(nsq, sim_table, codes + l * nsq, distance_tmp_buffer + l, dis0);
+                    }
+                    if (ncode & 4) {
+                        DistanceCodesN8x4(nsq, sim_table, codes + l * nsq, distance_tmp_buffer + l, dis0);
+                        l += 4;
+                    }
+                    if (ncode & 2) {
+                        DistanceCodesN8x2(nsq, sim_table, codes + l * nsq, distance_tmp_buffer + l, dis0);
+                    }
+                    if (ncode & 1) {
+                        distance_tmp_buffer[ncode - 1] =
+                                DistanceCodesN8x1(nsq, sim_table, codes + (ncode - 1) * nsq, dis0);
+                    }
+
+                    res.add_batch_optimized(0, ncode, distance_tmp_buffer);
+                } else {
+                    this->scan_list_with_table(ncode, codes, res);
+                }
+            } else {
+                this->scan_list_with_table(ncode, codes, res);
+            }
+#elif defined(KRL)
             if (this->pq.nbits == 8 && this->klh) {
 				if constexpr (use_sel) {
                     size_t j = 0;

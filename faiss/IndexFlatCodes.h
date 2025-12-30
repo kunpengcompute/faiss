@@ -26,9 +26,11 @@ struct IndexFlatCodes : Index {
     size_t code_size;
 
     /// encoded dataset, size ntotal * code_size
-#ifdef KRL
+#if defined(KRL) || defined(OPTI_IVFPQ)
     std::vector<uint8_t, AlignedAllocator<uint8_t>> codes;
+#if defined(KRL) && !defined(OPTI_IVFPQ)
     uint8_t* get_codes_pointer() override;
+#endif
 #else
     std::vector<uint8_t> codes;
 #endif

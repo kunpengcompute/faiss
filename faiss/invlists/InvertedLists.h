@@ -124,7 +124,7 @@ struct InvertedLists {
     virtual void resize(size_t list_no, size_t new_size) = 0;
 
     virtual void reset();
-#ifdef KRL
+#if defined(KRL) || defined(OPTI_IVFPQ)
     virtual size_t initialize_tmp_buffer(size_t batchsize);
 #endif
 
@@ -266,7 +266,7 @@ struct ArrayInvertedLists : InvertedLists {
     void permute_invlists(const idx_t* map);
 
     ~ArrayInvertedLists() override;
-#ifdef KRL
+#if defined(KRL) || defined(OPTI_IVFPQ)
     size_t initialize_tmp_buffer(size_t batchsize) override;
 #endif
 };

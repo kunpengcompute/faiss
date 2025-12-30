@@ -47,7 +47,7 @@ struct IDSelector;
 struct RangeSearchResult;
 struct DistanceComputer;
 
-#ifdef KRL
+#if defined(KRL) || defined(OPTI_IVFPQ)
 template<typename T, int N = 64>
 struct AlignedAllocator {
 

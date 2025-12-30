@@ -18,7 +18,7 @@
 #include <faiss/utils/sorting.h>
 #include <faiss/utils/utils.h>
 #include <cstring>
-#ifdef __aarch64__
+#ifdef KRL
 #include <iostream>
 #include <arm_neon.h>
 extern "C" {
@@ -39,7 +39,7 @@ void IndexFlat::search(
         idx_t* labels,
         const SearchParameters* params) const {
     IDSelector* sel = params ? params->sel : nullptr;
-#ifdef __aarch64__
+#ifdef KRL
     if(use_handle && 4 * k < ntotal && !sel) {
         #pragma omp parallel for if (n > 1)
         for (int i = 0; i < n; ++i) {
@@ -123,8 +123,12 @@ struct FlatL2Dis : FlatCodesDistanceComputer {
     }
 
     float symmetric_dis(idx_t i, idx_t j) override {
+#ifdef KRL
         return fvec_L2sqr(reinterpret_cast<const float*>(codes + j * code_size), 
             reinterpret_cast<const float*>(codes + i * code_size), d);
+#else
+        return fvec_L2sqr(b + j * d, b + i * d, d);
+#endif
     }
 
     explicit FlatL2Dis(const IndexFlat& storage, const float* q = nullptr)
@@ -174,10 +178,12 @@ struct FlatL2Dis : FlatCodesDistanceComputer {
         dis3 = dp3;
     }
 
+#ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
         krl_L2sqr_by_idx(dis, q, reinterpret_cast<const float*>(codes), idx, d, ny, ny);
     }
+#endif
 };
 
 struct FlatIPDis : FlatCodesDistanceComputer {
@@ -210,9 +216,11 @@ struct FlatIPDis : FlatCodesDistanceComputer {
         q = x;
     }
 
+#ifdef KRL
     void set_base(const float* x) override {
         std::cerr << "TypeError, struct FlatIPDis can't use set_base func!\n" << std::endl;
     }
+#endif
 
     // compute four distances
     void distances_batch_4(
@@ -246,12 +254,13 @@ struct FlatIPDis : FlatCodesDistanceComputer {
         dis2 = dp2;
         dis3 = dp3;
     }
-    
+
+#ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
         krl_inner_product_by_idx(dis, q, reinterpret_cast<const float*>(codes), idx, d, ny, ny);
     }
-
+#endif
 };
 
 } // namespace
@@ -273,17 +282,25 @@ void IndexFlat::reconstruct(idx_t key, float* recons) const {
 
 void IndexFlat::sa_encode(idx_t n, const float* x, uint8_t* bytes) const {
     if (n > 0) {
+#ifdef KRL
         for (size_t i = 0; i < n; ++i) {
             memcpy(bytes + i * code_size, x + i * d, sizeof(float) * d);
         }
+#else
+        memcpy(bytes, x, sizeof(float) * d * n);
+#endif
     }
 }
 
 void IndexFlat::sa_decode(idx_t n, const uint8_t* bytes, float* x) const {
     if (n > 0) {
+#ifdef KRL
         for (size_t i = 0; i < n; ++i) {
             memcpy(x + i * d, bytes + i * code_size, sizeof(float) * d);
         }
+#else
+        memcpy(x, bytes, sizeof(float) * d * n);
+#endif
     }
 }
 

@@ -23,7 +23,7 @@
 #include <faiss/invlists/InvertedLists.h>
 #include <faiss/utils/Heap.h>
 
-#ifdef __aarch64__
+#ifdef KRL
 extern "C" {
     typedef struct KRLLookupTable8bitHandle KRLLUT8bHandle;
     void krl_clean_LUT8b_handle(KRLLUT8bHandle** klh);
@@ -208,7 +208,7 @@ struct IndexIVF : Index, IndexIVFInterface {
     /// centroids?
     bool by_residual = true;
 
-#ifdef __aarch64__
+#ifdef KRL
     size_t tmp_buffer_size = 0;
 #endif
 
@@ -527,7 +527,7 @@ struct InvertedListScanner {
             RangeQueryResult& result,
             size_t& list_size) const;
 
-#ifdef __aarch64__
+#ifdef KRL
     KRLLUT8bHandle* klh = nullptr;
     virtual ~InvertedListScanner() {
         if(klh){
@@ -536,7 +536,7 @@ struct InvertedListScanner {
         }
     }
 #else
-    virtual ~InvertedListScanner() {};
+    virtual ~InvertedListScanner() {}
 #endif
 };
 

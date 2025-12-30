@@ -38,12 +38,13 @@ struct SIMDResultHandler {
             size_t b,
             simd16uint16 d0,
             simd16uint16 d1) = 0;
-
+#ifdef KRL
     virtual bool get_keepmin(){return true;};
     virtual uint16_t get_threshold(const size_t q){return 0;};
     virtual void handle_generic(const size_t nq, const size_t q, const uint16_t* distance, uint32_t* lt_mask){};
     virtual void handle_generic2(const size_t b, const uint16_t* distance, uint32_t* lt_mask){};
     virtual void handle_generic3(const size_t b, const uint16_t* distance, uint32_t* lt_mask){};
+#endif
     /// set the sub-matrix that is being computed
     virtual void set_block_origin(size_t i0, size_t j0) = 0;
 
@@ -437,6 +438,7 @@ struct ReservoirHandler : ResultHandlerCompare<C, with_id_map> {
         }
     }
 
+#ifdef KRL
     bool get_keepmin(){
         return C::is_max;
     }
@@ -539,6 +541,7 @@ struct ReservoirHandler : ResultHandlerCompare<C, with_id_map> {
         add2reservec(lt_mask[1], idx + 32, distance + 32, res);
         add2reservec(lt_mask[2], idx + 64, distance + 64, res);
     }
+#endif
 
     void end() override {
         using Cf = typename std::conditional<

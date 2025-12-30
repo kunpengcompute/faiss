@@ -29,7 +29,7 @@
 #include <faiss/impl/FaissAssert.h>
 #include <faiss/impl/IDSelector.h>
 
-#ifdef __aarch64__
+#ifdef KRL
 extern "C" {
 #include <faiss/sra_krl/include/krl.h>
 }
@@ -89,7 +89,9 @@ void Level1Quantizer::train_q1(
         } else {
             clus.train(n, x, *quantizer);
         }
+#ifdef KRL
         quantizer->train(-1, x);
+#endif
         quantizer->is_trained = true;
     } else if (quantizer_trains_alone == 2) {
         if (verbose) {
@@ -464,8 +466,9 @@ void IndexIVF::search_preassigned(
     {
         std::unique_ptr<InvertedListScanner> scanner(
                 get_InvertedListScanner(store_pairs, sel));
+#ifdef KRL
         krl_create_LUT8b_handle(&(scanner->klh),(int)(sel != nullptr), tmp_buffer_size);
-
+#endif
         /*****************************************************
          * Depending on parallel_mode, there are two possible ways
          * to organize the search. Here we define local functions

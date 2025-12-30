@@ -33,13 +33,13 @@ struct IndexHNSW : Index {
     // the sequential storage
     bool own_fields = false;
     Index* storage = nullptr;
-#ifdef __aarch64__
-    // *** add for quanting ***
+#ifdef KRL
+    // add for quanting
     int quant_bits = 32;
     float quant_scale = 1.0;
     void requant(float scale);
 
-    // *** add for reordering ***
+    // add for reordering
     bool apply_reorder = true;
     size_t perm_size = 0;
     faiss::idx_t* perm = nullptr; 

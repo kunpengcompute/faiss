@@ -226,8 +226,13 @@ if(NOT WIN32)
   list(APPEND FAISS_HEADERS invlists/OnDiskInvertedLists.h)
 endif()
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
+option(KRL "Enable sra_krl" OFF)
+
+if(KRL AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
   message(STATUS "AArch64 detected: enabling sra_krl")
+
+  add_compile_definitions(KRL)
+
   set(KRL_SRC
     sra_krl/src/handle_IO.c
     sra_krl/src/Heap_sort.c
@@ -249,11 +254,14 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
     sra_krl/src/reorder_2_vectors.c
     sra_krl/src/sve_search_codes.c
   )
+
   set_source_files_properties(${KRL_SRC} PROPERTIES LANGUAGE CXX)
+
   set(SVE_FILE sra_krl/src/sve_search_codes.c)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
     set_source_files_properties(${SVE_FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -march=armv8.2-a+fp16+sve -msve-vector-bits=256")
   endif()
+
   list(APPEND FAISS_SRC ${KRL_SRC})
 endif()
 
@@ -266,7 +274,8 @@ target_include_directories(faiss PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/faiss>
 )
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
+
+if(KRL AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
   target_include_directories(faiss PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/sra_krl/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/faiss/sra_krl>

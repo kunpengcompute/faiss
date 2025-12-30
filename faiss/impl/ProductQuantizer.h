@@ -18,7 +18,7 @@
 #include <faiss/impl/Quantizer.h>
 #include <faiss/impl/platform_macros.h>
 #include <faiss/utils/Heap.h>
-#ifdef __aarch64__
+#ifdef KRL
 extern "C" {
 #include <faiss/sra_krl/include/krl.h>
 }
@@ -51,7 +51,7 @@ struct ProductQuantizer : Quantizer {
     /// if non-NULL, use this index for assignment (should be of size
     /// d / M)
     Index* assign_index;
-#ifdef __aarch64__
+#ifdef KRL
     bool use_transpose = false;
     KRLDistanceHandle* kdh = nullptr; 
 

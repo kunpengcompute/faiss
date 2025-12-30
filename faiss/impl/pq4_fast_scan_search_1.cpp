@@ -10,10 +10,11 @@
 #include <faiss/impl/FaissAssert.h>
 #include <faiss/impl/LookupTableScaler.h>
 #include <faiss/impl/simd_result_handlers.h>
-
+#ifdef KRL
 extern "C" {
 #include <faiss/sra_krl/include/krl.h>
 }
+#endif
 
 namespace faiss {
 
@@ -138,6 +139,7 @@ void accumulate_fixed_blocks(
     }
 }
 
+#ifdef KRL
 template <class ResultHandler>
 inline void accumulate_fixed_blocks64(
         size_t nb,
@@ -196,6 +198,7 @@ inline void accumulate_fixed_blocks96(
         }
     }
 }
+#endif
 
 template <class ResultHandler, class Scaler>
 void pq4_accumulate_loop_fixed_scaler(
@@ -207,7 +210,7 @@ void pq4_accumulate_loop_fixed_scaler(
         const uint8_t* LUT,
         ResultHandler& res,
         const Scaler& scaler) {
-
+#ifdef KRL
     switch (bbs) {
         case 64:
         accumulate_fixed_blocks64(nb, nsq, codes, LUT, res);
@@ -217,6 +220,7 @@ void pq4_accumulate_loop_fixed_scaler(
         return;
 
     }
+#endif
     FAISS_THROW_IF_NOT(is_aligned_pointer(codes));
     FAISS_THROW_IF_NOT(is_aligned_pointer(LUT));
     FAISS_THROW_IF_NOT(bbs % 32 == 0);

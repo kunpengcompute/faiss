@@ -24,6 +24,9 @@
 extern "C" {
 
 /* declare BLAS functions, see http://www.netlib.org/clapack/cblas/ */
+#ifdef KRL
+#include <faiss/sra_krl/include/krl.h>
+#endif
 
 int sgemm_(
         const char* transa,
@@ -39,10 +42,6 @@ int sgemm_(
         float* beta,
         float* c,
         FINTEGER* ldc);
-        
-#ifdef __aarch64__
-#include <faiss/sra_krl/include/krl.h>
-#endif
 }
 
 namespace faiss {
@@ -431,7 +430,7 @@ void ProductQuantizer::compute_codes(const float* x, uint8_t* codes, size_t n)
 
 void ProductQuantizer::compute_distance_table(const float* x, float* dis_table)
         const {
-#ifdef __aarch64__
+#ifdef KRL
     if(use_transpose) {
         krl_L2sqr_ny_with_handle(kdh, dis_table, x, M * ksub, dsub * M);
         return;
@@ -465,13 +464,15 @@ void ProductQuantizer::compute_distance_table(const float* x, float* dis_table)
 void ProductQuantizer::compute_inner_prod_table(
         const float* x,
         float* dis_table) const {
-#ifdef __aarch64__
+#ifdef KRL
     if(use_transpose) {
         krl_inner_product_ny_with_handle(kdh, dis_table, x, M * ksub, dsub * M);
         return;
     }
 #endif
-    for (size_t m = 0; m < M; m++) {
+    size_t m;
+
+    for (m = 0; m < M; m++) {
         fvec_inner_products_ny(
                 dis_table + m * ksub,
                 x + m * dsub,
@@ -485,7 +486,7 @@ void ProductQuantizer::compute_distance_tables(
         size_t nx,
         const float* x,
         float* dis_tables) const {
-#ifdef __aarch64__
+#ifdef KRL
     if(use_transpose) {
     	#pragma omp parallel for if (nx > 1)
         for (int64_t i = 0; i < nx; i++) {
@@ -528,7 +529,7 @@ void ProductQuantizer::compute_inner_prod_tables(
         size_t nx,
         const float* x,
         float* dis_tables) const {
-#ifdef __aarch64__
+#ifdef KRL
     if(use_transpose) {
 		#pragma omp parallel for if (nx > 1)
         for (int64_t i = 0; i < nx; i++) {

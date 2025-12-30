@@ -12,13 +12,16 @@
 #include <faiss/impl/DistanceComputer.h>
 #include <faiss/impl/FaissAssert.h>
 #include <faiss/impl/IDSelector.h>
+#ifdef KRL
+#include <arm_neon.h>
+#endif
 
 namespace faiss {
 
 IndexFlatCodes::IndexFlatCodes(size_t code_size, idx_t d, MetricType metric)
         : Index(d, metric), code_size(code_size) {}
 
-#ifdef __aarch64__
+#ifdef KRL
 uint8_t* IndexFlatCodes::get_codes_pointer() {
      return codes.data(); 
 }
@@ -121,8 +124,7 @@ void IndexFlatCodes::permute_entries(const idx_t* perm) {
     }
     std::swap(codes, new_codes);
 }
-#ifdef __aarch64__
-#include <arm_neon.h>
+#ifdef KRL
 void IndexFlatCodes::dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) {
     std::vector<uint8_t, AlignedAllocator<uint8_t>> new_codes(sizeof(float) * num_entries);
     float* c = (float*)new_codes.data();

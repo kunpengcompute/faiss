@@ -397,35 +397,49 @@ void greedy_update_nearest(
         int level,
         storage_idx_t& nearest,
         float& d_nearest) {
-    size_t max_neighbor_size = hnsw.cum_nneighbor_per_level[level];
-    std::unique_ptr<int64_t> saved_j(new int64_t[max_neighbor_size]);
-    std::unique_ptr<float> dis(new float[max_neighbor_size]);
-    int64_t* p_saved = saved_j.get();
-    float* p_dis = dis.get();
+#ifdef KRL
+    const size_t max_neighbor_size = hnsw.cum_nneighbor_per_level[level];
+    std::unique_ptr<int64_t[]> saved_j(new int64_t[max_neighbor_size]);
+    std::unique_ptr<float[]>   dis    (new float   [max_neighbor_size]);
+#endif
     for (;;) {
         storage_idx_t prev_nearest = nearest;
 
         size_t begin, end;
-        int nv = 0;
         hnsw.neighbor_range(nearest, level, &begin, &end);
+#ifdef KRL
+        int nv = 0;
         for (size_t i = begin; i < end; i++) {
             storage_idx_t v = hnsw.neighbors[i];
-            if (v < 0){
+            if (v < 0) {
                 break;
-            } else {
-                *(p_saved + nv) = v;
-                nv++;
+            }
+            saved_j[nv++] = (int64_t)v;
+        }
+
+        if (nv > 0) {
+            qdis.distances_multi_codes(saved_j.get(), dis.get(), nv);
+        }
+
+        for (int i = 0; i < nv; i++) {
+            const float di = dis[i];
+            if (di < d_nearest) {
+                nearest   = (storage_idx_t)saved_j[i];
+                d_nearest = di;
             }
         }
-		if (nv > 0) {
-        	qdis.distances_multi_codes(saved_j.get(), dis.get(), nv);			
-		}
-        for (int i = 0; i < nv; i++) {    
-            if (*(p_dis + i) < d_nearest) {
-                nearest = *(p_saved + i);
-                d_nearest = *(p_dis + i);
+#else
+        for (size_t i = begin; i < end; i++) {
+            storage_idx_t v = hnsw.neighbors[i];
+            if (v < 0)
+                break;
+            float dis = qdis(v);
+            if (dis < d_nearest) {
+                nearest = v;
+                d_nearest = dis;
             }
         }
+#endif
         if (nearest == prev_nearest) {
             return;
         }
@@ -567,9 +581,11 @@ int search_from_candidates(
 
     int nstep = 0;
 
+#ifdef KRL
     size_t max_neighbor_size = hnsw.cum_nneighbor_per_level[hnsw.cum_nneighbor_per_level.size() - 1];
-    std::unique_ptr<int64_t> saved_j(new int64_t[max_neighbor_size]);
-    std::unique_ptr<float> dis(new float[max_neighbor_size]);
+    std::unique_ptr<int64_t[]> saved_j(new int64_t[max_neighbor_size]);
+    std::unique_ptr<float[]>   dis    (new float   [max_neighbor_size]);
+#endif
 
     while (candidates.size() > 0) {
         float d0 = 0;
@@ -622,6 +638,9 @@ int search_from_candidates(
         }
 
         int counter = 0;
+#ifndef KRL
+        size_t saved_j[4];
+#endif
 
         ndis += jmax - begin;
         threshold = res.threshold;
@@ -637,37 +656,64 @@ int search_from_candidates(
             candidates.push(idx, dis);
         };
 
-        auto add_to_heap_nosel = [&](const size_t idx, const float dis) {
-            if (dis < threshold) {
-                if (res.add_result(dis, idx)) {
-                    threshold = res.threshold;
-                }
-            }
-            candidates.push(idx, dis);
-        };
+#ifdef KRL
         for (size_t j = begin; j < jmax; j++) {
             int v1 = hnsw.neighbors[j];
 
-            if(vt.get(v1)) {
-                continue;
-            }
+            bool vget = vt.get(v1);
             vt.set(v1);
-            *(saved_j.get() + counter) = (int64_t)v1;
-            counter++;
+            saved_j[counter] = (int64_t)v1;
+            counter += vget ? 0 : 1;
         }
+
         if (counter > 0) {
-			qdis.distances_multi_codes(saved_j.get(), dis.get(), counter);
-		}
+            qdis.distances_multi_codes(saved_j.get(), dis.get(), counter);
+        }
+
         int id = 0;
         for (; id + 4 <= counter; id += 4) {
-            add_to_heap_nosel(*(saved_j.get() + id), *(dis.get() + id));
-            add_to_heap_nosel(*(saved_j.get() + id + 1), *(dis.get() + id + 1));
-            add_to_heap_nosel(*(saved_j.get() + id + 2), *(dis.get() + id + 2));
-            add_to_heap_nosel(*(saved_j.get() + id + 3), *(dis.get() + id + 3));
+            add_to_heap((size_t)saved_j[id],     dis[id]);
+            add_to_heap((size_t)saved_j[id + 1], dis[id + 1]);
+            add_to_heap((size_t)saved_j[id + 2], dis[id + 2]);
+            add_to_heap((size_t)saved_j[id + 3], dis[id + 3]);
         }
-        for(; id < counter; ++id) {
-           add_to_heap_nosel(*(saved_j.get() + id), *(dis.get() + id));
+        for (; id < counter; ++id) {
+            add_to_heap((size_t)saved_j[id], dis[id]);
         }
+#else
+        for (size_t j = begin; j < jmax; j++) {
+            int v1 = hnsw.neighbors[j];
+
+            bool vget = vt.get(v1);
+            vt.set(v1);
+            saved_j[counter] = v1;
+            counter += vget ? 0 : 1;
+
+            if (counter == 4) {
+                float dis[4];
+                qdis.distances_batch_4(
+                        saved_j[0],
+                        saved_j[1],
+                        saved_j[2],
+                        saved_j[3],
+                        dis[0],
+                        dis[1],
+                        dis[2],
+                        dis[3]);
+
+                for (size_t id4 = 0; id4 < 4; id4++) {
+                    add_to_heap(saved_j[id4], dis[id4]);
+                }
+
+                counter = 0;
+            }
+        }
+
+        for (size_t icnt = 0; icnt < counter; icnt++) {
+            float dis = qdis(saved_j[icnt]);
+            add_to_heap(saved_j[icnt], dis);
+        }
+#endif
 
         nstep++;
         if (!do_dis_check && nstep > efSearch) {

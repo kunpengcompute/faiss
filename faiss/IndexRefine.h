@@ -9,13 +9,12 @@
 
 #include <faiss/Index.h>
 
-#ifdef __aarch64__
+#ifdef KRL
 #include <faiss/impl/ProductQuantizer.h>
 extern "C" {
 #include <faiss/sra_krl/include/krl.h>
 }
 #endif
-
 
 namespace faiss {
 
@@ -87,7 +86,7 @@ struct IndexRefineFlat : IndexRefine {
 
     IndexRefineFlat();
 
-#ifdef __aarch64__
+#ifdef KRL
     KRLDistanceHandle* kdh = nullptr;
     size_t full_level = 3;
     size_t accu_level = 1;

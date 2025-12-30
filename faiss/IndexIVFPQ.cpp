@@ -35,7 +35,7 @@
 
 #include <faiss/impl/code_distance/code_distance.h>
 
-#ifdef __aarch64__
+#ifdef KRL
 extern "C" {
 #include <faiss/sra_krl/include/krl.h>
 }
@@ -84,7 +84,7 @@ void IndexIVFPQ::train_encoder(idx_t n, const float* x, const idx_t* assign) {
     if (by_residual) {
         precompute_table();
     }
-#ifdef __aarch64__
+#ifdef KRL
     if (pq.nbits == 8 && pq.dsub <= 64) {
         if(metric_type == METRIC_L2) {
             pq.initialize_krl_transpose_centroids(64, metric_type);
@@ -152,7 +152,7 @@ void IndexIVFPQ::add_core(
         const idx_t* coarse_idx,
         void* inverted_list_context) {
     add_core_o(n, x, xids, nullptr, coarse_idx, inverted_list_context);
-#ifdef __aarch64__
+#ifdef KRL
     if(pq.nbits == 8) {
         tmp_buffer_size = invlists->initialize_tmp_buffer(64);
     }
@@ -1262,7 +1262,7 @@ struct IVFPQScanner : IVFPQScannerT<idx_t, METRIC_TYPE, PQDecoder>,
             assert(precompute_mode == 2);
             this->scan_list_polysemous(ncode, codes, res);
         } else if (precompute_mode == 2) {
-#ifdef __aarch64__
+#ifdef KRL
             if (this->pq.nbits == 8 && this->klh) {
 				if constexpr (use_sel) {
                     size_t j = 0;

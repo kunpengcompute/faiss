@@ -50,7 +50,7 @@ void IndexPQFastScan::train(idx_t n, const float* x) {
         return;
     }
     pq.train(n, x);
-#ifdef __aarch64__
+#ifdef KRL
     if(pq.nbits == 4 && pq.dsub <= 256) {
         pq.initialize_krl_transpose_centroids(16, metric_type);
     }

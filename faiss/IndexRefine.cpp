@@ -234,7 +234,7 @@ IndexRefineFlat::IndexRefineFlat() : IndexRefine() {
     own_refine_index = true;
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void IndexRefineFlat::add(idx_t n, const float* x) {
     FAISS_THROW_IF_NOT(is_trained);
     base_index->add(n, x);
@@ -307,7 +307,7 @@ void IndexRefineFlat::search(
     base_index->search(
             n, x, k_base, base_distances, base_labels, base_index_params);
 
-#ifdef __aarch64__
+#ifdef KRL
     if(kdh) {
 #pragma omp parallel for if(n > 1)
 	    for (int i = 0; i < n; i++) {

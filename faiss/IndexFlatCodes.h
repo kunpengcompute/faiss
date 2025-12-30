@@ -12,8 +12,7 @@
 #include <faiss/Index.h>
 #include <faiss/impl/DistanceComputer.h>
 #include <vector>
-
-#ifdef __aarch64__
+#ifdef KRL
 #include <faiss/sra_krl/include/krl.h>
 #endif
 
@@ -27,7 +26,7 @@ struct IndexFlatCodes : Index {
     size_t code_size;
 
     /// encoded dataset, size ntotal * code_size
-#ifdef __aarch64__
+#ifdef KRL
     std::vector<uint8_t, AlignedAllocator<uint8_t>> codes;
     uint8_t* get_codes_pointer() override;
 #else
@@ -69,7 +68,7 @@ struct IndexFlatCodes : Index {
 
     // permute_entries. perm of size ntotal maps new to old positions
     void permute_entries(const idx_t* perm);
-#ifdef __aarch64__
+#ifdef KRL
     bool use_handle = false;
     KRLDistanceHandle* kdh = nullptr;
 

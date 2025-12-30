@@ -88,7 +88,7 @@ void IndexIVFFlat::add_core(
                n);
     }
     ntotal += n;
-#ifdef __aarch64__
+#ifdef KRL
     tmp_buffer_size = invlists->initialize_tmp_buffer(64);
 #endif
 }

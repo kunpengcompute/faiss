@@ -11,13 +11,11 @@
 #include <faiss/impl/LookupTableScaler.h>
 #include <faiss/impl/simd_result_handlers.h>
 #include <faiss/utils/simdlib.h>
-
-#ifdef __aarch64__
+#ifdef KRL
 extern "C" {
 #include <faiss/sra_krl/include/krl.h>
 }
 #endif
-
 
 namespace faiss {
 
@@ -132,7 +130,7 @@ void accumulate_q_4step(
     constexpr int Q3 = (QBS >> 8) & 15;
     constexpr int Q4 = (QBS >> 12) & 15;
     constexpr int SQ = Q1 + Q2 + Q3 + Q4;
-#ifdef __aarch64__
+#ifdef KRL
     bool keep_min = res.get_keepmin();
     for (size_t j0 = 0; j0 < ntotal2; j0 += 32) {
         res.set_block_origin(0, j0);

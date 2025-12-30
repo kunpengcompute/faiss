@@ -150,6 +150,7 @@ int test_selector(const char* index_key) {
     auto new_result = search_index_with_params(index.get(), xq.data(), &params);
 
     if (ref_result != new_result) {
+#ifdef KRL
         const int k = ref_result.size() / nq;
         std::cerr << "[TSEL.IVFFlat] mismatch detected\n";
         std::cerr << "index->ntotal=" << index->ntotal
@@ -191,6 +192,9 @@ int test_selector(const char* index_key) {
             }
         }
         return 1;
+#else
+        return 1;
+#endif
     }
 
     return 0;
@@ -237,20 +241,29 @@ TEST(TPO, IVFFlatPP) {
 
 TEST(TSEL, IVFFlat) {
     int err = test_selector("PCA16,IVF32,Flat");
-	(void)err;
-    // EXPECT_EQ(err, 0);
+#ifdef KRL
+    (void)err;
+#else
+    EXPECT_EQ(err, 0);
+#endif
 }
 
 TEST(TSEL, IVFFPQ) {
     int err = test_selector("PCA16,IVF32,PQ4x8np");
-	(void)err;
-    // EXPECT_EQ(err, 0);
+#ifdef KRL
+    (void)err;
+#else
+    EXPECT_EQ(err, 0);
+#endif
 }
 
 TEST(TSEL, IVFFSQ) {
     int err = test_selector("PCA16,IVF32,SQ8");
-	(void)err;
-    // EXPECT_EQ(err, 0);
+#ifdef KRL
+    (void)err;
+#else
+    EXPECT_EQ(err, 0);
+#endif
 }
 
 /*************************************************************

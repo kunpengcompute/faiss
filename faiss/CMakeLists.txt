@@ -270,7 +270,7 @@ if(KRL AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
 
   set(SVE_FILE sra_krl/src/sve_search_codes.c)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
-    set_source_files_properties(${SVE_FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -march=armv8.2-a+fp16+sve -msve-vector-bits=256")
+    set_source_files_properties(${SVE_FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -march=armv8.2-a+fp16+sve+rcpc -msve-vector-bits=256")
   endif()
 
   list(APPEND FAISS_SRC ${KRL_SRC})
@@ -308,7 +308,7 @@ if(OPTI_IVFPQ)
     )
 
     target_compile_options(faiss PRIVATE
-      $<$<COMPILE_LANGUAGE:C,CXX>:-march=armv9-a+fp16fml+dotprod+sve>
+      $<$<COMPILE_LANGUAGE:C,CXX>:-march=armv8.2-a+fp16fml+dotprod+sve+rcpc>
     )
   endif()
 
@@ -321,7 +321,7 @@ if(OPTI_IVFPQ)
   set_source_files_properties(${FAISS_ARM_ASM} PROPERTIES LANGUAGE ASM)
 
   set_source_files_properties(${FAISS_ARM_ASM} PROPERTIES
-    COMPILE_OPTIONS "-O3;-march=armv9-a+fp16fml+dotprod+sve"
+    COMPILE_OPTIONS "-O3;-march=armv8.2-a+fp16fml+dotprod+sve+rcpc"
   )
 endif()
 

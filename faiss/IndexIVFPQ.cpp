@@ -640,10 +640,10 @@ struct QueryTables {
               use_precomputed_table(ivfpq.use_precomputed_table) {
         mem.resize(pq.ksub * pq.M * 2 + d * 2);
         sim_table = mem.data();
-#endif
         sim_table_2 = sim_table + pq.ksub * pq.M;
         residual_vec = sim_table_2 + pq.ksub * pq.M;
         decoded_vec = residual_vec + d;
+#endif
 
         // for polysemous
         polysemous_ht = ivfpq.polysemous_ht;

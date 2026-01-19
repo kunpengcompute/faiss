@@ -29,9 +29,13 @@
 
 #ifdef __aarch64__
 #include <arm_neon.h>
+#if defined(OPTI_IVFPQ)
+#include <faiss/utils/arm/asm/distances_simd.h>
+#elif defined(KRL)
 extern "C" {
 #include <faiss/sra_krl/include/krl.h>
 }
+#endif
 #endif
 
 namespace faiss {
@@ -88,7 +92,10 @@ void fvec_L2sqr_ny_ref(
         const float* y,
         size_t d,
         size_t ny) {
-#ifdef __aarch64__
+#if defined(OPTI_IVFPQ)
+    L2sqrNy(dis, x, y, ny, d);
+    return;
+#elif defined(KRL)
     krl_L2sqr_ny(dis, x, y, ny, d, ny);
     return;
 #endif
@@ -182,7 +189,10 @@ void fvec_inner_products_ny_ref(
         sgemv_ ("T", &di, &nyi, &one, y, &di, x, &onei, &zero, ip, &onei);
     }
 #endif
-#ifdef __aarch64__
+#if defined(OPTI_IVFPQ)
+    IPNy(ip, x, y, ny, d);
+    return;
+#elif defined(KRL)
     krl_inner_product_ny(ip, x, y, ny, d, ny);
     return;
 #endif
@@ -198,12 +208,18 @@ void fvec_inner_products_ny_ref(
 
 FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
 float fvec_inner_product(const float* x, const float* y, size_t d) {
+#ifdef OPTI_IVFPQ
+    float res;
+    IPSingle(x, y, d, &res);
+    return res;
+#else
     float res = 0.F;
     FAISS_PRAGMA_IMPRECISE_LOOP
     for (size_t i = 0; i != d; ++i) {
         res += x[i] * y[i];
     }
     return res;
+#endif
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
 
@@ -223,6 +239,11 @@ FAISS_PRAGMA_IMPRECISE_FUNCTION_END
 
 FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
 float fvec_L2sqr(const float* x, const float* y, size_t d) {
+#ifdef OPTI_IVFPQ
+    float res;
+    L2sqrSingle(x, y, d, &res);
+    return res;
+#else
     size_t i;
     float res = 0;
     FAISS_PRAGMA_IMPRECISE_LOOP
@@ -231,6 +252,7 @@ float fvec_L2sqr(const float* x, const float* y, size_t d) {
         res += tmp * tmp;
     }
     return res;
+#endif
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
 
@@ -1959,6 +1981,98 @@ void fvec_madd(size_t n, const float* a, float bf, const float* b, float* c) {
 
 #elif defined(__aarch64__)
 
+#ifdef OPTI_IVFPQ
+
+size_t aligned_mem = 32;
+
+__attribute__((noinline)) void fvec_madd(size_t n, const float* a, float bf, const float* b, float* c) {
+    bool use_fallback = false;
+
+    if (n < aligned_mem) {
+        use_fallback = true;
+    } else {
+        const uintptr_t am = (uintptr_t)a & 31;
+        const uintptr_t bm = (uintptr_t)b & 31;
+        const uintptr_t cm = (uintptr_t)c & 31;
+        if (!((am == bm) && (am == cm))) {
+            use_fallback = true;
+        }
+    }
+
+    if (!use_fallback) {
+        size_t i = 0;
+
+        for (; i < n && (((uintptr_t)(c + i)) & 31); ++i) {
+            c[i] = a[i] + bf * b[i];
+        }
+
+        size_t rem = n - i;
+        const float *pa = a + i;
+        const float *pb = b + i;
+        float *pc = c + i;
+
+        if (rem >= 16) {
+            size_t n_blk = rem & ~((size_t)15);
+            if (n_blk) {
+                uint32_t bf_bits;
+                memcpy(&bf_bits, &bf, 4);
+                size_t cnt = n_blk;
+
+                asm volatile(
+                    "dup     v31.4s, %w[bf]\n"
+                    "1:\n"
+                    "ld1     {v16.4s, v17.4s}, [%[pb]], #32\n"
+                    "ld1     {v0.4s,  v1.4s},  [%[pa]], #32\n"
+                    "fmla    v0.4s,  v16.4s, v31.4s\n"
+                    "fmla    v1.4s,  v17.4s, v31.4s\n"
+                    "stnp    q0, q1, [%[pc]]\n"
+                    "add     %[pc], %[pc], #32\n"
+
+                    "ld1     {v18.4s, v19.4s}, [%[pb]], #32\n"
+                    "ld1     {v2.4s,  v3.4s},  [%[pa]], #32\n"
+                    "fmla    v2.4s,  v18.4s, v31.4s\n"
+                    "fmla    v3.4s,  v19.4s, v31.4s\n"
+                    "stnp    q2, q3, [%[pc]]\n"
+                    "add     %[pc], %[pc], #32\n"
+
+                    "subs    %x[cnt], %x[cnt], #16\n"
+                    "b.gt    1b\n"
+                    : [pa] "+r"(pa), [pb] "+r"(pb), [pc] "+r"(pc), [cnt] "+r"(cnt)
+                    : [bf] "r"(bf_bits)
+                    : "cc", "memory",
+                      "v0","v1","v2","v3","v16","v17","v18","v19","v31"
+                );
+                i += n_blk;
+            }
+        }
+
+        for (; i + 4 <= n; i += 4) {
+            float32x4_t ai = vld1q_f32(a + i);
+            float32x4_t bi = vld1q_f32(b + i);
+            ai = vfmaq_n_f32(ai, bi, bf);
+            vst1q_f32(c + i, ai);
+        }
+        for (; i < n; ++i) {
+            c[i] = a[i] + bf * b[i];
+        }
+        return;
+    }
+
+    const size_t n_simd = n - (n & 3);
+    const float32x4_t bfv = vdupq_n_f32(bf);
+    size_t j;
+    for (j = 0; j < n_simd; j += 4) {
+        const float32x4_t ai = vld1q_f32(a + j);
+        const float32x4_t bi = vld1q_f32(b + j);
+        const float32x4_t ci = vfmaq_f32(ai, bfv, bi);
+        vst1q_f32(c + j, ci);
+    }
+    for (; j < n; ++j)
+        c[j] = a[j] + bf * b[j];
+}
+
+#else
+
 void fvec_madd(size_t n, const float* a, float bf, const float* b, float* c) {
     const size_t n_simd = n - (n & 3);
     const float32x4_t bfv = vdupq_n_f32(bf);
@@ -1972,6 +2086,8 @@ void fvec_madd(size_t n, const float* a, float bf, const float* b, float* c) {
     for (; i < n; ++i)
         c[i] = a[i] + bf * b[i];
 }
+
+#endif
 
 #else
 

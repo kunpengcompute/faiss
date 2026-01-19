@@ -20,7 +20,36 @@
 
 cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)
 
-set(CMAKE_CXX_FLAGS "-O3 -march=armv8.2-a+fp16fml+dotprod -fpermissive")
+# ARM-only options (Linux only): fail fast on x86
+option(KRL "Enable sra_krl (ARM only)" OFF)
+option(OPTI_IVFPQ "Enable optimized_ivfpq (ARM only)" OFF)
+
+# Detect arch by uname (most reliable on Linux)
+execute_process(
+  COMMAND uname -m
+  OUTPUT_VARIABLE FAISS_ARCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+string(TOLOWER "${FAISS_ARCH}" FAISS_ARCH)
+
+set(FAISS_IS_X86 FALSE)
+if(FAISS_ARCH MATCHES "^(x86_64|amd64|i[3-6]86)")
+  set(FAISS_IS_X86 TRUE)
+endif()
+
+set(FAISS_IS_ARM FALSE)
+if(FAISS_ARCH MATCHES "^(aarch64|arm64|armv[0-9]+l|arm)")
+  set(FAISS_IS_ARM TRUE)
+endif()
+
+# Only care x86 vs arm: x86 => hard fail when enabling ARM-only options
+if((KRL OR OPTI_IVFPQ) AND FAISS_IS_X86)
+  message(FATAL_ERROR
+    "KRL/OPTI_IVFPQ are ARM-only, but detected arch '${FAISS_ARCH}'. "
+    "Please configure with -DKRL=OFF -DOPTI_IVFPQ=OFF on x86."
+  )
+endif()
+
 set(FAISS_LANGUAGES CXX)
 
 if(FAISS_ENABLE_GPU)

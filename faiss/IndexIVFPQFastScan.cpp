@@ -116,7 +116,7 @@ void IndexIVFPQFastScan::train_encoder(
     if (by_residual && metric_type == METRIC_L2) {
         precompute_table();
     }
-#ifdef __aarch64__
+#ifdef KRL
     if(pq.nbits == 4 && pq.dsub <= 256) {
         pq.initialize_krl_transpose_centroids(16, metric_type);
     }

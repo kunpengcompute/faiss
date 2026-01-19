@@ -78,7 +78,7 @@ void InvertedLists::reset() {
     }
 }
 
-#ifdef __aarch64__
+#if defined(KRL) || defined(OPTI_IVFPQ)
 size_t InvertedLists::initialize_tmp_buffer(size_t batchsize) {
     return 0;
 }
@@ -311,7 +311,7 @@ void ArrayInvertedLists::permute_invlists(const idx_t* map) {
     std::swap(ids, new_ids);
 }
 
-#ifdef __aarch64__
+#if defined(KRL) || defined(OPTI_IVFPQ)
 size_t ArrayInvertedLists::initialize_tmp_buffer(size_t batchsize) {
     size_t tmp_buffer_size = 0;
     for(int i = 0; i < nlist; ++i) {

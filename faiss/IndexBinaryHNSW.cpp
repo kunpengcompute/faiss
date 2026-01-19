@@ -278,7 +278,9 @@ struct FlatHammingDis : DistanceComputer {
         hc.set((uint8_t*)x, code_size);
     }
 
+#ifdef KRL
 	void set_base(const float* x) override {}
+#endif
 
     ~FlatHammingDis() override {
 #pragma omp critical

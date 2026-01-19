@@ -13,6 +13,9 @@
 #include <faiss/utils/Heap.h>
 #include <faiss/utils/distances.h>
 #include <faiss/utils/utils.h>
+#ifdef OPTI_IVFPQ
+#include <faiss/utils/arm/asm/distances_simd.h>
+#endif
 
 namespace faiss {
 
@@ -234,7 +237,7 @@ IndexRefineFlat::IndexRefineFlat() : IndexRefine() {
     own_refine_index = true;
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void IndexRefineFlat::add(idx_t n, const float* x) {
     FAISS_THROW_IF_NOT(is_trained);
     base_index->add(n, x);
@@ -307,7 +310,65 @@ void IndexRefineFlat::search(
     base_index->search(
             n, x, k_base, base_distances, base_labels, base_index_params);
 
-#ifdef __aarch64__
+#if defined(OPTI_IVFPQ)
+    const auto* rif = dynamic_cast<const IndexFlat*>(refine_index);
+    if (rif) {
+        const float* base_vector = rif->get_xb();
+
+#pragma omp parallel for if (n > 1)
+        for (idx_t i = 0; i < n; ++i) {
+            const idx_t off_base = i * k_base;
+            const idx_t off_out  = i * k;
+
+            float* base_dis = base_distances + off_base;
+            idx_t* base_idx = base_labels + off_base;
+            const float* q  = x + i * d;
+
+            idx_t bk = k_base;
+
+            if (UNLIKELY(base_idx[bk - 1] < 0)) {
+                idx_t left = -1;
+                idx_t right = bk - 1;
+
+                while (left < right - 1) {
+                    idx_t mid = (left + right) >> 1;
+                    if (base_idx[mid] < 0) {
+                        right = mid;
+                    } else {
+                        left = mid;
+                    }
+                }
+                bk = right;
+
+                if (bk <= k) {
+                    if (metric_type == METRIC_L2) {
+                        SelectL2Topk(bk, labels + off_out, distances + off_out, bk, base_idx, base_dis);
+                        for (idx_t j = bk; j < k; ++j) {
+                            labels[off_out + j] = -1;
+                            distances[off_out + j] = INFINITY;
+                        }
+                    } else {
+                        SelectIPTopk(bk, labels + off_out, distances + off_out, bk, base_idx, base_dis);
+                        for (idx_t j = bk; j < k; ++j) {
+                            labels[off_out + j] = -1;
+                            distances[off_out + j] = -INFINITY;
+                        }
+                    }
+                    continue;
+                }
+            }
+
+            if (metric_type == METRIC_L2) {
+                L2sqrNyByIdx(base_dis, q, base_vector, base_idx, d, bk);
+                SelectL2Topk(k, labels + off_out, distances + off_out, bk, base_idx, base_dis);
+            } else {
+                IPNyByIdx(base_dis, q, base_vector, base_idx, d, bk);
+                SelectIPTopk(k, labels + off_out, distances + off_out, bk, base_idx, base_dis);
+            }
+        }
+        return;
+    }
+#elif defined(KRL)
     if(kdh) {
 #pragma omp parallel for if(n > 1)
 	    for (int i = 0; i < n; i++) {

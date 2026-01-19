@@ -162,8 +162,9 @@ struct GenericDistanceComputer : DistanceComputer {
     void set_query(const float* x) override {
         q = x;
     }
-
+#ifdef KRL
 	void set_base(const float* x) override {}
+#endif
 };
 
 } // namespace

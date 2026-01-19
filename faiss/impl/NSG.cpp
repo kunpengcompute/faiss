@@ -38,9 +38,9 @@ struct NegativeDistanceComputer : DistanceComputer {
     void set_query(const float* x) override {
         basedis->set_query(x);
     }
-
+#ifdef KRL
 	void set_base(const float* x) override {}
-
+#endif
     /// compute distance of vector i to current query
     float operator()(idx_t i) override {
         return -(*basedis)(i);

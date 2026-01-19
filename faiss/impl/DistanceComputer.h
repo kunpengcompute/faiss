@@ -8,7 +8,7 @@
 #pragma once
 
 #include <faiss/Index.h>
-#ifdef __aarch64__
+#ifdef KRL
 #include <iostream>
 #endif
 
@@ -29,7 +29,9 @@ struct DistanceComputer {
     /// called before computing distances. Pointer x should remain valid
     /// while operator () is called
     virtual void set_query(const float* x) = 0;
+#ifdef KRL
     virtual void set_base(const float* x) = 0;
+#endif
     /// compute distance of vector i to current query
     virtual float operator()(idx_t i) = 0;
 
@@ -56,11 +58,13 @@ struct DistanceComputer {
         dis3 = d3;
     }
 
+#ifdef KRL
     virtual void distances_multi_codes(const int64_t* idx, float* dis, int ny) {
         for(int i = 0; i < ny; ++i) {
             dis[i] = this->operator()(idx[i]);
         }
     }
+#endif
 
     /// compute distance between two stored vectors
     virtual float symmetric_dis(idx_t i, idx_t j) = 0;
@@ -85,9 +89,11 @@ struct FlatCodesDistanceComputer : DistanceComputer {
         return distance_to_code(codes + i * code_size);
     }
 
+#ifdef KRL
     void set_query(const float* x) override {}
 
 	void set_base(const float* x) override {}
+#endif
 
     /// compute distance of current query to an encoded vector
     virtual float distance_to_code(const uint8_t* code) = 0;

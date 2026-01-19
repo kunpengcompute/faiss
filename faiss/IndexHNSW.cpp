@@ -35,6 +35,10 @@
 #include <faiss/utils/sorting.h>
 
 extern "C" {
+#ifdef KRL
+#include <arm_neon.h>
+#include <faiss/sra_krl/include/krl.h>
+#endif
 
 /* declare BLAS functions, see http://www.netlib.org/clapack/cblas/ */
 
@@ -52,11 +56,7 @@ int sgemm_(
         float* beta,
         float* c,
         FINTEGER* ldc);
-#ifdef __aarch64__
-#include <faiss/sra_krl/include/krl.h>
-#endif
 }
-
 
 namespace faiss {
 
@@ -85,9 +85,9 @@ struct NegativeDistanceComputer : DistanceComputer {
     void set_query(const float* x) override {
         basedis->set_query(x);
     }
-
+#ifdef KRL
 	void set_base(const float* x) override {}
-
+#endif
     /// compute distance of vector i to current query
     float operator()(idx_t i) override {
         return -(*basedis)(i);
@@ -110,7 +110,7 @@ struct NegativeDistanceComputer : DistanceComputer {
         dis3 = -dis3;
     }
 
-#ifdef __aarch64__
+#ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) {
         basedis->distances_multi_codes(idx, dis, ny);
         for(int i = 0; i < ny; ++i) {
@@ -135,8 +135,8 @@ DistanceComputer* storage_distance_computer(const Index* storage) {
         return storage->get_distance_computer();
     }
 }
-#ifdef __aarch64__
-// *** add for reordering ***
+
+#ifdef KRL
 void graphBFSPerm(faiss::IndexHNSW *index, faiss::idx_t* perm)
 {
     size_t permInd = 0;
@@ -179,6 +179,7 @@ void graphBFSPerm(faiss::IndexHNSW *index, faiss::idx_t* perm)
     }
 }
 #endif
+
 void hnsw_add_vertices(
         IndexHNSW& index_hnsw,
         size_t n0,
@@ -314,8 +315,8 @@ void hnsw_add_vertices(
     for (int i = 0; i < ntotal; i++) {
         omp_destroy_lock(&locks[i]);
     }
-#ifdef __aarch64__
-    // *** add for reordering ***
+
+#ifdef KRL
     if (index_hnsw.apply_reorder) {
         index_hnsw.perm_size = ntotal;
         index_hnsw.perm = new faiss::idx_t[ntotal];
@@ -350,7 +351,7 @@ IndexHNSW::IndexHNSW(Index* storage, int M)
         : Index(storage->d, storage->metric_type), hnsw(M), storage(storage) {}
 
 IndexHNSW::~IndexHNSW() {
-#ifdef __aarch64__
+#ifdef KRL
     if (own_fields) {
         delete storage;
         own_fields = false;
@@ -360,7 +361,7 @@ IndexHNSW::~IndexHNSW() {
         perm = nullptr;
     }
 #else
-	if (own_fields) {
+    if (own_fields) {
         delete storage;
     }
 #endif
@@ -374,8 +375,7 @@ void IndexHNSW::train(idx_t n, const float* x) {
     storage->train(n, x);
     is_trained = true;
 }
-#ifdef __aarch64__
-#include<arm_neon.h>
+#ifdef KRL
 struct FlatL2DisSQ8 : DistanceComputer {
     const uint8_t* q8;
     const uint8_t* b8;
@@ -586,6 +586,7 @@ void quant_u8_noscale(const float* src, idx_t d, uint8_t* out) {
 #endif
 
 namespace {
+
 template <class BlockResultHandler>
 void hnsw_search(
         const IndexHNSW* index,
@@ -612,8 +613,8 @@ void hnsw_search(
 
     for (idx_t i0 = 0; i0 < n; i0 += check_period) {
         idx_t i1 = std::min(i0 + check_period, n);
-    
-#ifdef __aarch64__
+
+#ifdef KRL
 #pragma omp parallel
         {
             VisitedTable vt(index->ntotal);
@@ -714,8 +715,7 @@ void IndexHNSW::search(
             distances[i] = -distances[i];
         }
     }
-#ifdef __aarch64__
-    // *** add for reordering ***
+#ifdef KRL
     if (apply_reorder) {
         std::vector<idx_t> labels_permuted(n * k);
         for (size_t i = 0; i < n * k; ++i) {
@@ -755,7 +755,7 @@ void IndexHNSW::add(idx_t n, const float* x) {
     ntotal = storage->ntotal;
 
     hnsw_add_vertices(*this, n0, n, x, verbose, hnsw.levels.size() == ntotal);
-#ifdef __aarch64__
+#ifdef KRL
     if(quant_bits == 16) {
         storage->quant_entries_f16(storage->get_codes_pointer(), n * d, quant_scale);
     } else if(quant_bits == 8) {

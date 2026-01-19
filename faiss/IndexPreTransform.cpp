@@ -314,9 +314,9 @@ struct PreTransformDistanceComputer : DistanceComputer {
             sub_dc->set_query(xt);
         }
     }
-
+#ifdef KRL
 	void set_base(const float* x) override {}
-
+#endif
     float symmetric_dis(idx_t i, idx_t j) override {
         return sub_dc->symmetric_dis(i, j);
     }

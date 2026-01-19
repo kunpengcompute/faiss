@@ -15,7 +15,7 @@
 #include <sstream>
 #include <string>
 #include <typeinfo>
-#ifdef __aarch64__
+#ifdef KRL
 #include <iostream>
 #endif
 
@@ -47,6 +47,7 @@ struct IDSelector;
 struct RangeSearchResult;
 struct DistanceComputer;
 
+#if defined(KRL) || defined(OPTI_IVFPQ)
 template<typename T, int N = 64>
 struct AlignedAllocator {
 
@@ -77,6 +78,7 @@ struct AlignedAllocator {
         return true;
     }
 };
+#endif
 
 /** Parent class for the optional search paramenters.
  *
@@ -138,7 +140,9 @@ struct Index {
      */
     virtual void add(idx_t n, const float* x) = 0;
 
+#ifdef KRL
     virtual uint8_t* get_codes_pointer() { return nullptr; };
+#endif
 
     /** Same as add, but stores xids instead of sequential ids.
      *
@@ -329,9 +333,11 @@ struct Index {
      * parameters). Otherwise throw. */
     virtual void check_compatible_for_merge(const Index& otherIndex) const;
 
+#ifdef KRL
     virtual void dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) {};
     virtual void quant_entries_f16(const uint8_t* entries, idx_t num_entries, float scale) {};
     virtual void quant_entries_u8(const uint8_t* entries, idx_t num_entries, float scale) {};
+#endif
 };
 
 } // namespace faiss

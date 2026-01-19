@@ -94,6 +94,34 @@ void IndexIVFFastScan::add_with_ids(
         const idx_t* xids) {
     FAISS_THROW_IF_NOT(is_trained);
 
+#ifndef KRL
+    // do some blocking to avoid excessive allocs
+    constexpr idx_t bs = 65536;
+    if (n > bs) {
+        double t0 = getmillisecs();
+        for (idx_t i0 = 0; i0 < n; i0 += bs) {
+            idx_t i1 = std::min(n, i0 + bs);
+            if (verbose) {
+                double t1 = getmillisecs();
+                double elapsed_time = (t1 - t0) / 1000;
+                double total_time = 0;
+                if (i0 != 0) {
+                    total_time = elapsed_time / i0 * n;
+                }
+                size_t mem = get_mem_usage_kb() / (1 << 10);
+
+                printf("IndexIVFFastScan::add_with_ids %zd/%zd, time %.2f/%.2f, RSS %zdMB\n",
+                       size_t(i1),
+                       size_t(n),
+                       elapsed_time,
+                       total_time,
+                       mem);
+            }
+            add_with_ids(i1 - i0, x + i0 * d, xids ? xids + i0 : nullptr);
+        }
+        return;
+    }
+#endif
     InterruptCallback::check();
 
     direct_map.check_can_add(xids);
@@ -340,7 +368,9 @@ ResultHandlerCompare<C, true>* make_knn_handler_fixC(
 
     if (k == 1) {
         return new SingleResultHC(n, 0, distances, labels);
-    } else {
+    } else if (impl % 2 == 0) {
+        return new HeapHC(n, 0, k, distances, labels);
+    } else /* if (impl % 2 == 1) */ {
         return new ReservoirHC(n, 0, k, 2 * k, distances, labels);
     }
 }

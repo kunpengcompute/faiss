@@ -18,7 +18,11 @@
 #include <faiss/utils/sorting.h>
 #include <faiss/utils/utils.h>
 #include <cstring>
-#ifdef __aarch64__
+#if defined(OPTI_IVFPQ)
+#include <iostream>
+#include <arm_neon.h>
+#include <faiss/utils/arm/asm/distances_simd.h>
+#elif defined(KRL)
 #include <iostream>
 #include <arm_neon.h>
 extern "C" {
@@ -39,7 +43,42 @@ void IndexFlat::search(
         idx_t* labels,
         const SearchParameters* params) const {
     IDSelector* sel = params ? params->sel : nullptr;
-#ifdef __aarch64__
+#if defined(OPTI_IVFPQ)
+    if (!sel &&
+        (metric_type == METRIC_L2 || metric_type == METRIC_INNER_PRODUCT) &&
+		__builtin_expect(k <= ntotal, 1)) {
+
+        const float* xb = get_xb();
+
+        std::vector<int64_t> base_idx((size_t)ntotal);
+        for (int64_t j = 0; j < (int64_t)ntotal; ++j) {
+            base_idx[(size_t)j] = j;
+        }
+
+#pragma omp parallel if (n > 1)
+        {
+            std::vector<float> base_dis((size_t)ntotal);
+
+#pragma omp for
+            for (idx_t i = 0; i < n; ++i) {
+                const float* q = x + (size_t)i * d;
+                float* dist_i = distances + (size_t)i * k;
+                idx_t* lab_i = labels + (size_t)i * k;
+
+                if (metric_type == METRIC_L2) {
+                    L2sqrNy(base_dis.data(), q, xb, (size_t)ntotal, (size_t)d);
+                    SelectL2Topk((int64_t)k, (int64_t*)lab_i, dist_i,
+                                (int64_t)ntotal, base_idx.data(), base_dis.data());
+                } else {
+                    IPNy(base_dis.data(), q, xb, (size_t)ntotal, (size_t)d);
+                    SelectIPTopk((int64_t)k, (int64_t*)lab_i, dist_i,
+                                 (int64_t)ntotal, base_idx.data(), base_dis.data());
+                }
+            }
+        }
+        return;
+    }
+#elif defined(KRL)
     if(use_handle && 4 * k < ntotal && !sel) {
         #pragma omp parallel for if (n > 1)
         for (int i = 0; i < n; ++i) {
@@ -123,8 +162,12 @@ struct FlatL2Dis : FlatCodesDistanceComputer {
     }
 
     float symmetric_dis(idx_t i, idx_t j) override {
+#ifdef KRL
         return fvec_L2sqr(reinterpret_cast<const float*>(codes + j * code_size), 
             reinterpret_cast<const float*>(codes + i * code_size), d);
+#else
+        return fvec_L2sqr(b + j * d, b + i * d, d);
+#endif
     }
 
     explicit FlatL2Dis(const IndexFlat& storage, const float* q = nullptr)
@@ -174,10 +217,12 @@ struct FlatL2Dis : FlatCodesDistanceComputer {
         dis3 = dp3;
     }
 
+#ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
         krl_L2sqr_by_idx(dis, q, reinterpret_cast<const float*>(codes), idx, d, ny, ny);
     }
+#endif
 };
 
 struct FlatIPDis : FlatCodesDistanceComputer {
@@ -210,9 +255,11 @@ struct FlatIPDis : FlatCodesDistanceComputer {
         q = x;
     }
 
+#ifdef KRL
     void set_base(const float* x) override {
         std::cerr << "TypeError, struct FlatIPDis can't use set_base func!\n" << std::endl;
     }
+#endif
 
     // compute four distances
     void distances_batch_4(
@@ -246,12 +293,13 @@ struct FlatIPDis : FlatCodesDistanceComputer {
         dis2 = dp2;
         dis3 = dp3;
     }
-    
+
+#ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
         krl_inner_product_by_idx(dis, q, reinterpret_cast<const float*>(codes), idx, d, ny, ny);
     }
-
+#endif
 };
 
 } // namespace
@@ -273,17 +321,25 @@ void IndexFlat::reconstruct(idx_t key, float* recons) const {
 
 void IndexFlat::sa_encode(idx_t n, const float* x, uint8_t* bytes) const {
     if (n > 0) {
+#ifdef KRL
         for (size_t i = 0; i < n; ++i) {
             memcpy(bytes + i * code_size, x + i * d, sizeof(float) * d);
         }
+#else
+        memcpy(bytes, x, sizeof(float) * d * n);
+#endif
     }
 }
 
 void IndexFlat::sa_decode(idx_t n, const uint8_t* bytes, float* x) const {
     if (n > 0) {
+#ifdef KRL
         for (size_t i = 0; i < n; ++i) {
             memcpy(x + i * d, bytes + i * code_size, sizeof(float) * d);
         }
+#else
+        memcpy(x, bytes, sizeof(float) * d * n);
+#endif
     }
 }
 

@@ -221,13 +221,66 @@ set(FAISS_HEADERS
   utils/hamming_distance/avx2-inl.h
 )
 
+# -------------------- ARM-only options (Linux only) --------------------
+option(KRL "Enable sra_krl (ARM only)" OFF)
+option(OPTI_IVFPQ "Enable optimized_ivfpq (ARM only)" OFF)
+
+execute_process(
+  COMMAND uname -m
+  OUTPUT_VARIABLE FAISS_ARCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+string(TOLOWER "${FAISS_ARCH}" FAISS_ARCH)
+
+set(FAISS_IS_X86 FALSE)
+if(FAISS_ARCH MATCHES "^(x86_64|amd64|i[3-6]86)")
+  set(FAISS_IS_X86 TRUE)
+endif()
+
+set(FAISS_IS_ARM FALSE)
+if(FAISS_ARCH MATCHES "^(aarch64|arm64|armv[0-9]+l|arm)")
+  set(FAISS_IS_ARM TRUE)
+endif()
+
+if((KRL OR OPTI_IVFPQ) AND FAISS_IS_X86)
+  message(FATAL_ERROR
+    "KRL/OPTI_IVFPQ are ARM-only, but detected arch '${FAISS_ARCH}'. "
+    "Please configure with -DKRL=OFF -DOPTI_IVFPQ=OFF on x86."
+  )
+endif()
+
+# enable only on ARM
+set(FAISS_ENABLE_KRL OFF)
+if(KRL AND FAISS_IS_ARM)
+  set(FAISS_ENABLE_KRL ON)
+endif()
+
+set(FAISS_ENABLE_OPTI_IVFPQ OFF)
+if(OPTI_IVFPQ AND FAISS_IS_ARM)
+  set(FAISS_ENABLE_OPTI_IVFPQ ON)
+endif()
+
+# -------------------- OPTI_IVFPQ sources/defs (ARM only) --------------------
+if(FAISS_ENABLE_OPTI_IVFPQ)
+  list(APPEND FAISS_SRC utils/arm/asm/distances_simd.cpp)
+
+  add_compile_definitions(OPTI_IVFPQ)
+  list(APPEND FAISS_HEADERS utils/arm/asm/distances_simd.h)
+  enable_language(ASM)
+endif()
+
+# -------------------- non-Windows sources --------------------
 if(NOT WIN32)
   list(APPEND FAISS_SRC invlists/OnDiskInvertedLists.cpp)
   list(APPEND FAISS_HEADERS invlists/OnDiskInvertedLists.h)
 endif()
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
-  message(STATUS "AArch64 detected: enabling sra_krl")
+# -------------------- KRL (ARM only) --------------------
+if(FAISS_ENABLE_KRL)
+  message(STATUS "ARM detected (${FAISS_ARCH}): enabling sra_krl")
+
+  add_compile_definitions(KRL)
+
   set(KRL_SRC
     sra_krl/src/handle_IO.c
     sra_krl/src/Heap_sort.c
@@ -249,11 +302,16 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
     sra_krl/src/reorder_2_vectors.c
     sra_krl/src/sve_search_codes.c
   )
+
   set_source_files_properties(${KRL_SRC} PROPERTIES LANGUAGE CXX)
+
   set(SVE_FILE sra_krl/src/sve_search_codes.c)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
-    set_source_files_properties(${SVE_FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " -march=armv8.2-a+fp16+sve -msve-vector-bits=256")
+    set_source_files_properties(${SVE_FILE} APPEND_STRING PROPERTY
+      COMPILE_FLAGS " -march=armv8.2-a+fp16+sve+rcpc -msve-vector-bits=256"
+    )
   endif()
+
   list(APPEND FAISS_SRC ${KRL_SRC})
 endif()
 
@@ -266,7 +324,8 @@ target_include_directories(faiss PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/faiss>
 )
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
+
+if(FAISS_ENABLE_KRL)
   target_include_directories(faiss PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/sra_krl/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/faiss/sra_krl>
@@ -274,6 +333,34 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|AARCH64|ARM64)$")
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/sra_krl/include/
           DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/faiss/sra_krl/include
           FILES_MATCHING PATTERN "*.h")
+endif()
+
+# -------------------- OPTI_IVFPQ compile flags / ASM (ARM only) --------------------
+if(FAISS_ENABLE_OPTI_IVFPQ)
+  if(MSVC)
+    target_compile_options(faiss PRIVATE
+      $<$<COMPILE_LANGUAGE:C,CXX>:/O2>
+    )
+  else()
+    target_compile_options(faiss PRIVATE
+      $<$<COMPILE_LANGUAGE:C,CXX>:-O3 -ffp-contract=fast -fno-math-errno -fpermissive>
+      $<$<AND:$<COMPILE_LANGUAGE:C,CXX>,$<CONFIG:Release>>:-fomit-frame-pointer>
+    )
+
+    target_compile_options(faiss PRIVATE
+      $<$<COMPILE_LANGUAGE:C,CXX>:-march=armv8.2-a+fp16fml+dotprod+sve+rcpc>
+    )
+  endif()
+
+  set(FAISS_ARM_ASM
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/arm/asm/scan_list_with_table.S
+  )
+
+  target_sources(faiss PRIVATE ${FAISS_ARM_ASM})
+  set_source_files_properties(${FAISS_ARM_ASM} PROPERTIES LANGUAGE ASM)
+  set_source_files_properties(${FAISS_ARM_ASM} PROPERTIES
+    COMPILE_OPTIONS "-O3;-march=armv8.2-a+fp16fml+dotprod+sve+rcpc"
+  )
 endif()
 
 add_library(faiss_avx2 ${FAISS_SRC})

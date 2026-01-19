@@ -161,7 +161,9 @@ struct Distance2Level : DistanceComputer {
         q = x;
     }
 
+#ifdef KRL
 	void set_base(const float* x) override {}
+#endif
 };
 
 // well optimized for xNN+PQNN

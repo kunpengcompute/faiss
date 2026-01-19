@@ -77,7 +77,7 @@
  * leak memory.
  **************************************************************/
 
-#ifdef __aarch64__
+#ifdef KRL
 extern "C" {
 #include <faiss/sra_krl/include/krl.h>
 }
@@ -169,7 +169,7 @@ void write_ProductQuantizer(const ProductQuantizer* pq, IOWriter* f) {
     WRITE1(pq->M);
     WRITE1(pq->nbits);
     WRITEVECTOR(pq->centroids);
-#ifdef __aarch64__
+#ifdef KRL
     if (pq->use_transpose && pq->kdh) {
         WRITE1(pq->use_transpose);
         krl_store_distanceHandle((dynamic_cast<FileIOWriter*>(f))->f, pq->kdh);
@@ -306,6 +306,7 @@ void write_InvertedLists(const InvertedLists* ils, IOWriter* f) {
                 WRITEANDCHECK(ails->ids[i].data(), n);
             }
         }
+
     } else {
         InvertedListsIOHook::lookup_classname(typeid(*ils).name())
                 ->write(ils, f);
@@ -402,9 +403,6 @@ static void write_ivf_header(const IndexIVF* ivf, IOWriter* f) {
     // by_residual).
     write_index(ivf->quantizer, f);
     write_direct_map(&ivf->direct_map, f);
-#ifdef __aarch64__
-    WRITE1(ivf->tmp_buffer_size);
-#endif
 }
 
 void write_index(const Index* idx, IOWriter* f) {
@@ -416,7 +414,7 @@ void write_index(const Index* idx, IOWriter* f) {
         WRITE1(h);
         write_index_header(idx, f);
         WRITEXBVECTOR(idxf->codes);
-#ifdef __aarch64__
+#ifdef KRL
         if (idxf->use_handle && idxf->kdh) {
             WRITE1(idxf->use_handle);
             krl_store_distanceHandle((dynamic_cast<FileIOWriter*>(f))->f, idxf->kdh);
@@ -772,7 +770,7 @@ void write_index(const Index* idx, IOWriter* f) {
         write_index(idxrf->base_index, f);
         write_index(idxrf->refine_index, f);
         WRITE1(idxrf->k_factor);
-#ifdef __aarch64__
+#ifdef KRL
         if (const IndexRefineFlat* idxrft = dynamic_cast<const IndexRefineFlat*>(idx)){
             WRITE1(idxrft->full_level);
             WRITE1(idxrft->accu_level);
@@ -799,7 +797,7 @@ void write_index(const Index* idx, IOWriter* f) {
         write_index_header(idxhnsw, f);
         write_HNSW(&idxhnsw->hnsw, f);
         write_index(idxhnsw->storage, f);
-#ifdef __aarch64__
+#ifdef KRL
         WRITE1(idxhnsw->quant_bits);
         WRITE1(idxhnsw->quant_scale);
         if (idxhnsw->apply_reorder && idxhnsw->perm && idxhnsw->perm_size > 0) {

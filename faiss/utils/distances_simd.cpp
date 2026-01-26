@@ -223,6 +223,19 @@ float fvec_inner_product(const float* x, const float* y, size_t d) {
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
 
+#ifdef __aarch64__
+FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
+float fvec_inner_product_f16(const float16_t* x, const float16_t* y, size_t d) {
+    float res = 0.F;
+    FAISS_PRAGMA_IMPRECISE_LOOP
+    for (size_t i = 0; i != d; ++i) {
+        res += (float)x[i] * (float)y[i];
+    }
+    return res;
+}
+FAISS_PRAGMA_IMPRECISE_FUNCTION_END
+#endif
+
 FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
 float fvec_norm_L2sqr(const float* x, size_t d) {
     // the double in the _ref is suspected to be a typo. Some of the manual
@@ -236,6 +249,22 @@ float fvec_norm_L2sqr(const float* x, size_t d) {
     return res;
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
+
+#ifdef __aarch64__
+FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
+float fvec_norm_L2sqr_f16(const float16_t* x, size_t d) {
+    // the double in the _ref is suspected to be a typo. Some of the manual
+    // implementations this replaces used float.
+    float res = 0;
+    FAISS_PRAGMA_IMPRECISE_LOOP
+    for (size_t i = 0; i != d; ++i) {
+        res += (float)x[i] * (float)x[i];
+    }
+
+    return res;
+}
+FAISS_PRAGMA_IMPRECISE_FUNCTION_END
+#endif
 
 FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
 float fvec_L2sqr(const float* x, const float* y, size_t d) {
@@ -255,6 +284,21 @@ float fvec_L2sqr(const float* x, const float* y, size_t d) {
 #endif
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
+
+#ifdef __aarch64__
+FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
+float fvec_L2sqr_f16(const float16_t* x, const float16_t* y, size_t d) {
+    size_t i;
+    float res = 0;
+    FAISS_PRAGMA_IMPRECISE_LOOP
+    for (i = 0; i < d; i++) {
+        const float tmp = (float)x[i] - (float)y[i];
+        res += tmp * tmp;
+    }
+    return res;
+}
+FAISS_PRAGMA_IMPRECISE_FUNCTION_END
+#endif
 
 /// Special version of inner product that computes 4 distances
 /// between x and yi
@@ -288,6 +332,39 @@ void fvec_inner_product_batch_4(
     dis3 = d3;
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
+
+#ifdef __aarch64__
+FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
+void fvec_inner_product_batch_4_f16(
+        const float16_t* __restrict x,
+        const float16_t* __restrict y0,
+        const float16_t* __restrict y1,
+        const float16_t* __restrict y2,
+        const float16_t* __restrict y3,
+        const size_t d,
+        float& dis0,
+        float& dis1,
+        float& dis2,
+        float& dis3) {
+    float d0 = 0;
+    float d1 = 0;
+    float d2 = 0;
+    float d3 = 0;
+    FAISS_PRAGMA_IMPRECISE_LOOP
+    for (size_t i = 0; i < d; ++i) {
+        d0 += (float)x[i] * (float)y0[i];
+        d1 += (float)x[i] * (float)y1[i];
+        d2 += (float)x[i] * (float)y2[i];
+        d3 += (float)x[i] * (float)y3[i];
+    }
+
+    dis0 = d0;
+    dis1 = d1;
+    dis2 = d2;
+    dis3 = d3;
+}
+FAISS_PRAGMA_IMPRECISE_FUNCTION_END
+#endif
 
 /// Special version of L2sqr that computes 4 distances
 /// between x and yi, which is performance oriented.
@@ -325,6 +402,43 @@ void fvec_L2sqr_batch_4(
     dis3 = d3;
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
+
+#ifdef __aarch64__
+FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
+void fvec_L2sqr_batch_4_f16(
+        const float16_t* x,
+        const float16_t* y0,
+        const float16_t* y1,
+        const float16_t* y2,
+        const float16_t* y3,
+        const size_t d,
+        float& dis0,
+        float& dis1,
+        float& dis2,
+        float& dis3) {
+    float d0 = 0;
+    float d1 = 0;
+    float d2 = 0;
+    float d3 = 0;
+    FAISS_PRAGMA_IMPRECISE_LOOP
+    for (size_t i = 0; i < d; ++i) {
+        const float q0 = (float)x[i] - (float)y0[i];
+        const float q1 = (float)x[i] - (float)y1[i];
+        const float q2 = (float)x[i] - (float)y2[i];
+        const float q3 = (float)x[i] - (float)y3[i];
+        d0 += q0 * q0;
+        d1 += q1 * q1;
+        d2 += q2 * q2;
+        d3 += q3 * q3;
+    }
+
+    dis0 = d0;
+    dis1 = d1;
+    dis2 = d2;
+    dis3 = d3;
+}
+FAISS_PRAGMA_IMPRECISE_FUNCTION_END
+#endif
 
 /*********************************************************
  * SSE and AVX implementations

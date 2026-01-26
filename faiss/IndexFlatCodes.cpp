@@ -21,6 +21,10 @@ namespace faiss {
 IndexFlatCodes::IndexFlatCodes(size_t code_size, idx_t d, MetricType metric)
         : Index(d, metric), code_size(code_size) {}
 
+#ifdef __aarch64__
+IndexFlatCodes::IndexFlatCodes(size_t code_size, idx_t d, NumericType ntype, MetricType metric)
+        : Index(d, ntype, metric), code_size(code_size) {}
+#endif
 #ifdef KRL
 uint8_t* IndexFlatCodes::get_codes_pointer() {
      return codes.data(); 
@@ -163,5 +167,27 @@ void IndexFlatCodes::quant_entries_u8(const uint8_t* entries, idx_t num_entries,
     std::swap(codes, new_codes);
     ntotal = num_entries;
 }
+#endif
+/* added FP16 function interfaces */
+#ifdef __aarch64__
+void IndexFlatCodes::add(idx_t n, const float16_t* x) {
+    FAISS_THROW_IF_NOT(is_trained);
+    if (n == 0) {
+        return;
+    }
+    codes.resize((ntotal + n) * code_size);
+    sa_encode(n, x, codes.data() + (ntotal * code_size));
+    ntotal += n;
+}
+
+void IndexFlatCodes::reconstruct_n(idx_t i0, idx_t ni, float16_t* recons) const {
+    FAISS_THROW_IF_NOT(ni == 0 || (i0 >= 0 && i0 + ni <= ntotal));
+    sa_decode(ni, codes.data() + i0 * code_size, recons);
+}
+
+void IndexFlatCodes::reconstruct(idx_t key, float16_t* recons) const {
+    reconstruct_n(key, 1, recons);
+}
+
 #endif
 } // namespace faiss

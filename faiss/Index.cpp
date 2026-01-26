@@ -185,4 +185,18 @@ void Index::check_compatible_for_merge(const Index& /* otherIndex */) const {
     FAISS_THROW_MSG("check_compatible_for_merge() not implemented");
 }
 
+/* added FP16 function interfaces */
+#ifdef __aarch64__
+void Index::reconstruct(idx_t, float16_t*) const {
+    FAISS_THROW_MSG("reconstruct not implemented for this type of index");
+}
+
+void Index::reconstruct_n(idx_t i0, idx_t ni, float16_t* recons) const {
+    #pragma omp parallel for if (ni > 1000)
+    for (idx_t i = 0; i < ni; i++) {
+        reconstruct(i0 + i, recons + i * d);
+    }
+}
+#endif
+
 } // namespace faiss

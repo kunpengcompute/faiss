@@ -21,7 +21,7 @@ INFO_MERGED="${ROOT_DIR}/coverage_merged.info"
 
 REPORT_DIR="${ROOT_DIR}/coverage_report"
 
-COV_CFLAGS='--coverage -O0 -g -fno-omit-frame-pointer'
+COV_CFLAGS='--coverage -O0 -g -fno-omit-frame-pointer -march=armv8.2-a+fp16fml+dotprod+sve+rcpc'
 COV_LDFLAGS='--coverage'
 
 COMMON_CMAKE_OPTS=(
@@ -32,7 +32,8 @@ COMMON_CMAKE_OPTS=(
   -DFAISS_ENABLE_PYTHON=OFF
   -DBLAS_LIBRARIES="${BLAS_LIBRARIES}"
   -DFAISS_OPT_LEVEL=generic
-  -DOPTI_IVFPQ=on
+  -DOPTI_IVFPQ=OFF
+  -DKRL=ON
   -DCMAKE_GTEST_DISCOVER_TESTS_DISCOVERY_MODE=PRE_TEST
 )
 
@@ -108,15 +109,36 @@ clean_all() {
 }
 
 configure_gcc() {
+  local omp_flag="-fopenmp"
+
+  local gomp_lib
+  gomp_lib="$(gcc -print-file-name=libgomp.so.1)"
+  if [[ -z "${gomp_lib}" || "${gomp_lib}" == "libgomp.so.1" || ! -f "${gomp_lib}" ]]; then
+    gomp_lib="/usr/lib/aarch64-linux-gnu/libgomp.so.1"
+  fi
+  if [[ ! -f "${gomp_lib}" ]]; then
+    echo "ERROR: libgomp.so.1 not found. Please install it:"
+    echo "  sudo apt-get update && sudo apt-get install -y libgomp1"
+    exit 1
+  fi
+  
+  local cflags="${COV_CFLAGS} ${omp_flag}"
+  local ldflags="${COV_LDFLAGS} ${omp_flag}"
+
   cmake -S "${ROOT_DIR}" -B "${BUILD_GCC}" \
     -DCMAKE_TOOLCHAIN_FILE="${TOOLCHAIN_SMART}" \
     "${COMMON_CMAKE_OPTS[@]}" \
     -DCMAKE_C_COMPILER=gcc \
     -DCMAKE_CXX_COMPILER=g++ \
-    -DCMAKE_C_FLAGS="${COV_CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${COV_CFLAGS}" \
-    -DCMAKE_EXE_LINKER_FLAGS="${COV_LDFLAGS}" \
-    -DCMAKE_SHARED_LINKER_FLAGS="${COV_LDFLAGS}"
+    -DCMAKE_C_FLAGS="${cflags}" \
+    -DCMAKE_CXX_FLAGS="${cflags}" \
+    -DCMAKE_EXE_LINKER_FLAGS="${ldflags}" \
+    -DCMAKE_SHARED_LINKER_FLAGS="${ldflags}" \
+    -DOpenMP_C_FLAGS="${omp_flag}" \
+    -DOpenMP_CXX_FLAGS="${omp_flag}" \
+    -DOpenMP_C_LIB_NAMES="gomp" \
+    -DOpenMP_CXX_LIB_NAMES="gomp" \
+    -DOpenMP_gomp_LIBRARY="${gomp_lib}"
 }
 
 configure_clang() {
@@ -193,23 +215,23 @@ merge_and_genhtml() {
 echo "[1/8] clean"
 clean_all
 
-# echo "[2/8] configure gcc"
-# configure_gcc
+echo "[2/8] configure gcc"
+configure_gcc
 
-# echo "[3/8] build & test gcc"
-# build_and_test "${BUILD_GCC}"
+echo "[3/8] build & test gcc"
+build_and_test "${BUILD_GCC}"
 
-# echo "[4/8] capture gcc (faiss/ only)"
-# capture_faiss_only_gcc
+echo "[4/8] capture gcc (faiss/ only)"
+capture_faiss_only_gcc
 
-echo "[5/8] configure clang"
-configure_clang
+# echo "[5/8] configure clang"
+# configure_clang
 
-echo "[6/8] build & test clang"
-build_and_test "${BUILD_CLANG}"
+# echo "[6/8] build & test clang"
+# build_and_test "${BUILD_CLANG}"
 
-echo "[7/8] capture clang (faiss/ only)"
-capture_faiss_only_clang
+# echo "[7/8] capture clang (faiss/ only)"
+# capture_faiss_only_clang
 
 # echo "[8/8] merge + html"
 # merge_and_genhtml

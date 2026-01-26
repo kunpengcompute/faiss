@@ -572,6 +572,32 @@ Index* read_index(IOReader* f, int io_flags) {
 #endif
         // leak!
         idx = idxf;
+#ifdef __aarch64__
+    } else if (h == fourcc("IxFi") || h == fourcc("IxFt") || h == fourcc("IxFL")) {
+        IndexFlat* idxf;
+        if (h == fourcc("IxFi")) {
+            idxf = new IndexFlatIP();
+        } else if (h == fourcc("IxFt")) {
+            idxf = new IndexFlatL2();
+        } else {
+            idxf = new IndexFlat();
+        }
+        read_index_header(idxf, f);
+        idxf->code_size = idxf->d * sizeof(float16_t);
+        READXBVECTOR(idxf->codes);
+        FAISS_THROW_IF_NOT(
+                idxf->codes.size() == idxf->ntotal * idxf->code_size);
+#ifdef KRL
+        READ1(idxf->use_handle);
+        if (idxf->use_handle) {
+            krl_build_distanceHandle_fromfile((dynamic_cast<FileIOReader*>(f))->f, &idxf->kdh);
+        } else {
+            idxf->kdh = nullptr;
+        }
+        // leak!
+        idx = idxf;
+#endif
+#endif
     } else if (h == fourcc("IxHE") || h == fourcc("IxHe")) {
         IndexLSH* idxl = new IndexLSH();
         read_index_header(idxl, f);
@@ -978,9 +1004,16 @@ Index* read_index(IOReader* f, int io_flags) {
         READVECTOR(idxp->codes);
         idx = idxp;
     } else if (
-            h == fourcc("IHNf") || h == fourcc("IHNp") || h == fourcc("IHNs") ||
+            h == fourcc("IHNh") || h == fourcc("IHNf") || h == fourcc("IHNp") || h == fourcc("IHNs") ||
             h == fourcc("IHN2")) {
         IndexHNSW* idxhnsw = nullptr;
+        NumericType loaded_numeric_type = NumericType::Float32;
+        if (h == fourcc("IHNh")) {
+            uint32_t stored_data_type;
+            READ1(stored_data_type);
+            loaded_numeric_type = static_cast<NumericType>(stored_data_type);
+            idxhnsw = new IndexHNSWFlat();
+        }
         if (h == fourcc("IHNf"))
             idxhnsw = new IndexHNSWFlat();
         if (h == fourcc("IHNp"))
@@ -992,6 +1025,7 @@ Index* read_index(IOReader* f, int io_flags) {
         read_index_header(idxhnsw, f);
         read_HNSW(&idxhnsw->hnsw, f);
         idxhnsw->storage = read_index(f, io_flags);
+        idxhnsw->storage->numeric_type = loaded_numeric_type;
         idxhnsw->own_fields = true;
         if (h == fourcc("IHNp")) {
             dynamic_cast<IndexPQ*>(idxhnsw->storage)->pq.compute_sdc_table();

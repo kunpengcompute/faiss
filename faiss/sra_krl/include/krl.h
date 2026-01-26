@@ -23,6 +23,10 @@
 
 #define KRL_API_PUBLIC __attribute__((visibility("default")))
 
+#ifdef __aarch64__
+typedef __fp16 float16_t;
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -550,6 +554,9 @@ KRL_API_PUBLIC int krl_reorder_2_vector(const KRLDistanceHandle *kdh, int64_t ba
  */
 KRL_API_PUBLIC int krl_reorder_2_vector_continuous(const KRLDistanceHandle *kdh, int64_t base_k, int64_t begin_id,
     const float *query_vector, int64_t k, float *dis, int64_t *idx, size_t query_vector_size);
+
+KRL_API_PUBLIC int krl_reorder_2_vector_continuous_f16(const KRLDistanceHandle *kdh, int64_t base_k, int64_t begin_id,
+    const float16_t *query_vector, int64_t k, float *dis, int64_t *idx, size_t query_vector_size);
 
 /* -------------------------------------- handle IO function -------------------------------------- */
 

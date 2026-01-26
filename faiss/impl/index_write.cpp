@@ -407,10 +407,13 @@ static void write_ivf_header(const IndexIVF* ivf, IOWriter* f) {
 
 void write_index(const Index* idx, IOWriter* f) {
     if (const IndexFlat* idxf = dynamic_cast<const IndexFlat*>(idx)) {
-        uint32_t h =
-                fourcc(idxf->metric_type == METRIC_INNER_PRODUCT ? "IxFI"
-                               : idxf->metric_type == METRIC_L2  ? "IxF2"
-                                                                 : "IxFl");
+        uint32_t h = fourcc(
+            idxf->numeric_type == NumericType::Float16 ? 
+                (idxf->metric_type == METRIC_INNER_PRODUCT ? "IxFi" :
+                 idxf->metric_type == METRIC_L2 ? "IxFt" : "IxFL") :
+                (idxf->metric_type == METRIC_INNER_PRODUCT ? "IxFI" :
+                 idxf->metric_type == METRIC_L2 ? "IxF2" : "IxFl")
+        );
         WRITE1(h);
         write_index_header(idx, f);
         WRITEXBVECTOR(idxf->codes);
@@ -787,13 +790,18 @@ void write_index(const Index* idx, IOWriter* f) {
         write_index(idxmap->index, f);
         WRITEVECTOR(idxmap->id_map);
     } else if (const IndexHNSW* idxhnsw = dynamic_cast<const IndexHNSW*>(idx)) {
-        uint32_t h = dynamic_cast<const IndexHNSWFlat*>(idx) ? fourcc("IHNf")
+        uint32_t h = dynamic_cast<const IndexHNSWFlat*>(idx) && idxhnsw->numeric_type == NumericType::Float16 ? fourcc("IHNh")
+                : dynamic_cast<const IndexHNSWFlat*>(idx) ? fourcc("IHNf")
                 : dynamic_cast<const IndexHNSWPQ*>(idx)      ? fourcc("IHNp")
                 : dynamic_cast<const IndexHNSWSQ*>(idx)      ? fourcc("IHNs")
                 : dynamic_cast<const IndexHNSW2Level*>(idx)  ? fourcc("IHN2")
                                                              : 0;
         FAISS_THROW_IF_NOT(h != 0);
         WRITE1(h);
+        if (idxhnsw->numeric_type == NumericType::Float16) {
+            uint32_t dt = idxhnsw->numeric_type;
+            WRITE1(dt);
+        }
         write_index_header(idxhnsw, f);
         write_HNSW(&idxhnsw->hnsw, f);
         write_index(idxhnsw->storage, f);

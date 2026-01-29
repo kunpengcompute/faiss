@@ -103,8 +103,8 @@ TEST_F(TestIndexFlat, search_ip)
     std::vector<faiss::idx_t> labels_fp16(nq * k);
     std::vector<faiss::idx_t> labels_fp32(nq * k);
 
-    index_ip_fp16->search_ex(nq, xq_fp16.data(), k, distances_fp16.data(), labels_fp16.data(), ntype, &hnsw_params);
-    index_ip_fp32->search(nq, xq_fp32.data(), k, distances_fp32.data(), labels_fp32.data(), &hnsw_params);
+    index_ip_fp16->search_ex(nq, xq_fp16.data(), k, distances_fp16.data(), labels_fp16.data(), ntype);
+    index_ip_fp32->search(nq, xq_fp32.data(), k, distances_fp32.data(), labels_fp32.data());
 
     compareLabelsDetailed(labels_fp16, labels_fp32, nq, k);
 }
@@ -121,8 +121,7 @@ TEST_F(TestIndexFlat, search_ex)
                      k,
                      distances_fp32.data(),
                      labels_fp32.data(),
-                     faiss::NumericType::Float32,
-                     &hnsw_params),
+                     faiss::NumericType::Float32),
         faiss::FaissException);
 
     EXPECT_THROW(index_ip_fp32->search_ex(nq,
@@ -130,8 +129,7 @@ TEST_F(TestIndexFlat, search_ex)
                      k,
                      distances_fp32.data(),
                      labels_fp32.data(),
-                     faiss::NumericType::Float32,
-                     &hnsw_params),
+                     faiss::NumericType::Float32),
         faiss::FaissException);
 }
 
@@ -218,9 +216,6 @@ TEST_F(TestIndexFlat, train_ex)
 
 TEST_F(TestIndexFlat, ntype)
 {
-    EXPECT_NO_THROW({ IndexFlat index_fp32(d, faiss::NumericType::Float32, faiss::METRIC_L2); });
-    EXPECT_NO_THROW({ IndexFlat index_fp16(d, faiss::NumericType::Float16, faiss::METRIC_L2); });
-    EXPECT_THROW({ IndexFlat index(d, 10, faiss::METRIC_L2); },
-        std::invalid_argument
-    );
+    EXPECT_NO_THROW({ faiss::IndexFlat index_fp32(d, faiss::NumericType::Float32, faiss::METRIC_L2); });
+    EXPECT_NO_THROW({ faiss::IndexFlat index_fp16(d, faiss::NumericType::Float16, faiss::METRIC_L2); });
 }

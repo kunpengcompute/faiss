@@ -39,6 +39,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
     common_test_functions.cpp
     common_test_functions.h
     test_distances_fp16.cpp
+    test_index_flat_fp16.cpp
     test_index_hnsw_fp16.cpp
     test_index_hnsw2level_fp16.cpp
     test_index_hnswpq_fp16.cpp

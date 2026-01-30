@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
+#include <stdexcept>
 
 #include <omp.h>
 
@@ -79,6 +80,18 @@ void fvec_norms_L2sqr(
         nr[i] = fvec_norm_L2sqr(x + i * d, d);
 }
 
+#ifdef __aarch64__
+void fvec_norms_L2sqr_f16(
+        float* __restrict nr,
+        const float16_t* __restrict x,
+        size_t d,
+        size_t nx) {
+#pragma omp parallel for if (nx > 10000)
+    for (int64_t i = 0; i < nx; i++)
+        nr[i] = fvec_norm_L2sqr_f16(x + i * d, d);
+}
+#endif
+
 // The following is a workaround to a problem
 // in OpenMP in fbcode. The crash occurs
 // inside OMP when IndexIVFSpectralHash::set_query()
@@ -130,10 +143,10 @@ void fvec_renorm_L2(size_t d, size_t nx, float* __restrict x) {
 namespace {
 
 /* Find the nearest neighbors for nx queries in a set of ny vectors */
-template <class BlockResultHandler, bool use_sel = false>
+template <typename T, class BlockResultHandler, bool use_sel = false>
 void exhaustive_inner_product_seq(
-        const float* x,
-        const float* y,
+        const T* x,
+        const T* y,
         size_t d,
         size_t nx,
         size_t ny,
@@ -150,8 +163,8 @@ void exhaustive_inner_product_seq(
         SingleResultHandler resi(res);
 #pragma omp for
         for (int64_t i = 0; i < nx; i++) {
-            const float* x_i = x + i * d;
-            const float* y_j = y;
+            const T* x_i = x + i * d;
+            const T* y_j = y;
 
             resi.begin(i);
 
@@ -159,7 +172,17 @@ void exhaustive_inner_product_seq(
                 if (use_sel && !sel->is_member(j)) {
                     continue;
                 }
-                float ip = fvec_inner_product(x_i, y_j, d);
+                float ip = 0;
+                if constexpr (std::is_same_v<T, float>) {
+                    ip = fvec_inner_product(x_i, y_j, d);
+#ifdef __aarch64__
+                } else if constexpr (std::is_same_v<T, float16_t>) {
+                    ip = fvec_inner_product_f16(x_i, y_j, d);
+#endif
+                } else {
+                    throw std::invalid_argument("exhaustive_inner_product_seq: Unsupported numeric type");
+                }
+
                 resi.add_result(ip, j);
             }
             resi.end();
@@ -167,10 +190,10 @@ void exhaustive_inner_product_seq(
     }
 }
 
-template <class BlockResultHandler, bool use_sel = false>
+template <typename T, class BlockResultHandler, bool use_sel = false>
 void exhaustive_L2sqr_seq(
-        const float* x,
-        const float* y,
+        const T* x,
+        const T* y,
         size_t d,
         size_t nx,
         size_t ny,
@@ -187,14 +210,23 @@ void exhaustive_L2sqr_seq(
         SingleResultHandler resi(res);
 #pragma omp for
         for (int64_t i = 0; i < nx; i++) {
-            const float* x_i = x + i * d;
-            const float* y_j = y;
+            const T* x_i = x + i * d;
+            const T* y_j = y;
             resi.begin(i);
             for (size_t j = 0; j < ny; j++, y_j += d) {
                 if (use_sel && !sel->is_member(j)) {
                     continue;
                 }
-                float disij = fvec_L2sqr(x_i, y_j, d);
+                float disij = 0;
+                if constexpr (std::is_same_v<T, float>) {
+                    disij = fvec_L2sqr(x_i, y_j, d);
+#ifdef __aarch64__
+                } else if constexpr (std::is_same_v<T, float16_t>) {
+                    disij = fvec_L2sqr_f16(x_i, y_j, d);
+#endif
+                } else {
+                    throw std::invalid_argument("exhaustive_L2sqr_seq: Unsupported numeric type");
+                }
                 resi.add_result(disij, j);
             }
             resi.end();
@@ -203,10 +235,10 @@ void exhaustive_L2sqr_seq(
 }
 
 /** Find the nearest neighbors for nx queries in a set of ny vectors */
-template <class BlockResultHandler>
+template <typename T, class BlockResultHandler>
 void exhaustive_inner_product_blas(
-        const float* x,
-        const float* y,
+        const T* x,
+        const T* y,
         size_t d,
         size_t nx,
         size_t ny,
@@ -235,19 +267,43 @@ void exhaustive_inner_product_blas(
             {
                 float one = 1, zero = 0;
                 FINTEGER nyi = j1 - j0, nxi = i1 - i0, di = d;
-                sgemm_("Transpose",
+                if constexpr (std::is_same_v<T, float>) {
+                    sgemm_("Transpose",
+                        "Not transpose",
+                        &nyi,
+                        &nxi,
+                        &di,
+                        &one,
+                        y + j0 * d,
+                        &di,
+                        x + i0 * d,
+                        &di,
+                        &zero,
+                        ip_block.get(),
+                        &nyi);
+#ifdef __aarch64__
+                } else if constexpr (std::is_same_v<T, float16_t>) {
+                    std::vector<float> x_float(nx * d);
+                    std::vector<float> y_float(ny * d);
+                    convert_fp16_to_fp32(x, nx * d, x_float.data());
+                    convert_fp16_to_fp32(y, ny * d, y_float.data());
+                    sgemm_("Transpose",
                        "Not transpose",
                        &nyi,
                        &nxi,
                        &di,
                        &one,
-                       y + j0 * d,
+                       y_float.data() + j0 * d,
                        &di,
-                       x + i0 * d,
+                       x_float.data() + i0 * d,
                        &di,
                        &zero,
                        ip_block.get(),
                        &nyi);
+#endif
+                } else {
+                    throw std::invalid_argument("exhaustive_inner_product_blas: Unsupported numeric type");
+                }
             }
 
             res.add_results(j0, j1, ip_block.get());
@@ -259,10 +315,10 @@ void exhaustive_inner_product_blas(
 
 // distance correction is an operator that can be applied to transform
 // the distances
-template <class BlockResultHandler>
+template <typename T, class BlockResultHandler>
 void exhaustive_L2sqr_blas_default_impl(
-        const float* x,
-        const float* y,
+        const T* x,
+        const T* y,
         size_t d,
         size_t nx,
         size_t ny,
@@ -280,12 +336,28 @@ void exhaustive_L2sqr_blas_default_impl(
     std::unique_ptr<float[]> x_norms(new float[nx]);
     std::unique_ptr<float[]> del2;
 
-    fvec_norms_L2sqr(x_norms.get(), x, d, nx);
+    if constexpr (std::is_same_v<T, float>){
+        fvec_norms_L2sqr(x_norms.get(), x, d, nx);
+#ifdef __aarch64__
+    } else if constexpr (std::is_same_v<T, float16_t>) {
+        fvec_norms_L2sqr_f16(x_norms.get(), x, d, nx);
+#endif
+    } else {
+        throw std::invalid_argument("exhaustive_L2sqr_blas_default_impl: Unsupported numeric type");
+    }
 
     if (!y_norms) {
         float* y_norms2 = new float[ny];
         del2.reset(y_norms2);
-        fvec_norms_L2sqr(y_norms2, y, d, ny);
+        if constexpr (std::is_same_v<T, float>){
+            fvec_norms_L2sqr(y_norms2, y, d, ny);
+#ifdef __aarch64__
+        } else if constexpr (std::is_same_v<T, float16_t>) {
+            fvec_norms_L2sqr_f16(y_norms2, y, d, ny);
+#endif
+        } else {
+            throw std::invalid_argument("exhaustive_L2sqr_blas_default_impl: Unsupported numeric type");
+        }
         y_norms = y_norms2;
     }
 
@@ -304,7 +376,8 @@ void exhaustive_L2sqr_blas_default_impl(
             {
                 float one = 1, zero = 0;
                 FINTEGER nyi = j1 - j0, nxi = i1 - i0, di = d;
-                sgemm_("Transpose",
+                if constexpr (std::is_same_v<T, float>) {
+                    sgemm_("Transpose",
                        "Not transpose",
                        &nyi,
                        &nxi,
@@ -317,6 +390,29 @@ void exhaustive_L2sqr_blas_default_impl(
                        &zero,
                        ip_block.get(),
                        &nyi);
+#ifdef __aarch64__
+                } else if constexpr (std::is_same_v<T, float16_t>) {
+                    std::vector<float> x_float(nx * d);
+                    std::vector<float> y_float(ny * d);
+                    convert_fp16_to_fp32(x, nx * d, x_float.data());
+                    convert_fp16_to_fp32(y, ny * d, y_float.data());
+                    sgemm_("Transpose",
+                       "Not transpose",
+                       &nyi,
+                       &nxi,
+                       &di,
+                       &one,
+                       y_float.data() + j0 * d,
+                       &di,
+                       x_float.data() + i0 * d,
+                       &di,
+                       &zero,
+                       ip_block.get(),
+                       &nyi);
+#endif
+                } else {
+                    throw std::invalid_argument("exhaustive_L2sqr_blas_default_impl: Unsupported numeric type");
+                }
             }
 #pragma omp parallel for
             for (int64_t i = i0; i < i1; i++) {
@@ -342,16 +438,16 @@ void exhaustive_L2sqr_blas_default_impl(
     }
 }
 
-template <class BlockResultHandler>
+template <typename T, class BlockResultHandler>
 void exhaustive_L2sqr_blas(
-        const float* x,
-        const float* y,
+        const T* x,
+        const T* y,
         size_t d,
         size_t nx,
         size_t ny,
         BlockResultHandler& res,
         const float* y_norms = nullptr) {
-    exhaustive_L2sqr_blas_default_impl(x, y, d, nx, ny, res);
+    exhaustive_L2sqr_blas_default_impl<T>(x, y, d, nx, ny, res);
 }
 
 #ifdef __AVX2__
@@ -564,7 +660,7 @@ void exhaustive_L2sqr_blas_cmax_avx2(
 
 // an override if only a single closest point is needed
 template <>
-void exhaustive_L2sqr_blas<Top1BlockResultHandler<CMax<float, int64_t>>>(
+void exhaustive_L2sqr_blas<float, Top1BlockResultHandler<CMax<float, int64_t>>>(
         const float* x,
         const float* y,
         size_t d,
@@ -591,20 +687,20 @@ void exhaustive_L2sqr_blas<Top1BlockResultHandler<CMax<float, int64_t>>>(
 
     // run the default implementation
     exhaustive_L2sqr_blas_default_impl<
-            Top1BlockResultHandler<CMax<float, int64_t>>>(
+            float, Top1BlockResultHandler<CMax<float, int64_t>>>(
             x, y, d, nx, ny, res, y_norms);
 #else
     // run the default implementation
     exhaustive_L2sqr_blas_default_impl<
-            Top1BlockResultHandler<CMax<float, int64_t>>>(
+            float, Top1BlockResultHandler<CMax<float, int64_t>>>(
             x, y, d, nx, ny, res, y_norms);
 #endif
 }
 
-template <class BlockResultHandler>
+template <typename T, class BlockResultHandler>
 void knn_L2sqr_select(
-        const float* x,
-        const float* y,
+        const T* x,
+        const T* y,
         size_t d,
         size_t nx,
         size_t ny,
@@ -612,31 +708,31 @@ void knn_L2sqr_select(
         const float* y_norm2,
         const IDSelector* sel) {
     if (sel) {
-        exhaustive_L2sqr_seq<BlockResultHandler, true>(
+        exhaustive_L2sqr_seq<T, BlockResultHandler, true>(
                 x, y, d, nx, ny, res, sel);
     } else if (nx < distance_compute_blas_threshold) {
-        exhaustive_L2sqr_seq(x, y, d, nx, ny, res);
+        exhaustive_L2sqr_seq<T>(x, y, d, nx, ny, res);
     } else {
-        exhaustive_L2sqr_blas(x, y, d, nx, ny, res, y_norm2);
+        exhaustive_L2sqr_blas<T>(x, y, d, nx, ny, res, y_norm2);
     }
 }
 
-template <class BlockResultHandler>
+template <typename T, class BlockResultHandler>
 void knn_inner_product_select(
-        const float* x,
-        const float* y,
+        const T* x,
+        const T* y,
         size_t d,
         size_t nx,
         size_t ny,
         BlockResultHandler& res,
         const IDSelector* sel) {
     if (sel) {
-        exhaustive_inner_product_seq<BlockResultHandler, true>(
+        exhaustive_inner_product_seq<T, BlockResultHandler, true>(
                 x, y, d, nx, ny, res, sel);
     } else if (nx < distance_compute_blas_threshold) {
-        exhaustive_inner_product_seq(x, y, d, nx, ny, res);
+        exhaustive_inner_product_seq<T>(x, y, d, nx, ny, res);
     } else {
-        exhaustive_inner_product_blas(x, y, d, nx, ny, res);
+        exhaustive_inner_product_blas<T>(x, y, d, nx, ny, res);
     }
 }
 
@@ -677,13 +773,13 @@ void knn_inner_product(
 
     if (k == 1) {
         Top1BlockResultHandler<CMin<float, int64_t>> res(nx, vals, ids);
-        knn_inner_product_select(x, y, d, nx, ny, res, sel);
+        knn_inner_product_select<float>(x, y, d, nx, ny, res, sel);
     } else if (k < distance_compute_min_k_reservoir) {
         HeapBlockResultHandler<CMin<float, int64_t>> res(nx, vals, ids, k);
-        knn_inner_product_select(x, y, d, nx, ny, res, sel);
+        knn_inner_product_select<float>(x, y, d, nx, ny, res, sel);
     } else {
         ReservoirBlockResultHandler<CMin<float, int64_t>> res(nx, vals, ids, k);
-        knn_inner_product_select(x, y, d, nx, ny, res, sel);
+        knn_inner_product_select<float>(x, y, d, nx, ny, res, sel);
     }
 
     if (imin != 0) {
@@ -706,6 +802,64 @@ void knn_inner_product(
     FAISS_THROW_IF_NOT(nx == res->nh);
     knn_inner_product(x, y, d, nx, ny, res->k, res->val, res->ids, sel);
 }
+
+#ifdef __aarch64__
+void knn_inner_product_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        size_t k,
+        float* vals,
+        int64_t* ids,
+        const IDSelector* sel) {
+    int64_t imin = 0;
+    if (auto selr = dynamic_cast<const IDSelectorRange*>(sel)) {
+        imin = std::max(selr->imin, int64_t(0));
+        int64_t imax = std::min(selr->imax, int64_t(ny));
+        ny = imax - imin;
+        y += d * imin;
+        sel = nullptr;
+    }
+    if (auto sela = dynamic_cast<const IDSelectorArray*>(sel)) {
+        knn_inner_products_by_idx_f16(
+                x, y, sela->ids, d, nx, ny, sela->n, k, vals, ids, 0);
+        return;
+    }
+
+    if (k == 1) {
+        Top1BlockResultHandler<CMin<float, int64_t>> res(nx, vals, ids);
+        knn_inner_product_select<float16_t>(x, y, d, nx, ny, res, sel);
+    } else if (k < distance_compute_min_k_reservoir) {
+        HeapBlockResultHandler<CMin<float, int64_t>> res(nx, vals, ids, k);
+        knn_inner_product_select<float16_t>(x, y, d, nx, ny, res, sel);
+    } else {
+        ReservoirBlockResultHandler<CMin<float, int64_t>> res(nx, vals, ids, k);
+        knn_inner_product_select<float16_t>(x, y, d, nx, ny, res, sel);
+    }
+
+    if (imin != 0) {
+        for (size_t i = 0; i < nx * k; i++) {
+            if (ids[i] >= 0) {
+                ids[i] += imin;
+            }
+        }
+    }
+}
+
+void knn_inner_product_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        float_minheap_array_t* res,
+        const IDSelector* sel) {
+    FAISS_THROW_IF_NOT(nx == res->nh);
+    knn_inner_product_f16(x, y, d, nx, ny, res->k, res->val, res->ids, sel);
+}
+#endif
 
 void knn_L2sqr(
         const float* x,
@@ -732,13 +886,13 @@ void knn_L2sqr(
     }
     if (k == 1) {
         Top1BlockResultHandler<CMax<float, int64_t>> res(nx, vals, ids);
-        knn_L2sqr_select(x, y, d, nx, ny, res, y_norm2, sel);
+        knn_L2sqr_select<float>(x, y, d, nx, ny, res, y_norm2, sel);
     } else if (k < distance_compute_min_k_reservoir) {
         HeapBlockResultHandler<CMax<float, int64_t>> res(nx, vals, ids, k);
-        knn_L2sqr_select(x, y, d, nx, ny, res, y_norm2, sel);
+        knn_L2sqr_select<float>(x, y, d, nx, ny, res, y_norm2, sel);
     } else {
         ReservoirBlockResultHandler<CMax<float, int64_t>> res(nx, vals, ids, k);
-        knn_L2sqr_select(x, y, d, nx, ny, res, y_norm2, sel);
+        knn_L2sqr_select<float>(x, y, d, nx, ny, res, y_norm2, sel);
     }
     if (imin != 0) {
         for (size_t i = 0; i < nx * k; i++) {
@@ -762,6 +916,63 @@ void knn_L2sqr(
     knn_L2sqr(x, y, d, nx, ny, res->k, res->val, res->ids, y_norm2, sel);
 }
 
+#ifdef __aarch64__
+void knn_L2sqr_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        size_t k,
+        float* vals,
+        int64_t* ids,
+        const float* y_norm2,
+        const IDSelector* sel) {
+    int64_t imin = 0;
+    if (auto selr = dynamic_cast<const IDSelectorRange*>(sel)) {
+        imin = std::max(selr->imin, int64_t(0));
+        int64_t imax = std::min(selr->imax, int64_t(ny));
+        ny = imax - imin;
+        y += d * imin;
+        sel = nullptr;
+    }
+    if (auto sela = dynamic_cast<const IDSelectorArray*>(sel)) {
+        knn_L2sqr_by_idx_f16(x, y, sela->ids, d, nx, ny, sela->n, k, vals, ids, 0);
+        return;
+    }
+    if (k == 1) {
+        Top1BlockResultHandler<CMax<float, int64_t>> res(nx, vals, ids);
+        knn_L2sqr_select<float16_t>(x, y, d, nx, ny, res, y_norm2, sel);
+    } else if (k < distance_compute_min_k_reservoir) {
+        HeapBlockResultHandler<CMax<float, int64_t>> res(nx, vals, ids, k);
+        knn_L2sqr_select<float16_t>(x, y, d, nx, ny, res, y_norm2, sel);
+    } else {
+        ReservoirBlockResultHandler<CMax<float, int64_t>> res(nx, vals, ids, k);
+        knn_L2sqr_select<float16_t>(x, y, d, nx, ny, res, y_norm2, sel);
+    }
+    if (imin != 0) {
+        for (size_t i = 0; i < nx * k; i++) {
+            if (ids[i] >= 0) {
+                ids[i] += imin;
+            }
+        }
+    }
+}
+
+void knn_L2sqr_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        float_maxheap_array_t* res,
+        const float* y_norm2,
+        const IDSelector* sel) {
+    FAISS_THROW_IF_NOT(res->nh == nx);
+    knn_L2sqr_f16(x, y, d, nx, ny, res->k, res->val, res->ids, y_norm2, sel);
+}
+#endif
+
 /***************************************************************************
  * Range search
  ***************************************************************************/
@@ -778,13 +989,35 @@ void range_search_L2sqr(
     using RH = RangeSearchBlockResultHandler<CMax<float, int64_t>>;
     RH resh(res, radius);
     if (sel) {
-        exhaustive_L2sqr_seq<RH, true>(x, y, d, nx, ny, resh, sel);
+        exhaustive_L2sqr_seq<float, RH, true>(x, y, d, nx, ny, resh, sel);
     } else if (nx < distance_compute_blas_threshold) {
-        exhaustive_L2sqr_seq(x, y, d, nx, ny, resh, sel);
+        exhaustive_L2sqr_seq<float>(x, y, d, nx, ny, resh, sel);
     } else {
-        exhaustive_L2sqr_blas(x, y, d, nx, ny, resh);
+        exhaustive_L2sqr_blas<float>(x, y, d, nx, ny, resh);
     }
 }
+
+#ifdef __aarch64__
+void range_search_L2sqr_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        float radius,
+        RangeSearchResult* res,
+        const IDSelector* sel) {
+    using RH = RangeSearchBlockResultHandler<CMax<float, int64_t>>;
+    RH resh(res, radius);
+    if (sel) {
+        exhaustive_L2sqr_seq<float16_t, RH, true>(x, y, d, nx, ny, resh, sel);
+    } else if (nx < distance_compute_blas_threshold) {
+        exhaustive_L2sqr_seq<float16_t>(x, y, d, nx, ny, resh, sel);
+    } else {
+        exhaustive_L2sqr_blas<float16_t>(x, y, d, nx, ny, resh);
+    }
+}
+#endif
 
 void range_search_inner_product(
         const float* x,
@@ -798,13 +1031,35 @@ void range_search_inner_product(
     using RH = RangeSearchBlockResultHandler<CMin<float, int64_t>>;
     RH resh(res, radius);
     if (sel) {
-        exhaustive_inner_product_seq<RH, true>(x, y, d, nx, ny, resh, sel);
+        exhaustive_inner_product_seq<float, RH, true>(x, y, d, nx, ny, resh, sel);
     } else if (nx < distance_compute_blas_threshold) {
-        exhaustive_inner_product_seq(x, y, d, nx, ny, resh);
+        exhaustive_inner_product_seq<float>(x, y, d, nx, ny, resh);
     } else {
-        exhaustive_inner_product_blas(x, y, d, nx, ny, resh);
+        exhaustive_inner_product_blas<float>(x, y, d, nx, ny, resh);
     }
 }
+
+#ifdef __aarch64__
+void range_search_inner_product_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        float radius,
+        RangeSearchResult* res,
+        const IDSelector* sel) {
+    using RH = RangeSearchBlockResultHandler<CMin<float, int64_t>>;
+    RH resh(res, radius);
+    if (sel) {
+        exhaustive_inner_product_seq<float16_t, RH, true>(x, y, d, nx, ny, resh, sel);
+    } else if (nx < distance_compute_blas_threshold) {
+        exhaustive_inner_product_seq<float16_t>(x, y, d, nx, ny, resh);
+    } else {
+        exhaustive_inner_product_blas<float16_t>(x, y, d, nx, ny, resh);
+    }
+}
+#endif
 
 /***************************************************************************
  * compute a subset of  distances
@@ -835,6 +1090,31 @@ void fvec_inner_products_by_idx(
     }
 }
 
+#ifdef __aarch64__
+void fvec_inner_products_by_idx_f16(
+        float* __restrict ip,
+        const float16_t* x,
+        const float16_t* y,
+        const int64_t* __restrict ids, /* for y vecs */
+        size_t d,
+        size_t nx,
+        size_t ny) {
+#pragma omp parallel for
+    for (int64_t j = 0; j < nx; j++) {
+        const int64_t* __restrict idsj = ids + j * ny;
+        const float16_t* xj = x + j * d;
+        float* __restrict ipj = ip + j * ny;
+        for (size_t i = 0; i < ny; i++) {
+            if (idsj[i] < 0) {
+                ipj[i] = -INFINITY;
+            } else {
+                ipj[i] = fvec_inner_product_f16(xj, y + d * idsj[i], d);
+            }
+        }
+    }
+}
+#endif
+
 /* compute the inner product between x and a subset y of ny vectors,
    whose indices are given by idy.  */
 void fvec_L2sqr_by_idx(
@@ -859,6 +1139,31 @@ void fvec_L2sqr_by_idx(
         }
     }
 }
+
+#ifdef __aarch64__
+void fvec_L2sqr_by_idx_f16(
+        float* __restrict dis,
+        const float16_t* x,
+        const float16_t* y,
+        const int64_t* __restrict ids, /* ids of y vecs */
+        size_t d,
+        size_t nx,
+        size_t ny) {
+#pragma omp parallel for
+    for (int64_t j = 0; j < nx; j++) {
+        const int64_t* __restrict idsj = ids + j * ny;
+        const float16_t* xj = x + j * d;
+        float* __restrict disj = dis + j * ny;
+        for (size_t i = 0; i < ny; i++) {
+            if (idsj[i] < 0) {
+                disj[i] = INFINITY;
+            } else {
+                disj[i] = fvec_L2sqr_f16(xj, y + d * idsj[i], d);
+            }
+        }
+    }
+}
+#endif
 
 void pairwise_indexed_L2sqr(
         size_t d,
@@ -937,6 +1242,47 @@ void knn_inner_products_by_idx(
     }
 }
 
+#ifdef __aarch64__
+void knn_inner_products_by_idx_f16(
+        const float16_t* x,
+        const float16_t* y,
+        const int64_t* ids,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        size_t nsubset,
+        size_t k,
+        float* res_vals,
+        int64_t* res_ids,
+        int64_t ld_ids) {
+    if (ld_ids < 0) {
+        ld_ids = ny;
+    }
+
+#pragma omp parallel for if (nx > 100)
+    for (int64_t i = 0; i < nx; i++) {
+        const float16_t* x_ = x + i * d;
+        const int64_t* idsi = ids + i * ld_ids;
+        size_t j;
+        float* __restrict simi = res_vals + i * k;
+        int64_t* __restrict idxi = res_ids + i * k;
+        minheap_heapify(k, simi, idxi);
+
+        for (j = 0; j < nsubset; j++) {
+            if (idsi[j] < 0 || idsi[j] >= ny) {
+                break;
+            }
+            float ip = fvec_inner_product_f16(x_, y + d * idsi[j], d);
+
+            if (ip > simi[0]) {
+                minheap_replace_top(k, simi, idxi, ip, idsi[j]);
+            }
+        }
+        minheap_reorder(k, simi, idxi);
+    }
+}
+#endif
+
 void knn_L2sqr_by_idx(
         const float* x,
         const float* y,
@@ -972,6 +1318,44 @@ void knn_L2sqr_by_idx(
         maxheap_reorder(k, simi, idxi);
     }
 }
+
+#ifdef __aarch64__
+void knn_L2sqr_by_idx_f16(
+        const float16_t* x,
+        const float16_t* y,
+        const int64_t* __restrict ids,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        size_t nsubset,
+        size_t k,
+        float* res_vals,
+        int64_t* res_ids,
+        int64_t ld_ids) {
+    if (ld_ids < 0) {
+        ld_ids = ny;
+    }
+#pragma omp parallel for if (nx > 100)
+    for (int64_t i = 0; i < nx; i++) {
+        const float16_t* x_ = x + i * d;
+        const int64_t* __restrict idsi = ids + i * ld_ids;
+        float* __restrict simi = res_vals + i * k;
+        int64_t* __restrict idxi = res_ids + i * k;
+        maxheap_heapify(k, simi, idxi);
+        for (size_t j = 0; j < nsubset; j++) {
+            if (idsi[j] < 0 || idsi[j] >= ny) {
+                break;
+            }
+            float disij = fvec_L2sqr_f16(x_, y + d * idsi[j], d);
+
+            if (disij < simi[0]) {
+                maxheap_replace_top(k, simi, idxi, disij, idsi[j]);
+            }
+        }
+        maxheap_reorder(k, simi, idxi);
+    }
+}
+#endif
 
 void pairwise_L2sqr(
         int64_t d,

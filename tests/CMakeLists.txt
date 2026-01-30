@@ -34,6 +34,19 @@ set(FAISS_TEST_SRC
   test_fastscan_perf.cpp
 )
 
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+  list(APPEND FAISS_TEST_SRC
+    common_test_functions.cpp
+    common_test_functions.h
+    test_distances_fp16.cpp
+    test_index_flat_fp16.cpp
+    test_index_hnsw_fp16.cpp
+    test_index_hnsw2level_fp16.cpp
+    test_index_hnswpq_fp16.cpp
+    test_index_hnswsq_fp16.cpp
+  )
+endif()
+
 if(OPTI_IVFPQ OR KRL)
   list(APPEND FAISS_TEST_SRC test_index_refine.cpp)
 endif()

@@ -311,3 +311,37 @@ int krl_reorder_2_vector_continuous(const KRLDistanceHandle *kdh, int64_t base_k
     free(base_dis);
     return SUCCESS;
 }
+
+int krl_reorder_2_vector_continuous_f16(const KRLDistanceHandle *kdh, int64_t base_k, int64_t begin_id,
+    const float16_t *query_vector, int64_t k, float *dis, int64_t *idx, size_t query_vector_size)
+{
+    const size_t use_parm = kdh->blocksize;
+    const size_t compute_bits = kdh->data_bits;
+    const int metric_type = kdh->metric_type;
+    const size_t d = kdh->d;
+    const float *base_vector = kdh->transposed_codes;
+    const uint8_t *quanted_index = kdh->quanted_codes + begin_id * d;
+    const size_t codes_num = kdh->ny;
+    float *base_dis = (float *)malloc(base_k * sizeof(float));
+    if (base_dis == NULL) {
+        printf("Error: FAILALLOC in krl_reorder_2_vector_continuous\n");
+        return FAILALLOC;
+    }
+    int64_t *base_idx = (int64_t *)malloc(base_k * sizeof(int64_t));
+    if (base_idx == NULL) {
+        printf("Error: FAILALLOC in krl_reorder_2_vector_continuous\n");
+        free(base_dis);
+        return FAILALLOC;
+    }
+    create_continuous_idx(base_idx, base_k, begin_id);
+    if (metric_type == METRIC_L2) {
+        krl_L2sqr_ny_f16f32(base_dis, (const uint16_t *)query_vector, (const uint16_t *)base_vector + begin_id * d, base_k, d, base_k);
+        krl_reorder_2_heaps_asce(k, idx, dis, base_k, base_idx, base_dis);
+    } else {
+        krl_inner_product_ny_f16f32(base_dis, (const uint16_t *)query_vector, (const uint16_t *)base_vector + begin_id * d, base_k, d, base_k);
+        krl_reorder_2_heaps_desc(k, idx, dis, base_k, base_idx, base_dis);
+    }
+    free(base_idx);
+    free(base_dis);
+    return SUCCESS;
+}

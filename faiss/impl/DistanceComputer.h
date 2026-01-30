@@ -29,8 +29,14 @@ struct DistanceComputer {
     /// called before computing distances. Pointer x should remain valid
     /// while operator () is called
     virtual void set_query(const float* x) = 0;
+#ifdef __aarch64__
+    virtual void set_query(const float16_t* x) {}
+#endif
 #ifdef KRL
     virtual void set_base(const float* x) = 0;
+
+    virtual void set_base(const float16_t* x) {}
+
 #endif
     /// compute distance of vector i to current query
     virtual float operator()(idx_t i) = 0;
@@ -89,10 +95,14 @@ struct FlatCodesDistanceComputer : DistanceComputer {
         return distance_to_code(codes + i * code_size);
     }
 
-#ifdef KRL
     void set_query(const float* x) override {}
+#ifdef KRL
+    void set_base(const float* x) override {}
 
-	void set_base(const float* x) override {}
+    void set_query(const float16_t* x) override {}
+
+    void set_base(const float16_t* x) override {}
+
 #endif
 
     /// compute distance of current query to an encoded vector

@@ -326,13 +326,17 @@ target_include_directories(faiss PUBLIC
 )
 
 if(FAISS_ENABLE_KRL)
+  target_compile_definitions(faiss PRIVATE KRL)
+
+  target_compile_options(faiss PRIVATE
+    $<$<COMPILE_LANGUAGE:C,CXX>:-O3 -fpermissive>
+    $<$<COMPILE_LANGUAGE:C,CXX>:-march=armv8.2-a+fp16fml+dotprod>
+  )
+
   target_include_directories(faiss PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/sra_krl/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/faiss/sra_krl>
   )
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/sra_krl/include/
-          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/faiss/sra_krl/include
-          FILES_MATCHING PATTERN "*.h")
 endif()
 
 # -------------------- OPTI_IVFPQ compile flags / ASM (ARM only) --------------------

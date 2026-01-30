@@ -85,8 +85,18 @@ struct NegativeDistanceComputer : DistanceComputer {
     void set_query(const float* x) override {
         basedis->set_query(x);
     }
+
+#ifdef __aarch64__
+    void set_query(const float16_t* x) override {
+        basedis->set_query(x);
+    }
+#endif
+
 #ifdef KRL
 	void set_base(const float* x) override {}
+#ifdef __aarch64__
+	void set_base(const float16_t* x) override {}
+#endif
 #endif
     /// compute distance of vector i to current query
     float operator()(idx_t i) override {
@@ -179,12 +189,12 @@ void graphBFSPerm(faiss::IndexHNSW *index, faiss::idx_t* perm)
     }
 }
 #endif
-
+template<typename T>
 void hnsw_add_vertices(
         IndexHNSW& index_hnsw,
         size_t n0,
         size_t n,
-        const float* x,
+        const T* x,
         bool verbose,
         bool preset_levels = false) {
     size_t d = index_hnsw.d;
@@ -350,6 +360,14 @@ IndexHNSW::IndexHNSW(int d, int M, MetricType metric)
 IndexHNSW::IndexHNSW(Index* storage, int M)
         : Index(storage->d, storage->metric_type), hnsw(M), storage(storage) {}
 
+#ifdef __aarch64__
+IndexHNSW::IndexHNSW(int d, int M, NumericType ntype, MetricType metric)
+        : Index(d, ntype, metric), hnsw(M) {}
+
+IndexHNSW::IndexHNSW(Index* storage, NumericType ntype, int M)
+        : Index(storage->d, ntype, storage->metric_type), hnsw(M), storage(storage) {}
+#endif
+
 IndexHNSW::~IndexHNSW() {
 #ifdef KRL
     if (own_fields) {
@@ -391,6 +409,14 @@ struct FlatL2DisSQ8 : DistanceComputer {
         b8 = (uint8_t*)x;
     }
 
+    void set_query(const float16_t* x) final override{
+        q8 = (uint8_t*)x;
+    };
+
+    void set_base(const float16_t* x) final override {
+        b8 = (uint8_t*)x;
+    }
+
     float operator()(idx_t i) override {
 		uint32_t ret;
 		krl_L2sqr_u8u32(q8, b8 + i * d, d, &ret, 1);
@@ -424,6 +450,14 @@ struct FlatL2DisSQ16 : DistanceComputer {
 
     void set_base(const float* x) final override {
         b16 = (float16_t*)x;
+    }
+
+    void set_query(const float16_t* x) final override {
+        q16 = x;
+    }
+
+    void set_base(const float16_t* x) final override {
+        b16 = x;
     }
 
     float operator()(idx_t i) override {
@@ -583,15 +617,124 @@ void quant_u8_noscale(const float* src, idx_t d, uint8_t* out) {
         out[l] = (uint8_t)(src[l] + 0.5);
     }
 }
+
+void quant_u8_noscale_f16(const float16_t* src, idx_t d, uint8_t* out) {
+    idx_t l = 0;    
+    constexpr idx_t multi_loop = 32;
+    constexpr idx_t double_loop = 16;
+    constexpr idx_t single_loop = 8;
+
+    for(; l + multi_loop <= d; l += multi_loop) {
+        float16x8_t neon_a1 = vld1q_f16(src + l);
+        float16x8_t neon_a2 = vld1q_f16(src + l + 8);
+        float16x8_t neon_a3 = vld1q_f16(src + l + 16);
+        float16x8_t neon_a4 = vld1q_f16(src + l + 24);
+
+        float32x4_t neon_b1_l = vcvt_f32_f16(vget_low_f16(neon_a1));
+        float32x4_t neon_b1_h = vcvt_f32_f16(vget_high_f16(neon_a1));
+        float32x4_t neon_b2_l = vcvt_f32_f16(vget_low_f16(neon_a2));
+        float32x4_t neon_b2_h = vcvt_f32_f16(vget_high_f16(neon_a2));
+        float32x4_t neon_b3_l = vcvt_f32_f16(vget_low_f16(neon_a3));
+        float32x4_t neon_b3_h = vcvt_f32_f16(vget_high_f16(neon_a3));
+        float32x4_t neon_b4_l = vcvt_f32_f16(vget_low_f16(neon_a4));
+        float32x4_t neon_b4_h = vcvt_f32_f16(vget_high_f16(neon_a4));
+
+        uint32x4_t neon_c1_l = vcvtnq_u32_f32(neon_b1_l);
+        uint32x4_t neon_c1_h = vcvtnq_u32_f32(neon_b1_h);
+        uint32x4_t neon_c2_l = vcvtnq_u32_f32(neon_b2_l);
+        uint32x4_t neon_c2_h = vcvtnq_u32_f32(neon_b2_h);
+        uint32x4_t neon_c3_l = vcvtnq_u32_f32(neon_b3_l);
+        uint32x4_t neon_c3_h = vcvtnq_u32_f32(neon_b3_h);
+        uint32x4_t neon_c4_l = vcvtnq_u32_f32(neon_b4_l);
+        uint32x4_t neon_c4_h = vcvtnq_u32_f32(neon_b4_h);
+
+        uint16x4_t neon_d1_l = vqmovn_u32(neon_c1_l);
+        uint16x4_t neon_d1_h = vqmovn_u32(neon_c1_h);
+        uint16x4_t neon_d2_l = vqmovn_u32(neon_c2_l);
+        uint16x4_t neon_d2_h = vqmovn_u32(neon_c2_h);
+        uint16x4_t neon_d3_l = vqmovn_u32(neon_c3_l);
+        uint16x4_t neon_d3_h = vqmovn_u32(neon_c3_h);
+        uint16x4_t neon_d4_l = vqmovn_u32(neon_c4_l);
+        uint16x4_t neon_d4_h = vqmovn_u32(neon_c4_h);
+
+        uint16x8_t neon_e1 = vcombine_u16(neon_d1_l, neon_d1_h);
+        uint16x8_t neon_e2 = vcombine_u16(neon_d2_l, neon_d2_h);
+        uint16x8_t neon_e3 = vcombine_u16(neon_d3_l, neon_d3_h);
+        uint16x8_t neon_e4 = vcombine_u16(neon_d4_l, neon_d4_h);
+
+        uint8x8_t neon_f1 = vqmovn_u16(neon_e1);
+        uint8x8_t neon_f2 = vqmovn_u16(neon_e2);
+        uint8x8_t neon_f3 = vqmovn_u16(neon_e3);
+        uint8x8_t neon_f4 = vqmovn_u16(neon_e4);
+
+        vst1_u8(out + l, neon_f1);
+        vst1_u8(out + l + 8, neon_f2);
+        vst1_u8(out + l + 16, neon_f3);
+        vst1_u8(out + l + 24, neon_f4);
+    }
+
+    if((d - l) >= double_loop) {
+        float16x8_t neon_a1 = vld1q_f16(src + l);
+        float16x8_t neon_a2 = vld1q_f16(src + l + 8);
+
+        float32x4_t neon_b1_l = vcvt_f32_f16(vget_low_f16(neon_a1));
+        float32x4_t neon_b1_h = vcvt_f32_f16(vget_high_f16(neon_a1));
+        float32x4_t neon_b2_l = vcvt_f32_f16(vget_low_f16(neon_a2));
+        float32x4_t neon_b2_h = vcvt_f32_f16(vget_high_f16(neon_a2));
+
+        uint32x4_t neon_c1_l = vcvtnq_u32_f32(neon_b1_l);
+        uint32x4_t neon_c1_h = vcvtnq_u32_f32(neon_b1_h);
+        uint32x4_t neon_c2_l = vcvtnq_u32_f32(neon_b2_l);
+        uint32x4_t neon_c2_h = vcvtnq_u32_f32(neon_b2_h);
+
+        uint16x4_t neon_d1_l = vqmovn_u32(neon_c1_l);
+        uint16x4_t neon_d1_h = vqmovn_u32(neon_c1_h);
+        uint16x4_t neon_d2_l = vqmovn_u32(neon_c2_l);
+        uint16x4_t neon_d2_h = vqmovn_u32(neon_c2_h);
+
+        uint16x8_t neon_e1 = vcombine_u16(neon_d1_l, neon_d1_h);
+        uint16x8_t neon_e2 = vcombine_u16(neon_d2_l, neon_d2_h);
+
+        uint8x8_t neon_f1 = vqmovn_u16(neon_e1);
+        uint8x8_t neon_f2 = vqmovn_u16(neon_e2);
+
+        vst1_u8(out + l, neon_f1);
+        vst1_u8(out + l + 8, neon_f2);
+        l += 16;
+    }
+
+    if((d - l) >= single_loop) {
+        float16x8_t neon_a = vld1q_f16(src + l);
+
+        float32x4_t neon_b_lo = vcvt_f32_f16(vget_low_f16(neon_a));
+        float32x4_t neon_b_hi = vcvt_f32_f16(vget_high_f16(neon_a));
+
+        uint32x4_t neon_c_lo = vcvtnq_u32_f32(neon_b_lo);
+        uint32x4_t neon_c_hi = vcvtnq_u32_f32(neon_b_hi);
+
+        uint16x4_t neon_d_lo = vqmovn_u32(neon_c_lo);
+        uint16x4_t neon_d_hi = vqmovn_u32(neon_c_hi);
+
+        uint16x8_t neon_e = vcombine_u16(neon_d_lo, neon_d_hi);
+        uint8x8_t neon_f = vqmovn_u16(neon_e);
+
+        vst1_u8(out + l, neon_f);
+        l += 8;
+    }
+
+    for (; l < d; ++l) {
+        out[l] = (uint8_t)((float)(src[l]) + 0.5f);
+    }
+}
+
 #endif
 
 namespace {
-
-template <class BlockResultHandler>
+template <typename T, class BlockResultHandler>
 void hnsw_search(
         const IndexHNSW* index,
         idx_t n,
-        const float* x,
+        const T* x,
         BlockResultHandler& bres,
         const SearchParameters* params_in) {
     FAISS_THROW_IF_NOT_MSG(
@@ -619,37 +762,57 @@ void hnsw_search(
         {
             VisitedTable vt(index->ntotal);
             typename BlockResultHandler::SingleResultHandler res(bres);
-            DistanceComputer* dis = nullptr;
+            std::unique_ptr<DistanceComputer> dis;
             if(index->quant_bits == 16) {
                 auto f16_x = std::make_unique<float16_t[]>(index->d);
                 if(index->metric_type == METRIC_L2) {
-                    dis = new FlatL2DisSQ16(index->d);
+                    dis = std::make_unique<FlatL2DisSQ16>(index->d);
                 } else {
-                    dis = new FlatIPDisSQ16(index->d);
+                    dis = std::make_unique<FlatIPDisSQ16>(index->d);
                 }
-                dis->set_base((float*)index->storage->get_codes_pointer());
-            
+                if constexpr (std::is_same_v<T, float16_t>) {
+                    dis->set_base((float16_t*)index->storage->get_codes_pointer());
+                } else {
+                    dis->set_base((float*)index->storage->get_codes_pointer());
+                }
+
                 for (idx_t i = i0; i < i1; i++) {
                     res.begin(i);
-                    quant_f16_noscale(x + i * index->d, index->d, f16_x.get());
-                    dis->set_query((float*)f16_x.get());
+                    if constexpr (std::is_same_v<T, float16_t>) {
+                        dis->set_query(x + i * index->d);
+                    } else {
+                        quant_f16_noscale(x + i * index->d, index->d, f16_x.get());
+                        dis->set_query((float*)f16_x.get());
+                    }
                     hnsw.search(*dis, res, vt, params);
                     res.end();
                 }
             } else if (index->quant_bits == 8) {
-                dis = new FlatL2DisSQ8(index->d);
-                dis->set_base((float*)index->storage->get_codes_pointer());
+                dis = std::make_unique<FlatL2DisSQ8>(index->d);
+                
                 auto u8_x = std::make_unique<uint8_t[]>(index->d);
             
-                for (idx_t i = i0; i < i1; i++) {
-                    quant_u8_noscale(x + i * index->d, index->d, u8_x.get());
-                    res.begin(i);
-                    dis->set_query((float*)u8_x.get());
-                    hnsw.search(*dis, res, vt, params);
-                    res.end();
+                if constexpr (std::is_same_v<T, float16_t>) {
+                    dis->set_base((float16_t*)index->storage->get_codes_pointer());
+                    for (idx_t i = i0; i < i1; i++) {
+                        quant_u8_noscale_f16(x + i * index->d, index->d, u8_x.get());
+                        res.begin(i);
+                        dis->set_query((float16_t*)u8_x.get());
+                        hnsw.search(*dis, res, vt, params);
+                        res.end();
+                    }
+                } else {
+                    dis->set_base((float*)index->storage->get_codes_pointer());
+                    for (idx_t i = i0; i < i1; i++) {
+                        quant_u8_noscale(x + i * index->d, index->d, u8_x.get());
+                        res.begin(i);
+                        dis->set_query((float*)u8_x.get());
+                        hnsw.search(*dis, res, vt, params);
+                        res.end();
+                    }
                 }
             } else {
-                dis = storage_distance_computer(index->storage);
+                dis.reset(storage_distance_computer(index->storage));
             
                 for (idx_t i = i0; i < i1; i++) {
                     res.begin(i);
@@ -658,7 +821,6 @@ void hnsw_search(
                     res.end();
                 }
             }
-            delete dis;
         }
         InterruptCallback::check();
         
@@ -707,7 +869,7 @@ void IndexHNSW::search(
     using RH = HeapBlockResultHandler<HNSW::C>;
     RH bres(n, distances, labels, k);
 
-    hnsw_search(this, n, x, bres, params_in);
+    hnsw_search<float>(this, n, x, bres, params_in);
 
     if (is_similarity_metric(this->metric_type)) {
         // we need to revert the negated distances
@@ -735,7 +897,7 @@ void IndexHNSW::range_search(
     using RH = RangeSearchBlockResultHandler<HNSW::C>;
     RH bres(result, radius);
 
-    hnsw_search(this, n, x, bres, params);
+    hnsw_search<float>(this, n, x, bres, params);
 
     if (is_similarity_metric(this->metric_type)) {
         // we need to revert the negated distances
@@ -754,7 +916,8 @@ void IndexHNSW::add(idx_t n, const float* x) {
     storage->add(n, x);
     ntotal = storage->ntotal;
 
-    hnsw_add_vertices(*this, n0, n, x, verbose, hnsw.levels.size() == ntotal);
+    hnsw_add_vertices<float>(*this, n0, n, x, verbose, hnsw.levels.size() == ntotal);
+
 #ifdef KRL
     if(quant_bits == 16) {
         storage->quant_entries_f16(storage->get_codes_pointer(), n * d, quant_scale);
@@ -1016,6 +1179,140 @@ void IndexHNSW::permute_entries(const idx_t* perm) {
     hnsw.permute_entries(perm);
 }
 
+/* added FP16 function interfaces */
+#ifdef __aarch64__
+void IndexHNSW::add(idx_t n, const float16_t* x) {
+    FAISS_THROW_IF_NOT_MSG(
+            storage,
+            "Please use IndexHNSWFlat (or variants) instead of IndexHNSW directly");
+    FAISS_THROW_IF_NOT(is_trained);
+    int n0 = ntotal;
+    storage->add(n, x);
+    ntotal = storage->ntotal;
+
+    hnsw_add_vertices<float16_t>(*this, n0, n, x, verbose, hnsw.levels.size() == ntotal);
+#ifdef KRL
+    if(quant_bits == 16) {
+        storage->quant_entries_f16(storage->get_codes_pointer(), n * d, quant_scale);
+    } else if(quant_bits == 8) {
+        storage->quant_entries_u8(storage->get_codes_pointer(), n * d, quant_scale);
+    }
+#endif
+}
+
+void IndexHNSW::train(idx_t n, const float16_t* x) {
+    FAISS_THROW_IF_NOT_MSG(
+        storage,
+        "Please use IndexHNSWFlat (or variants) instead of IndexHNSW directly");
+    // hnsw structure does not require training
+    storage->train(n, x);
+    is_trained = true;
+}
+
+void IndexHNSW::search(
+        idx_t n,
+        const float16_t* x,
+        idx_t k,
+        float* distances,
+        idx_t* labels,
+        const SearchParameters* params_in) const {
+    FAISS_THROW_IF_NOT(k > 0);
+
+    using RH = HeapBlockResultHandler<HNSW::C>;
+    RH bres(n, distances, labels, k);
+
+    hnsw_search<float16_t>(this, n, x, bres, params_in);
+
+    if (is_similarity_metric(this->metric_type)) {
+        // we need to revert the negated distances
+        for (size_t i = 0; i < k * n; i++) {
+            distances[i] = -distances[i];
+        }
+    }
+#ifdef KRL
+    // *** add for reordering ***
+    if (apply_reorder) {
+        std::vector<idx_t> labels_permuted(n * k);
+        for (size_t i = 0; i < n * k; ++i) {
+            labels_permuted[i] = perm[labels[i]];
+        }
+        std::copy_n(labels_permuted.cbegin(), n * k, labels);
+    }
+#endif
+}
+
+void IndexHNSW::range_search(
+        idx_t n,
+        const float16_t* x,
+        float radius,
+        RangeSearchResult* result,
+        const SearchParameters* params) const {
+    using RH = RangeSearchBlockResultHandler<HNSW::C>;
+    RH bres(result, radius);
+
+    hnsw_search<float16_t>(this, n, x, bres, params);
+
+    if (is_similarity_metric(this->metric_type)) {
+        // we need to revert the negated distances
+        for (size_t i = 0; i < result->lims[result->nq]; i++) {
+            result->distances[i] = -result->distances[i];
+        }
+    }
+}
+
+void IndexHNSW::reconstruct(idx_t key, float16_t* recons) const {
+    storage->reconstruct(key, recons);
+}
+
+void IndexHNSW::search_level_0(
+        idx_t n,
+        const float16_t* x,
+        idx_t k,
+        const storage_idx_t* nearest,
+        const float* nearest_d,
+        float* distances,
+        idx_t* labels,
+        int nprobe,
+        int search_type) const {
+    FAISS_THROW_IF_NOT(k > 0);
+    FAISS_THROW_IF_NOT(nprobe > 0);
+
+    storage_idx_t ntotal = hnsw.levels.size();
+
+    using RH = HeapBlockResultHandler<HNSW::C>;
+    RH bres(n, distances, labels, k);
+
+#pragma omp parallel
+    {
+        std::unique_ptr<DistanceComputer> qdis(
+                storage_distance_computer(storage));
+        HNSWStats search_stats;
+        VisitedTable vt(ntotal);
+        RH::SingleResultHandler res(bres);
+
+#pragma omp for
+        for (idx_t i = 0; i < n; i++) {
+            res.begin(i);
+            qdis->set_query(x + i * d);
+
+            hnsw.search_level_0(
+                    *qdis.get(),
+                    res,
+                    nprobe,
+                    nearest + i * nprobe,
+                    nearest_d + i * nprobe,
+                    search_type,
+                    search_stats,
+                    vt);
+            res.end();
+            vt.advance();
+        }
+#pragma omp critical
+        { hnsw_stats.combine(search_stats); }
+    }
+}
+#endif
+
 /**************************************************************
  * IndexHNSWFlat implementation
  **************************************************************/
@@ -1032,6 +1329,18 @@ IndexHNSWFlat::IndexHNSWFlat(int d, int M, MetricType metric)
     own_fields = true;
     is_trained = true;
 }
+
+#ifdef __aarch64__
+IndexHNSWFlat::IndexHNSWFlat(int d, int M, NumericType ntype, MetricType metric)
+        : IndexHNSW(
+                  (metric == METRIC_L2) ? new IndexFlatL2(d, ntype)
+                                        : new IndexFlat(d, ntype, metric),
+                  ntype,
+                  M) {
+    own_fields = true;
+    is_trained = true;
+}
+#endif
 
 /**************************************************************
  * IndexHNSWPQ implementation
@@ -1050,6 +1359,107 @@ void IndexHNSWPQ::train(idx_t n, const float* x) {
     (dynamic_cast<IndexPQ*>(storage))->pq.compute_sdc_table();
 }
 
+/* explicit FP32 function interface */
+#ifdef __aarch64__
+void IndexHNSWPQ::add(idx_t n, const float* x) {
+    IndexHNSW::add(n, x);
+}
+
+void IndexHNSWPQ::search(
+        idx_t n,
+        const float* x,
+        idx_t k,
+        float* distances,
+        idx_t* labels,
+        const SearchParameters* params) const {
+    IndexHNSW::search(n, x, k, distances, labels, params);
+}
+
+void IndexHNSWPQ::range_search(
+        idx_t n,
+        const float* x,
+        float radius,
+        RangeSearchResult* result,
+        const SearchParameters* params) const {
+    IndexHNSW::range_search(n, x, radius, result, params);
+}
+
+void IndexHNSWPQ::reconstruct(idx_t key, float* recons) const {
+    IndexHNSW::reconstruct(key, recons);
+}
+
+void IndexHNSWPQ::search_level_0(
+        idx_t n,
+        const float* x,
+        idx_t k,
+        const storage_idx_t* nearest,
+        const float* nearest_d,
+        float* distances,
+        idx_t* labels,
+        int nprobe,
+        int search_type) const {
+    IndexHNSW::search_level_0(n, x, k, nearest, nearest_d, distances, labels, nprobe, search_type);
+}
+
+/* added FP16 function interfaces */
+void IndexHNSWPQ::add(idx_t n, const float16_t* x) {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::add(n, x_float.data());
+}
+
+void IndexHNSWPQ::train(idx_t n, const float16_t* x) {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::train(n, x_float.data());
+    (dynamic_cast<IndexPQ*>(storage))->pq.compute_sdc_table();
+}
+
+void IndexHNSWPQ::search(
+        idx_t n,
+        const float16_t* x,
+        idx_t k,
+        float* distances,
+        idx_t* labels,
+        const SearchParameters* params) const {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::search(n, x_float.data(), k, distances, labels, params);
+}
+
+void IndexHNSWPQ::range_search(
+        idx_t n,
+        const float16_t* x,
+        float radius,
+        RangeSearchResult* result,
+        const SearchParameters* params) const {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::range_search(n, x_float.data(), radius, result, params);
+}
+
+void IndexHNSWPQ::reconstruct(idx_t key, float16_t* recons) const {
+    std::vector<float> recons_float(key * d);
+    convert_fp16_to_fp32(recons, key * d, recons_float.data());
+    IndexHNSW::reconstruct(key, recons_float.data());
+}
+
+void IndexHNSWPQ::search_level_0(
+        idx_t n,
+        const float16_t* x,
+        idx_t k,
+        const storage_idx_t* nearest,
+        const float* nearest_d,
+        float* distances,
+        idx_t* labels,
+        int nprobe,
+        int search_type) const {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::search_level_0(n, x_float.data(), k, nearest, nearest_d, distances, labels, nprobe, search_type);
+}
+#endif
+
 /**************************************************************
  * IndexHNSWSQ implementation
  **************************************************************/
@@ -1065,6 +1475,110 @@ IndexHNSWSQ::IndexHNSWSQ(
 }
 
 IndexHNSWSQ::IndexHNSWSQ() = default;
+
+/* explicit FP32 function interface */
+#ifdef __aarch64__
+void IndexHNSWSQ::add(idx_t n, const float* x) {
+    IndexHNSW::add(n, x);
+}
+
+void IndexHNSWSQ::train(idx_t n, const float* x) {
+    IndexHNSW::train(n, x);
+}
+
+void IndexHNSWSQ::search(
+        idx_t n,
+        const float* x,
+        idx_t k,
+        float* distances,
+        idx_t* labels,
+        const SearchParameters* params) const {
+    IndexHNSW::search(n, x, k, distances, labels, params);
+}
+
+void IndexHNSWSQ::range_search(
+        idx_t n,
+         const float* x,
+        float radius,
+        RangeSearchResult* result,
+        const SearchParameters* params) const {
+    IndexHNSW::range_search(n, x, radius, result, params);
+}
+
+void IndexHNSWSQ::reconstruct(idx_t key, float* recons) const {
+    IndexHNSW::reconstruct(key, recons);
+}
+
+void IndexHNSWSQ::search_level_0(
+        idx_t n,
+        const float* x,
+        idx_t k,
+        const storage_idx_t* nearest,
+        const float* nearest_d,
+        float* distances,
+        idx_t* labels,
+        int nprobe,
+        int search_type) const {
+    IndexHNSW::search_level_0(n, x, k, nearest, nearest_d, distances, labels, nprobe, search_type);
+}
+
+/* added FP16 function interfaces */
+void IndexHNSWSQ::add(idx_t n, const float16_t* x) {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::add(n, x_float.data());
+}
+
+void IndexHNSWSQ::train(idx_t n, const float16_t* x) {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::train(n, x_float.data());
+}
+
+void IndexHNSWSQ::search(
+        idx_t n,
+        const float16_t* x,
+        idx_t k,
+        float* distances,
+        idx_t* labels,
+        const SearchParameters* params) const {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::search(n, x_float.data(), k, distances, labels, params);
+}
+
+void IndexHNSWSQ::range_search(
+        idx_t n,
+         const float16_t* x,
+        float radius,
+        RangeSearchResult* result,
+        const SearchParameters* params) const {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::range_search(n, x_float.data(), radius, result, params);
+}
+
+void IndexHNSWSQ::reconstruct(idx_t key, float16_t* recons) const {
+    std::vector<float> recons_float(key * d);
+    convert_fp16_to_fp32(recons, key * d, recons_float.data());
+    IndexHNSW::reconstruct(key, recons_float.data());
+}
+
+void IndexHNSWSQ::search_level_0(
+        idx_t n,
+        const float16_t* x,
+        idx_t k,
+        const storage_idx_t* nearest,
+        const float* nearest_d,
+        float* distances,
+        idx_t* labels,
+        int nprobe,
+        int search_type) const {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::search_level_0(n, x_float.data(), k, nearest, nearest_d, distances, labels, nprobe, search_type);
+}
+#endif
 
 /**************************************************************
  * IndexHNSW2Level implementation
@@ -1280,4 +1794,194 @@ void IndexHNSW2Level::flip_to_ivf() {
     delete storage2l;
 }
 
+/* explicit FP32 function interface */
+#ifdef __aarch64__
+void IndexHNSW2Level::add(idx_t n, const float* x) {
+    IndexHNSW::add(n, x);
+}
+
+void IndexHNSW2Level::train(idx_t n, const float* x) {
+    IndexHNSW::train(n, x);
+}
+
+void IndexHNSW2Level::range_search(
+        idx_t n,
+        const float* x,
+        float radius,
+        RangeSearchResult* result,
+        const SearchParameters* params) const {
+    IndexHNSW::range_search(n, x, radius, result, params);
+}
+
+void IndexHNSW2Level::reconstruct(idx_t key, float* recons) const {
+    IndexHNSW::reconstruct(key, recons);
+}
+
+void IndexHNSW2Level::search_level_0(
+        idx_t n,
+        const float* x,
+        idx_t k,
+        const storage_idx_t* nearest,
+        const float* nearest_d,
+        float* distances,
+        idx_t* labels,
+        int nprobe,
+        int search_type) const {
+    IndexHNSW::search_level_0(n, x, k, nearest, nearest_d, distances, labels, nprobe, search_type);
+}
+
+/* added FP16 function interfaces */
+void IndexHNSW2Level::add(idx_t n, const float16_t* x) {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::add(n, x_float.data());
+}
+
+void IndexHNSW2Level::train(idx_t n, const float16_t* x) {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::train(n, x_float.data());
+}
+
+void IndexHNSW2Level::search(
+        idx_t n,
+        const float16_t* x,
+        idx_t k,
+        float* distances,
+        idx_t* labels,
+        const SearchParameters* params) const {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    FAISS_THROW_IF_NOT(k > 0);
+    FAISS_THROW_IF_NOT_MSG(
+            !params, "search params not supported for this index");
+
+    if (dynamic_cast<const Index2Layer*>(storage)) {
+        IndexHNSW::search(n, x_float.data(), k, distances, labels);
+
+    } else { // "mixed" search
+        size_t n1 = 0, n2 = 0, n3 = 0, ndis = 0, nreorder = 0;
+
+        const IndexIVFPQ* index_ivfpq =
+                dynamic_cast<const IndexIVFPQ*>(storage);
+
+        int nprobe = index_ivfpq->nprobe;
+
+        auto coarse_assign = std::make_unique<idx_t[]>(n * nprobe);
+        auto coarse_dis = std::make_unique<float[]>(n * nprobe);
+
+        index_ivfpq->quantizer->search(
+                n, x_float.data(), nprobe, coarse_dis.get(), coarse_assign.get());
+
+        index_ivfpq->search_preassigned(
+                n,
+                x_float.data(),
+                k,
+                coarse_assign.get(),
+                coarse_dis.get(),
+                distances,
+                labels,
+                false);
+
+#pragma omp parallel
+        {
+            VisitedTable vt(ntotal);
+            std::unique_ptr<DistanceComputer> dis(
+                    storage_distance_computer(storage));
+
+            int candidates_size = hnsw.upper_beam;
+            MinimaxHeap candidates(candidates_size);
+
+#pragma omp for reduction(+ : n1, n2, n3, ndis, nreorder)
+            for (idx_t i = 0; i < n; i++) {
+                idx_t* idxi = labels + i * k;
+                float* simi = distances + i * k;
+                dis->set_query(x_float.data() + i * d);
+
+                // mark all inverted list elements as visited
+
+                for (int j = 0; j < nprobe; j++) {
+                    idx_t key = coarse_assign[j + i * nprobe];
+                    if (key < 0)
+                        break;
+                    size_t list_length = index_ivfpq->get_list_size(key);
+                    const idx_t* ids = index_ivfpq->invlists->get_ids(key);
+
+                    for (int jj = 0; jj < list_length; jj++) {
+                        vt.set(ids[jj]);
+                    }
+                }
+
+                candidates.clear();
+
+                for (int j = 0; j < hnsw.upper_beam && j < k; j++) {
+                    if (idxi[j] < 0)
+                        break;
+                    candidates.push(idxi[j], simi[j]);
+                }
+
+                // reorder from sorted to heap
+                maxheap_heapify(k, simi, idxi, simi, idxi, k);
+
+                HNSWStats search_stats;
+                search_from_candidates_2(
+                        hnsw,
+                        *dis,
+                        k,
+                        idxi,
+                        simi,
+                        candidates,
+                        vt,
+                        search_stats,
+                        0,
+                        k);
+                n1 += search_stats.n1;
+                n2 += search_stats.n2;
+                n3 += search_stats.n3;
+                ndis += search_stats.ndis;
+                nreorder += search_stats.nreorder;
+
+                vt.advance();
+                vt.advance();
+
+                maxheap_reorder(k, simi, idxi);
+            }
+        }
+
+        hnsw_stats.combine({n1, n2, n3, ndis, nreorder});
+    }
+}
+
+void IndexHNSW2Level::range_search(
+        idx_t n,
+        const float16_t* x,
+        float radius,
+        RangeSearchResult* result,
+        const SearchParameters* params) const {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::range_search(n, x_float.data(), radius, result, params);
+}
+
+void IndexHNSW2Level::reconstruct(idx_t key, float16_t* recons) const {
+    std::vector<float> recons_float(key * d);
+    convert_fp16_to_fp32(recons, key * d, recons_float.data());
+    IndexHNSW::reconstruct(key, recons_float.data());
+}
+
+void IndexHNSW2Level::search_level_0(
+        idx_t n,
+        const float16_t* x,
+        idx_t k,
+        const storage_idx_t* nearest,
+        const float* nearest_d,
+        float* distances,
+        idx_t* labels,
+        int nprobe,
+        int search_type) const {
+    std::vector<float> x_float(n * d);
+    convert_fp16_to_fp32(x, n * d, x_float.data());
+    IndexHNSW::search_level_0(n, x_float.data(), k, nearest, nearest_d, distances, labels, nprobe, search_type);
+}
+#endif
 } // namespace faiss

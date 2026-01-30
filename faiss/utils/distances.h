@@ -15,6 +15,11 @@
 
 #include <faiss/impl/platform_macros.h>
 #include <faiss/utils/Heap.h>
+#ifdef __aarch64__
+#include <faiss/utils/fp16-arm.h>
+
+typedef __fp16 float16_t;
+#endif
 
 namespace faiss {
 
@@ -483,4 +488,144 @@ int fvec_madd_and_argmin(
         const float* b,
         float* c);
 
+/* added FP16 function interfaces */
+#ifdef __aarch64__
+float fvec_L2sqr_f16(const float16_t* x, const float16_t* y, size_t d);
+
+float fvec_inner_product_f16(const float16_t* x, const float16_t* y, size_t d);
+
+void fvec_inner_product_batch_4_f16(
+        const float16_t* x,
+        const float16_t* y0,
+        const float16_t* y1,
+        const float16_t* y2,
+        const float16_t* y3,
+        const size_t d,
+        float& dis0,
+        float& dis1,
+        float& dis2,
+        float& dis3);
+
+void fvec_L2sqr_batch_4_f16(
+        const float16_t* x,
+        const float16_t* y0,
+        const float16_t* y1,
+        const float16_t* y2,
+        const float16_t* y3,
+        const size_t d,
+        float& dis0,
+        float& dis1,
+        float& dis2,
+        float& dis3);
+
+float fvec_norm_L2sqr_f16(const float16_t* x, size_t d);
+
+void fvec_norms_L2sqr_f16(float* norms, const float16_t* x, size_t d, size_t nx);
+
+void fvec_inner_products_by_idx_f16(
+        float* ip,
+        const float16_t* x,
+        const float16_t* y,
+        const int64_t* ids,
+        size_t d,
+        size_t nx,
+        size_t ny);
+
+void fvec_L2sqr_by_idx_f16(
+        float* dis,
+        const float16_t* x,
+        const float16_t* y,
+        const int64_t* ids, /* ids of y vecs */
+        size_t d,
+        size_t nx,
+        size_t ny);
+
+void knn_inner_product_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        float_minheap_array_t* res,
+        const IDSelector* sel = nullptr);
+
+void knn_inner_product_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        size_t k,
+        float* distances,
+        int64_t* indexes,
+        const IDSelector* sel = nullptr);
+
+void knn_L2sqr_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        float_maxheap_array_t* res,
+        const float* y_norm2 = nullptr,
+        const IDSelector* sel = nullptr);
+
+void knn_L2sqr_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        size_t k,
+        float* distances,
+        int64_t* indexes,
+        const float* y_norm2 = nullptr,
+        const IDSelector* sel = nullptr);
+
+void knn_inner_products_by_idx_f16(
+        const float16_t* x,
+        const float16_t* y,
+        const int64_t* subset,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        size_t nsubset,
+        size_t k,
+        float* vals,
+        int64_t* ids,
+        int64_t ld_ids = -1);
+
+void knn_L2sqr_by_idx_f16(
+        const float16_t* x,
+        const float16_t* y,
+        const int64_t* subset,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        size_t nsubset,
+        size_t k,
+        float* vals,
+        int64_t* ids,
+        int64_t ld_subset = -1);
+
+void range_search_L2sqr_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        float radius,
+        RangeSearchResult* result,
+        const IDSelector* sel = nullptr);
+
+void range_search_inner_product_f16(
+        const float16_t* x,
+        const float16_t* y,
+        size_t d,
+        size_t nx,
+        size_t ny,
+        float radius,
+        RangeSearchResult* result,
+        const IDSelector* sel = nullptr);
+#endif
 } // namespace faiss

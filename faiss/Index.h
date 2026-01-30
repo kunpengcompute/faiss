@@ -11,10 +11,14 @@
 #define FAISS_INDEX_H
 
 #include <faiss/MetricType.h>
+#include <faiss/impl/FaissAssert.h>
 #include <cstdio>
 #include <sstream>
 #include <string>
 #include <typeinfo>
+#ifdef __aarch64__
+#include <faiss/utils/fp16-arm.h>
+#endif
 #ifdef KRL
 #include <iostream>
 #endif
@@ -22,6 +26,10 @@
 #define FAISS_VERSION_MAJOR 1
 #define FAISS_VERSION_MINOR 8
 #define FAISS_VERSION_PATCH 0
+
+#ifdef __aarch64__
+typedef __fp16 float16_t;
+#endif
 
 /**
  * @namespace faiss
@@ -46,6 +54,23 @@ namespace faiss {
 struct IDSelector;
 struct RangeSearchResult;
 struct DistanceComputer;
+
+enum NumericType {
+    Float32,
+    Float16,
+};
+
+inline size_t get_numeric_type_size(NumericType numeric_type) {
+    switch (numeric_type) {
+        case NumericType::Float32:
+            return 4;
+        case NumericType::Float16:
+            return 2;
+        default:
+            FAISS_THROW_MSG(
+                    "Unknown Numeric Type. Only supports Float32, Float16");
+    }
+}
 
 #if defined(KRL) || defined(OPTI_IVFPQ)
 template<typename T, int N = 64>
@@ -112,6 +137,7 @@ struct Index {
     /// type of metric this index uses for search
     MetricType metric_type;
     float metric_arg; ///< argument of the metric type
+    NumericType numeric_type;
 
     explicit Index(idx_t d = 0, MetricType metric = METRIC_L2)
             : d(d),
@@ -119,7 +145,19 @@ struct Index {
               verbose(false),
               is_trained(true),
               metric_type(metric),
-              metric_arg(0) {}
+              metric_arg(0),
+              numeric_type(NumericType::Float32) {}
+
+#ifdef __aarch64__
+    Index(idx_t d, NumericType ntype, MetricType metric)
+            : d(d),
+              ntotal(0),
+              verbose(false),
+              is_trained(true),
+              metric_type(metric),
+              metric_arg(0),
+              numeric_type(ntype) {}
+#endif
 
     virtual ~Index();
 
@@ -314,6 +352,7 @@ struct Index {
      */
     virtual void sa_encode(idx_t n, const float* x, uint8_t* bytes) const;
 
+
     /** decode a set of vectors
      *
      * @param n       number of vectors
@@ -337,6 +376,137 @@ struct Index {
     virtual void dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) {};
     virtual void quant_entries_f16(const uint8_t* entries, idx_t num_entries, float scale) {};
     virtual void quant_entries_u8(const uint8_t* entries, idx_t num_entries, float scale) {};
+#endif
+    /* added FP16 function interfaces */
+#ifdef __aarch64__
+    virtual void train(idx_t n, const float16_t* x) {
+        std::vector<float> x_float(n);
+        convert_fp16_to_fp32(x, n, x_float.data());
+        this->train(n, x_float.data());
+    }
+
+    virtual void train_ex(idx_t n, const void* x, NumericType numeric_type) {
+        if (numeric_type == NumericType::Float16) {
+            train(n, static_cast<const float16_t*>(x));
+        } else {
+            FAISS_THROW_MSG("Index::train: unsupported numeric type");
+        }
+    }
+
+    virtual void add(idx_t n, const float16_t* x) {
+        std::vector<float> x_float(n);
+        convert_fp16_to_fp32(x, n, x_float.data());
+        this->add(n, x_float.data());
+    }
+
+    virtual void add_ex(idx_t n, const void* x, NumericType numeric_type) {
+        if (numeric_type == NumericType::Float16) {
+            add(n, static_cast<const float16_t*>(x));
+        } else {
+            FAISS_THROW_MSG("Index::add: unsupported numeric type");
+        }
+    }
+
+    virtual void search(
+            idx_t n,
+            const float16_t* x,
+            idx_t k,
+            float* distances,
+            idx_t* labels,
+            const SearchParameters* params = nullptr) const {
+        std::vector<float> x_float(n);
+        convert_fp16_to_fp32(x, n, x_float.data());
+        this->search(n, x_float.data(), k, distances, labels, params);
+    }
+
+    virtual void search_ex(
+            idx_t n,
+            const void* x,
+            idx_t k,
+            float* distances,
+            idx_t* labels,
+            NumericType numeric_type,
+            const SearchParameters* params = nullptr) const {
+        if (numeric_type == NumericType::Float16) {
+            search(n, static_cast<const float16_t*>(x), k, distances, labels, params);
+        } else {
+            FAISS_THROW_MSG("Index::search: unsupported numeric type");
+        }
+    }
+
+    virtual void range_search(
+            idx_t n,
+            const float16_t* x,
+            float radius,
+            RangeSearchResult* result,
+            const SearchParameters* params = nullptr) const {
+        std::vector<float> x_float(n);
+        convert_fp16_to_fp32(x, n, x_float.data());
+        this->range_search(n, x_float.data(), radius, result, params);
+    }
+
+    virtual void range_search_ex(
+            idx_t n,
+            const void* x,
+            float radius,
+            RangeSearchResult* result,
+            NumericType numeric_type,
+            const SearchParameters* params = nullptr) const {
+        if (numeric_type == NumericType::Float16) {
+            range_search(n, static_cast<const float16_t*>(x), radius, result, params);
+        } else {
+            FAISS_THROW_MSG("Index::range_search: unsupported numeric type");
+        }
+    }
+
+    virtual void reconstruct_n(idx_t i0, idx_t ni, float16_t* recons) const;
+
+    virtual void reconstruct_n_ex(idx_t i0, idx_t ni, void* recons, NumericType numeric_type) const {
+        if (numeric_type == NumericType::Float16) {
+            reconstruct_n(i0, ni, static_cast<float16_t*>(recons));
+        } else {
+            FAISS_THROW_MSG("Index::reconstruct_n: unsupported numeric type");
+        }
+    }
+
+    virtual void reconstruct(idx_t key, float16_t* recons) const;
+
+    virtual void reconstruct_ex(idx_t key, void* recons, NumericType numeric_type) const {
+        if (numeric_type == NumericType::Float16) {
+            reconstruct(key, static_cast<float16_t*>(recons));
+        } else {
+            FAISS_THROW_MSG("Index::reconstruct: unsupported numeric type");
+        }
+    }
+
+    virtual void sa_encode(idx_t n, const float16_t* x, uint8_t* bytes) const {
+        std::vector<float> x_float(n);
+        convert_fp16_to_fp32(x, n, x_float.data());
+        this->sa_encode(n, x_float.data() ,bytes);
+    }
+
+    virtual void sa_encode_ex(idx_t n, const void* x, uint8_t* bytes, NumericType numeric_type) const {
+        if (numeric_type == NumericType::Float16) {
+            sa_encode(n, static_cast<const float16_t*>(x), bytes);
+        } else {
+            FAISS_THROW_MSG("Index::sa_encode: unsupported numeric type");
+        }
+    }
+
+    virtual void sa_decode(idx_t n, const uint8_t* bytes, float16_t* x) const {
+        std::vector<float> x_float(n);
+        convert_fp16_to_fp32(x, n, x_float.data());
+        this->sa_decode(n, bytes, x_float.data());
+    }
+
+    virtual void sa_decode_ex(idx_t n, const uint8_t* bytes, void* x, NumericType numeric_type) const {
+        if (numeric_type == NumericType::Float16) {
+            sa_decode(n, bytes, static_cast<float16_t*>(x));
+        } else {
+            FAISS_THROW_MSG("Index::sa_decode: unsupported numeric type");
+        }
+    }
+
 #endif
 };
 

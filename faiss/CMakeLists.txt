@@ -260,32 +260,13 @@ if(OPTI_IVFPQ AND FAISS_IS_ARM)
   set(FAISS_ENABLE_OPTI_IVFPQ ON)
 endif()
 
-# -------------------- OPTI_IVFPQ compile flags / ASM (ARM only) --------------------
+# -------------------- OPTI_IVFPQ sources/defs (ARM only) --------------------
 if(FAISS_ENABLE_OPTI_IVFPQ)
-  if(MSVC)
-    target_compile_options(faiss PRIVATE
-      $<$<COMPILE_LANGUAGE:C,CXX>:/O2>
-    )
-  else()
-    target_compile_options(faiss PRIVATE
-      $<$<COMPILE_LANGUAGE:C,CXX>:-O3 -ffp-contract=fast -fno-math-errno -fpermissive>
-      $<$<AND:$<COMPILE_LANGUAGE:C,CXX>,$<CONFIG:Release>>:-fomit-frame-pointer>
-    )
+  list(APPEND FAISS_SRC utils/arm/asm/distances_simd.cpp)
 
-    target_compile_options(faiss PRIVATE
-      $<$<COMPILE_LANGUAGE:C,CXX>:-march=armv8.2-a+fp16fml+dotprod+sve+rcpc>
-    )
-  endif()
-
-  set(FAISS_ARM_ASM
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils/arm/asm/scan_list_with_table.ScalarQuantizer
-  )
-
-  target_sources(faiss PRIVATE ${FAISS_ARM_ASM})
-  set_source_files_properties(${FAISS_ARM_ASM} PROPERTIES LANGUAGE ASM)
-  set_source_files_properties(${FAISS_ARM_ASM} PROPERTIES
-    COMPILE_OPTIONS "-O3;-march=armv8.2-a+fp16fml+dotprod+sve+rcpc"
-  )
+  add_compile_definitions(OPTI_IVFPQ)
+  list(APPEND FAISS_HEADERS utils/arm/asm/distances_simd.h)
+  enable_language(ASM)
 endif()
 
 # -------------------- non-Windows sources --------------------

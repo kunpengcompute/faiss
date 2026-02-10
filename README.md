@@ -25,9 +25,16 @@
 </td>
 <td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.3 "><p id="p83151347184614"><a name="p83151347184614"></a><a name="p83151347184614"></a>24 * 64G</p>
 </td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.4 "><p id="p831564711465"><a name="p831564711465"></a><a name="p831564711465"></a>GCC 12.3.1</p>
+<td class="cellrowborder" rowspan="2" valign="top" width="20%" headers="mcps1.1.6.1.4 "><p id="p831564711465"><a name="p831564711465"></a><a name="p831564711465"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.5 "><p id="p13315124713463"><a name="p13315124713463"></a><a name="p13315124713463"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" rowspan="2" valign="top" width="20%" headers="mcps1.1.6.1.5 "><p id="p13315124713463"><a name="p13315124713463"></a><a name="p13315124713463"></a>CMake&gt;=3.22.0</p>
+</td>
+</tr>
+<tr id="row47712054131620"><td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.3 "><p id="p631524754611"><a name="p631524754611"></a><a name="p631524754611"></a>openEuler 22.03 LTS SP3</p>
+</td>
+<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.6 "><p id="p18315184774615"><a name="p18315184774615"></a><a name="p18315184774615"></a>鲲鹏920 7282C处理器</p>
+</td>
+<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.3 "><p id="p83151347184615"><a name="p83151347184615"></a><a name="p83151347184615"></a>16 * 32G</p>
 </td>
 </tr>
 </tbody>
@@ -62,20 +69,23 @@
     # 可通过make install PREFIX=/path/to/openblas/install设置/path/to/openblas/install以指定安装路径，默认安装路径为/opt/OpenBLAS。
     ```
 
-4.  安装补丁文件0001-boostsra-faiss-1.8.0.patch。
+4.  安装补丁文件，以0001-faiss_1.8.0-optimize-neq.patch为例。
 
     ```
     cd /path/to/faiss-1.8.0/faiss
-    patch -p1 < 0001-boostsra-faiss-1.8.0.patch
+    patch -p1 < 0001-faiss_1.8.0-optimize-neq.patch
     ```
 
 5.  编译Faiss代码获取libfaiss.so。
+    GCC编译：
 
     ```
     cd /path/to/faiss-1.8.0/faiss
     cmake -B build . \
       -DFAISS_ENABLE_GPU=OFF \
       -DBUILD_TESTING=OFF \
+      -DOPTI_IVFPQ=OFF \
+      -DKRL=0N \
       -DBUILD_SHARED_LIBS=ON \
       -DCMAKE_BUILD_TYPE=Release \
       -DFAISS_OPT_LEVEL=generic \
@@ -83,24 +93,51 @@
       -DMKL_LIBRARIES=/opt/OpenBLAS/lib/libopenblas.so
     make -C build -j faiss
     make -C build install
-    # 可通过在编译时添加编译选项-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install设置/path/to/faiss/install以指定安装路径，默认安装路径为/usr/local。
-    # 编译选项-DMKL_LIBRARIES需指定为OpenBLAS的实际安装路径。
     ```
+    LLVM编译：
+    ```
+    cd /path/to/faiss-1.8.0/faiss
+    cmake -B build . \
+      -DFAISS_ENABLE_GPU=OFF \
+      -DBUILD_TESTING=OFF \
+      -DOPTI_IVFPQ=OFF \
+      -DKRL=0N \
+      -DBUILD_SHARED_LIBS=ON \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DFAISS_ENABLE_PYTHON=OFF \
+      -DCMAKE_INSTALL_PREFIX=/path/to/faiss/install-llvm-gomp \
+      -DMKL_LIBRARIES=/opt/OpenBLAS/lib/libopenblas.so \
+      -DOpenMP_C_FLAGS="-fopenmp=libgomp" \
+      -DOpenMP_CXX_FLAGS="-fopenmp=libgomp" \
+      -DOpenMP_C_LIB_NAMES="gomp" \
+      -DOpenMP_CXX_LIB_NAMES="gomp" \
+      -DOpenMP_gomp_LIBRARY=/usr/lib/gcc/aarch64-linux-gnu/12/libgomp.so
+    cmake --build build --parallel
+    cmake --install build
+    ```
+    >![](public_sys-resources/icon-note.gif) **说明：**
+    >-   可通过在编译时添加编译选项-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install设置/path/to/faiss/install以指定安装路径，默认安装路径为/usr/local。
+    >-   编译选项-DMKL_LIBRARIES需指定为OpenBLAS的实际安装路径。
+    >-   编译选项-DKRL和-DOPTI_IVFPQ用于指定是否开启KRL和OPTI_IVFPQ优化选项，二者不可同时开启。
+    >-   0002-faiss_1.8.0-optimize-eqv.patch不包含OPTI_IVFPQ优化选项，仅支持KRL。
+
 
 ## 测试示例<a name="ZH-CN_TOPIC_0000002475969077"></a>
 
 下方使用示例以使用sift-128-euclidean.hdf5数据集，Faiss\(HNSW\)算法，线程数32为例。
 
-1.  获取数据集。
+1.  获取测试程序。
 
     ```
+    git clone https://gitcode.com/openeuler/sra_test.git
+    ```
+
+2.  创建data文件夹，获取测试数据。
+
+    ```
+    cd /path/to/sra_test
+    mkdir data && cd data
     wget http://ann-benchmarks.com/sift-128-euclidean.hdf5 --no-check-certificate
-    ```
-
-2.  获取测试程序。
-
-    ```
-    git clone --branch v1.4.0 --single-branch https://gitee.com/openeuler/sra_test.git
     ```
 
     完整的目录结构应如下所示：
@@ -112,6 +149,8 @@
     ├── include                                                   // 存放测试框架对应的头文件
     ├── src                                                       // 存放测试框架对应的源文件
     ├── Makefile                                                  // 编译脚本文件
+    ├── scripts
+          └── build.sh                                            // 脚本文件
     ├── test.sh                                                   // 测试脚本
     ├── data                                                      // 存放数据集
           └── sift-128-euclidean.hdf5
@@ -130,21 +169,25 @@
 4.  编译运行程序。请根据实际安装Faiss的路径，修改Makefile中FAISSROOT项。
 
     ```
-    export KRL_PATH=/path/to/KRL/out
     make hnsw_test
     # 目前可通过安装patch的形式对Faiss原生的HNSW、PQFS、IVFPQ、IVFPQFS、IVFFLAT等算法进行加速，测试时选择不同的编译指令：
-    # HNSW：make hnsw
-    # PQFS：make pqfs
-    # IVFPQ：make ivfpq
-    # IVFPQFS：make ivfpqfs
-	# IVFFLAT: make ivfflat
+    # HNSW：make hnsw_test
+    # HNSW-FP16: make hnsw_fp16_test
+    # PQFS：make pqfs_test
+    # IVFPQ：make ivfpq_test
+    # IVFPQFS：make ivfpqfs_test
+	# IVFFLAT: make ivfflat_test
     ```
 
-5.  执行测试。
+5.  执行测试。可根据需求调整test.sh中的数据集和绑核。
 
     ```
-    numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
+    sh test.sh hnsw
     ```
+    >![](public_sys-resources/icon-note.gif) **说明：**
+    >-   若是第一次执行，确保hnsw_sift-128-euclidean.config文件夹中的"save_or_load"为"save"；后续执行可改为"load"，使用构件好的图索引查询。
+    >-   首次编译时，根据命令行提示交互输入对应算法动态库路径与头文件路径。
+    >-   脚本将在build文件夹下自动保存对应算法所需动态库与头文件路径，后续编译无需命令行交互输入路径，可以直接修改build文件夹下config_faiss_aarch64.sh中的对应配置，再运行make hnsw_test即可。
 
 # 贡献指南<a name="ZH-CN_TOPIC_0000002442489288"></a>
 

@@ -143,19 +143,6 @@ void krl_inner_product_by_idx_f16f16(
  */
 void krl_inner_product_ny_f16f16(uint16_t *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
 
-/*
- * @brief Compute the negative inner product distance between a int8 vector and multiple int8 vectors based on indices.
- * @param dis Pointer to the output array storing the computed distances.
- * @param x Pointer to the input int8 vector.
- * @param y Pointer to the input int8 vector array.
- * @param ids Pointer to the indices of the y vectors.
- * @param d Length of the vectors.
- * @param ny Number of vectors to compute.
- */
-void krl_negative_inner_product_by_idx_s8f32(float *dis, const int8_t *x, const int8_t *y,
-    const int64_t *ids, /* ids of y vecs */
-    size_t d, size_t ny);
-
 /* -------------------------------------- 4bits lookup table -------------------------------------- */
 
 /* -------------------------------------- 8bits lookup table -------------------------------------- */

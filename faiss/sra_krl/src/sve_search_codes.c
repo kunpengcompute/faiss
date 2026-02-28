@@ -127,26 +127,3 @@ static void krl_distance_codes_simd_4b_kernel(
     svst1_f32(all_true, result + 48, svcvt_f32_f16_x(all_true, res3));
     svst1_f32(all_true, result + 56, svcvt_f32_f16_x(all_true, res7));
 }
-
-/*
- * @brief Perform table lookup for 4-bit codes with 16-bit floating-point distances.
- * @param nsq Number of subquantizers.
- * @param ncode Number of codes.
- * @param codes Pointer to the 4-bit codes.
- * @param LUT Precomputed distance table, layout (M, ksub).
- * @param dis Pointer to store the computed distances.
- * @param dis0 Initial distance for IVF.
- * @param codes_size Length of codes.
- * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
- */
-int krl_table_lookup_4b_f16(const size_t nsq, const size_t ncode, const uint8_t *codes, const uint16_t *LUT, float *dis,
-    uint16_t dis0, size_t codes_size, size_t LUT_size, size_t dis_size)
-{
-    size_t code_size = ((nsq + 1) >> 1);
-    const float16_t f16_dis0 = *((const float16_t *)(&dis0));
-    for (size_t j = 0; j < ncode; j += 64) {
-        krl_distance_codes_simd_4b_kernel(nsq, (const float16_t *)LUT, codes + j * code_size, dis + j, f16_dis0);
-    }
-    return SUCCESS;
-}

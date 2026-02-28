@@ -1027,7 +1027,11 @@ void IndexIVFFastScan::search_implem_12(
         handler.id_map = ids.get();
 
         pq4_accumulate_loop_qbs(
-                qbs, list_size, M2, codes.get(), LUT.get(), handler, scaler);
+                qbs, list_size, M2, codes.get(), LUT.get(), handler, scaler
+#ifdef KRL
+                , this->apply_repack
+#endif
+        );
         // prepare for next loop
         i0 = i1;
     }
@@ -1220,7 +1224,11 @@ void IndexIVFFastScan::search_implem_14(
                     codes.get(),
                     LUT.get(),
                     *handler.get(),
-                    scaler);
+                    scaler
+#ifdef KRL
+                    , this->apply_repack
+#endif   
+            );
         }
 
         // labels is in-place for HeapHC

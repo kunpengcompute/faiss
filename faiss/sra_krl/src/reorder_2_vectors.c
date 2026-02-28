@@ -110,21 +110,21 @@ int krl_reorder_2_vector(const KRLDistanceHandle *kdh, int64_t base_k, float *ba
                 const float qbias = kdh->quanted_bias;
                 quant_u8_with_parm(query_vector, d, quant_x, qscale, qbias);
                 /* first rough calculation */
-                krl_L2sqr_by_idx_u8f32(base_dis, quant_x, (const uint8_t *)quanted_index, base_idx, d, base_k, base_k);
+                krl_L2sqr_by_idx_u8f32(base_dis, quant_x, (const uint8_t *)quanted_index, base_idx, d, base_k);
                 if (full_data_bits == 32) {
                     /* Obtains recalculation threshold */
                     krl_obtion_topk_heap_asce(k, dis, base_k, base_dis);
                     /* Amplification threshold */
                     const float target = Obtain_L2_threshold(dis[0]); /* 1/16 */
                     const idx_t k_base2 = Adapt_reorder_asce(base_dis, base_idx, base_k, target);
-                    krl_L2sqr_by_idx(base_dis, query_vector, base_vector, base_idx, d, k_base2, k_base2);
+                    krl_L2sqr_by_idx(base_dis, query_vector, base_vector, base_idx, d, k_base2);
                     krl_reorder_2_heaps_asce(k, idx, dis, k_base2, base_idx, base_dis);
                 } else {
                     krl_reorder_2_heaps_asce(k, idx, dis, base_k, base_idx, base_dis);
                 }
             } else {
                 quant_u8(query_vector, d, quant_x);
-                krl_L2sqr_by_idx_u8f32(base_dis, quant_x, (const uint8_t *)quanted_index, base_idx, d, base_k, base_k);
+                krl_L2sqr_by_idx_u8f32(base_dis, quant_x, (const uint8_t *)quanted_index, base_idx, d, base_k);
                 krl_reorder_2_heaps_asce(k, idx, dis, base_k, base_idx, base_dis);
             }
             free(quant_x);
@@ -140,7 +140,7 @@ int krl_reorder_2_vector(const KRLDistanceHandle *kdh, int64_t base_k, float *ba
                 quant_s8_with_parm(query_vector, d, quant_x, qscale);
                 /* first rough calculation */
                 krl_inner_product_by_idx_s8f32(
-                    base_dis, quant_x, (const int8_t *)quanted_index, base_idx, d, base_k, base_k);
+                    base_dis, quant_x, (const int8_t *)quanted_index, base_idx, d, base_k);
                 if (full_data_bits == 32) {
                     /* Obtains recalculation threshold */
                     krl_obtion_topk_heap_desc(k, dis, base_k, base_dis);
@@ -148,7 +148,7 @@ int krl_reorder_2_vector(const KRLDistanceHandle *kdh, int64_t base_k, float *ba
                     const float target = Obtain_IP_threshold(dis[0]); /* 1/32 */
                     const idx_t k_base2 = Adapt_reorder_desc(base_dis, base_idx, base_k, target);
                     /* Fine-grained computing */
-                    krl_inner_product_by_idx(base_dis, query_vector, base_vector, base_idx, d, k_base2, k_base2);
+                    krl_inner_product_by_idx(base_dis, query_vector, base_vector, base_idx, d, k_base2);
                     krl_reorder_2_heaps_desc(k, idx, dis, k_base2, base_idx, base_dis);
                 } else {
                     krl_reorder_2_heaps_desc(k, idx, dis, base_k, base_idx, base_dis);
@@ -156,7 +156,7 @@ int krl_reorder_2_vector(const KRLDistanceHandle *kdh, int64_t base_k, float *ba
             } else {
                 quant_s8(query_vector, d, quant_x);
                 krl_inner_product_by_idx_s8f32(
-                    base_dis, quant_x, (const int8_t *)quanted_index, base_idx, d, base_k, base_k);
+                    base_dis, quant_x, (const int8_t *)quanted_index, base_idx, d, base_k);
                 krl_reorder_2_heaps_desc(k, idx, dis, base_k, base_idx, base_dis);
             }
             free(quant_x);
@@ -170,19 +170,19 @@ int krl_reorder_2_vector(const KRLDistanceHandle *kdh, int64_t base_k, float *ba
         quant_f16(query_vector, d, quant_x);
         if (metric_type == METRIC_L2) {
             krl_L2sqr_by_idx_f16f32(
-                base_dis, (const uint16_t *)quant_x, (const uint16_t *)quanted_index, base_idx, d, base_k, base_k);
+                base_dis, (const uint16_t *)quant_x, (const uint16_t *)quanted_index, base_idx, d, base_k);
             krl_reorder_2_heaps_asce(k, idx, dis, base_k, base_idx, base_dis);
         } else {
             krl_inner_product_by_idx_f16f32(
-                base_dis, (const uint16_t *)quant_x, (const uint16_t *)quanted_index, base_idx, d, base_k, base_k);
+                base_dis, (const uint16_t *)quant_x, (const uint16_t *)quanted_index, base_idx, d, base_k);
             krl_reorder_2_heaps_desc(k, idx, dis, base_k, base_idx, base_dis);
         }
         free(quant_x);
     } else if (metric_type == METRIC_L2) {
-        krl_L2sqr_by_idx(base_dis, query_vector, (const float *)base_vector, base_idx, d, base_k, base_k);
+        krl_L2sqr_by_idx(base_dis, query_vector, (const float *)base_vector, base_idx, d, base_k);
         krl_reorder_2_heaps_asce(k, idx, dis, base_k, base_idx, base_dis);
     } else {
-        krl_inner_product_by_idx(base_dis, query_vector, (const float *)base_vector, base_idx, d, base_k, base_k);
+        krl_inner_product_by_idx(base_dis, query_vector, (const float *)base_vector, base_idx, d, base_k);
         krl_reorder_2_heaps_desc(k, idx, dis, base_k, base_idx, base_dis);
     }
     return SUCCESS;
@@ -233,18 +233,18 @@ int krl_reorder_2_vector_continuous(const KRLDistanceHandle *kdh, int64_t base_k
             if (use_parm != 0) {
                 quant_u8_with_parm(query_vector, d, quant_x, kdh->quanted_scale, kdh->quanted_bias);
                 /* First rough calculation */
-                krl_L2sqr_ny_u8f32(base_dis, quant_x, (const uint8_t *)quanted_index, base_k, d, base_k);
+                krl_L2sqr_ny_u8f32(base_dis, quant_x, (const uint8_t *)quanted_index, base_k, d);
                 /* Obtains recalculation threshold */
                 krl_obtion_topk_heap_asce(k, dis, base_k, base_dis);
                 const float target = Obtain_L2_threshold(dis[0]); /* 1/16 */
                 idx_t k_base2 = Adapt_reorder_asce(base_dis, base_idx, base_k, target);
                 /* Fine-grained computing */
-                krl_L2sqr_by_idx(base_dis, query_vector, base_vector, base_idx, d, k_base2, k_base2);
+                krl_L2sqr_by_idx(base_dis, query_vector, base_vector, base_idx, d, k_base2);
                 /* Secondary reflow */
                 krl_reorder_2_heaps_asce(k, idx, dis, k_base2, base_idx, base_dis);
             } else {
                 quant_u8(query_vector, d, quant_x);
-                krl_L2sqr_ny_u8f32(base_dis, quant_x, (const uint8_t *)quanted_index, base_k, d, base_k);
+                krl_L2sqr_ny_u8f32(base_dis, quant_x, (const uint8_t *)quanted_index, base_k, d);
                 krl_reorder_2_heaps_asce(k, idx, dis, base_k, base_idx, base_dis);
             }
             free(quant_x);
@@ -258,15 +258,15 @@ int krl_reorder_2_vector_continuous(const KRLDistanceHandle *kdh, int64_t base_k
             }
             if (use_parm != 0) {
                 quant_s8_with_parm(query_vector, d, quant_x, kdh->quanted_scale);
-                krl_inner_product_ny_s8f32(base_dis, quant_x, (const int8_t *)quanted_index, base_k, d, base_k);
+                krl_inner_product_ny_s8f32(base_dis, quant_x, (const int8_t *)quanted_index, base_k, d);
                 krl_obtion_topk_heap_desc(k, dis, base_k, base_dis);
                 const float target = Obtain_IP_threshold(dis[0]); /* 1/32 */
                 idx_t k_base2 = Adapt_reorder_desc(base_dis, base_idx, base_k, target);
-                krl_inner_product_by_idx(base_dis, query_vector, base_vector, base_idx, d, k_base2, k_base2);
+                krl_inner_product_by_idx(base_dis, query_vector, base_vector, base_idx, d, k_base2);
                 krl_reorder_2_heaps_desc(k, idx, dis, k_base2, base_idx, base_dis);
             } else {
                 quant_s8(query_vector, d, quant_x);
-                krl_inner_product_ny_s8f32(base_dis, quant_x, (const int8_t *)quanted_index, base_k, d, base_k);
+                krl_inner_product_ny_s8f32(base_dis, quant_x, (const int8_t *)quanted_index, base_k, d);
                 krl_reorder_2_heaps_desc(k, idx, dis, base_k, base_idx, base_dis);
             }
             free(quant_x);
@@ -286,7 +286,6 @@ int krl_reorder_2_vector_continuous(const KRLDistanceHandle *kdh, int64_t base_k
                 (const uint16_t *)(kdh->quanted_codes),
                 base_idx,
                 d,
-                base_k,
                 base_k);
             krl_reorder_2_heaps_asce(k, idx, dis, base_k, base_idx, base_dis);
         } else {
@@ -295,16 +294,15 @@ int krl_reorder_2_vector_continuous(const KRLDistanceHandle *kdh, int64_t base_k
                 (const uint16_t *)(kdh->quanted_codes),
                 base_idx,
                 d,
-                base_k,
                 base_k);
             krl_reorder_2_heaps_desc(k, idx, dis, base_k, base_idx, base_dis);
         }
         free(quant_x);
     } else if (metric_type == METRIC_L2) {
-        krl_L2sqr_ny(base_dis, query_vector, (const float *)base_vector + begin_id * d, base_k, d, base_k);
+        krl_L2sqr_ny(base_dis, query_vector, (const float *)base_vector + begin_id * d, base_k, d);
         krl_reorder_2_heaps_asce(k, idx, dis, base_k, base_idx, base_dis);
     } else {
-        krl_inner_product_ny(base_dis, query_vector, (const float *)base_vector + begin_id * d, base_k, d, base_k);
+        krl_inner_product_ny(base_dis, query_vector, (const float *)base_vector + begin_id * d, base_k, d);
         krl_reorder_2_heaps_desc(k, idx, dis, base_k, base_idx, base_dis);
     }
     free(base_idx);
@@ -335,10 +333,10 @@ int krl_reorder_2_vector_continuous_f16(const KRLDistanceHandle *kdh, int64_t ba
     }
     create_continuous_idx(base_idx, base_k, begin_id);
     if (metric_type == METRIC_L2) {
-        krl_L2sqr_ny_f16f32(base_dis, (const uint16_t *)query_vector, (const uint16_t *)base_vector + begin_id * d, base_k, d, base_k);
+        krl_L2sqr_ny_f16f32(base_dis, (const uint16_t *)query_vector, (const uint16_t *)base_vector + begin_id * d, base_k, d);
         krl_reorder_2_heaps_asce(k, idx, dis, base_k, base_idx, base_dis);
     } else {
-        krl_inner_product_ny_f16f32(base_dis, (const uint16_t *)query_vector, (const uint16_t *)base_vector + begin_id * d, base_k, d, base_k);
+        krl_inner_product_ny_f16f32(base_dis, (const uint16_t *)query_vector, (const uint16_t *)base_vector + begin_id * d, base_k, d);
         krl_reorder_2_heaps_desc(k, idx, dis, base_k, base_idx, base_dis);
     }
     free(base_idx);

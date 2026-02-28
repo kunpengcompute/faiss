@@ -471,7 +471,11 @@ void IndexFastScan::search_implem_12(
                 codes.get(),
                 LUT.get(),
                 *handler.get(),
-                scaler);
+                scaler
+#ifdef KRL
+                , this->apply_repack
+#endif
+        );
     }
     if (!(skip & 8)) {
         handler->end();

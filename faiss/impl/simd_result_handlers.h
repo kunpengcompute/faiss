@@ -42,6 +42,7 @@ struct SIMDResultHandler {
     virtual bool get_keepmin(){return true;};
     virtual uint16_t get_threshold(const size_t q){return 0;};
     virtual void handle_generic(const size_t nq, const size_t q, const uint16_t* distance, uint32_t* lt_mask){};
+    virtual void handle_generic1(const size_t b, const uint16_t* distance, uint32_t* lt_mask){};
     virtual void handle_generic2(const size_t b, const uint16_t* distance, uint32_t* lt_mask){};
     virtual void handle_generic3(const size_t b, const uint16_t* distance, uint32_t* lt_mask){};
 #endif
@@ -489,6 +490,32 @@ struct ReservoirHandler : ResultHandlerCompare<C, with_id_map> {
             add2reservec(mask, idx, distance, res);
         }
     }
+
+    void handle_generic1(
+            const size_t b,
+            const uint16_t* distance,
+            uint32_t* lt_mask) final {
+        const int64_t idx = b;
+        size_t q2 = this->i0;
+        if constexpr (with_id_map) {
+            q2 = this->q_map[q2];
+        }
+        ReservoirTopN<C>& res = reservoirs[q2];
+
+        // tail handling
+        if (idx + 32 > this->ntotal) {
+            const int nbits = this->ntotal - idx;
+            if (nbits > 0) {
+                uint32_t mask =
+                    lt_mask[0] & ((uint32_t(1) << nbits) - 1);
+                add2reservec(mask, idx, distance, res);
+            }
+            return;
+        }
+
+        add2reservec(lt_mask[0], idx, distance, res);
+    }
+
 
     void handle_generic2(const size_t b, const uint16_t* distance, uint32_t* lt_mask) final {
         const int64_t idx = b;

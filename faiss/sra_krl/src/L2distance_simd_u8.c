@@ -28,7 +28,7 @@
  * @param dis_size Length of dis.
  */
 KRL_IMPRECISE_FUNCTION_BEGIN
-int krl_L2sqr_u8u32(const uint8_t *x, const uint8_t *__restrict y, const size_t d, uint32_t *dis, size_t dis_size)
+int krl_L2sqr_u8u32(const uint8_t *x, const uint8_t *__restrict y, const size_t d, uint32_t *dis)
 {
     size_t i;
     uint32_t res;
@@ -2437,7 +2437,7 @@ KRL_IMPRECISE_FUNCTION_END
  * @param dis_size Length of dis.
  */
 int krl_L2sqr_by_idx_u8f32(
-    float *dis, const uint8_t *x, const uint8_t *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size)
+    float *dis, const uint8_t *x, const uint8_t *y, const int64_t *ids, size_t d, size_t ny)
 {
     size_t i = 0;
     const uint8_t *__restrict listy[24];
@@ -2558,7 +2558,7 @@ int krl_L2sqr_by_idx_u8f32(
     }
     if (ny & 1) {
         uint32_t tmp;
-        krl_L2sqr_u8u32(x, y + d * ids[i], d, &tmp, 1);
+        krl_L2sqr_u8u32(x, y + d * ids[i], d, &tmp);
         dis[i] = (float)tmp;
     }
     return SUCCESS;
@@ -2591,7 +2591,7 @@ void krl_L2sqr_ny_u8u32(uint32_t *dis, const uint8_t *x, const uint8_t *y, size_
         i += 2;
     }
     if (ny & 1) {
-        krl_L2sqr_u8u32(x, y + i * d, d, &dis[i], 1);
+        krl_L2sqr_u8u32(x, y + i * d, d, &dis[i]);
     }
 }
 
@@ -2602,9 +2602,8 @@ void krl_L2sqr_ny_u8u32(uint32_t *dis, const uint8_t *x, const uint8_t *y, size_
  * @param y Pointer to the database vectors (uint8_t).
  * @param ny Number of vectors to process.
  * @param d Dimension of the vectors.
- * @param dis_size Length of dis.
  */
-int krl_L2sqr_ny_u8f32(float *dis, const uint8_t *x, const uint8_t *y, size_t ny, size_t d, size_t dis_size)
+int krl_L2sqr_ny_u8f32(float *dis, const uint8_t *x, const uint8_t *y, size_t ny, size_t d)
 {
     size_t i = 0;
 
@@ -2625,7 +2624,7 @@ int krl_L2sqr_ny_u8f32(float *dis, const uint8_t *x, const uint8_t *y, size_t ny
     }
     if (ny & 1) {
         uint32_t tmp;
-        krl_L2sqr_u8u32(x, y + i * d, d, &tmp, 1);
+        krl_L2sqr_u8u32(x, y + i * d, d, &tmp);
         dis[i] = (float)tmp;
     }
     return SUCCESS;

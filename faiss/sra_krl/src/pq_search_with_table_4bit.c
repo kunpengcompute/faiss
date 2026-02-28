@@ -26,6 +26,29 @@
         0x101, 0x202, 0x404, 0x808, 0x1010, 0x2020, 0x4040, 0x8080 \
     }
 
+#if defined(__GNUC__) && !defined(__clang__)
+#define TBL2_LOOKUP_ASM(result, dict, indices) do { \
+    uint8x16_t _tmp_result; \
+    asm volatile( \
+        "mov v16.16B, %[d0].16B\n\t" \
+        "mov v17.16B, %[d1].16B\n\t" \
+        "tbl %[res].16B, {v16.16B, v17.16B}, %[idx].16B" \
+        : [res] "=w"(_tmp_result) \
+        : [d0] "w"((dict).val[0]), [d1] "w"((dict).val[1]), [idx] "w"(indices) \
+        : "v16", "v17" \
+    ); \
+    result = _tmp_result; \
+} while(0)
+#else
+#define TBL2_LOOKUP_ASM(result, dict, indices) do { \
+    asm volatile( \
+        "tbl %[res].16B, { %[d0].16B, %[d1].16B }, %[idx].16B" \
+        : [res] "=w"(result) \
+        : [d0] "w"((dict).val[0]), [d1] "w"((dict).val[1]), [idx] "w"(indices) \
+    ); \
+} while(0)
+#endif
+
 /*
  * @brief Accumulate lookup table (LUT) results and apply filtering based on thresholds.
  * @param nq Number of queries.
@@ -65,26 +88,10 @@ static void krl_lut_accumulate_filter(int nq, int nsq, const uint8_t *codes, con
             LUT += 32;
 
             uint8x16_t res0, res1, res0_2, res1_2;
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(res0)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask0_1)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(res1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask1_1)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(res0_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask0_2)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(res1_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask1_2)
-                :);
+            TBL2_LOOKUP_ASM(res0, dictCombine, mask0_1);
+            TBL2_LOOKUP_ASM(res1, dictCombine, mask1_1);
+            TBL2_LOOKUP_ASM(res0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(res1_2, dictCombine, mask1_2);
 
             result[q] = vpaddlq_u8(res0);
             result[q + 1] = vpaddlq_u8(res1);
@@ -126,26 +133,10 @@ static void krl_lut_accumulate_filter(int nq, int nsq, const uint8_t *codes, con
             LUT += 32;
 
             uint8x16_t res0, res1, res0_2, res1_2;
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(res0)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask0_1)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(res1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask1_1)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(res0_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask0_2)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(res1_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask1_2)
-                :);
+            TBL2_LOOKUP_ASM(res0, dictCombine, mask0_1);
+            TBL2_LOOKUP_ASM(res1, dictCombine, mask1_1);
+            TBL2_LOOKUP_ASM(res0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(res1_2, dictCombine, mask1_2);
 
             result[q] = vpadalq_u8(result[q], res0);
             result[q + 1] = vpadalq_u8(result[q + 1], res1);
@@ -166,26 +157,10 @@ static void krl_lut_accumulate_filter(int nq, int nsq, const uint8_t *codes, con
             LUT += 32;
 
             uint8x16_t res0, res1, res0_2, res1_2;
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(res0)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask0_1)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(res1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask1_1)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(res0_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask0_2)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(res1_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask1_2)
-                :);
+            TBL2_LOOKUP_ASM(res0, dictCombine, mask0_1);
+            TBL2_LOOKUP_ASM(res1, dictCombine, mask1_1);
+            TBL2_LOOKUP_ASM(res0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(res1_2, dictCombine, mask1_2);
 
             result[q] = vpadalq_u8(result[q], res0);
             result[q + 1] = vpadalq_u8(result[q + 1], res1);
@@ -236,12 +211,11 @@ static void krl_lut_accumulate_filter(int nq, int nsq, const uint8_t *codes, con
  * @param keep_min Filter comparison rule (0 for keep minimum, 1 for keep maximum).
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param threshold_size Length of threshold.
  * @param lt_mask_size Length of lt_mask.
  */
 int krl_fast_table_lookup_step(int nq, int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
-    const uint16_t *threshold, uint32_t *lt_mask, int keep_min, size_t codes_size, size_t LUT_size, size_t dis_size,
+    const uint16_t *threshold, uint32_t *lt_mask, int keep_min, size_t codes_size, size_t LUT_size,
     size_t threshold_size, size_t lt_mask_size)
 {
     int q = 0;
@@ -255,6 +229,146 @@ int krl_fast_table_lookup_step(int nq, int nsq, const uint8_t *codes, const uint
             left_q, nsq, codes, LUT + q * nsq * 16, dis + q * 32, threshold + q, lt_mask + q, keep_min);
     }
     return SUCCESS;
+}
+
+/*
+ * @brief Perform fast table lookup and filtering operations for single query with batch size 32.
+ * @param nsq Number of subquantizers.
+ * @param codes Pointer to the codes array, layout (nsq, batch=32).
+ * @param LUT Pointer to the precomputed distances array, layout (nsq, ksub=16).
+ * @param distance Pointer to the array storing computed distances, length 32.
+ * @param threshold Filter threshold value.
+ * @param lt_mask Pointer to the array storing filter results, length 1.
+ */
+template <int keep_min = 0>
+static inline void krl_table_lookup_fast_scan_bs32(
+    int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *distance, uint16_t threshold, uint32_t *lt_mask)
+{
+    uint16x8_t result[4];
+    {
+        uint8x16_t mask0 = vld1q_u8(codes);
+        uint8x16_t mask1 = vld1q_u8(codes + 16);
+        codes += 32;
+        const uint8x16_t mask16 = vreinterpretq_u8_u16(vdupq_n_u16(0x1000));
+        const uint8x16_t maskone = vreinterpretq_u8_u16(vdupq_n_u16(0x0100));
+        uint8x16x2_t dictCombine = vld1q_u8_x2(LUT);
+        LUT += 32;
+
+        /* first loop */
+        if (likely(nsq > 2)) {
+            uint8x16_t mask0_1 = vsliq_n_u8(mask0, maskone, 4);
+            uint8x16_t mask0_2 = vsriq_n_u8(mask16, mask0, 4);
+            mask0 = vld1q_u8(codes);
+            uint8x16_t mask1_1 = vsliq_n_u8(mask1, maskone, 4);
+            uint8x16_t mask1_2 = vsriq_n_u8(mask16, mask1, 4);
+            mask1 = vld1q_u8(codes + 16);
+            codes += 32;
+
+            TBL2_LOOKUP_ASM(mask0_1, dictCombine, mask0_1);
+            TBL2_LOOKUP_ASM(mask0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(mask1_1, dictCombine, mask1_1);
+            TBL2_LOOKUP_ASM(mask1_2, dictCombine, mask1_2);
+
+            dictCombine = vld1q_u8_x2(LUT);
+            LUT += 32;
+
+            result[0] = vpaddlq_u8(mask0_1);
+            result[1] = vpaddlq_u8(mask0_2);
+            result[2] = vpaddlq_u8(mask1_1);
+            result[3] = vpaddlq_u8(mask1_2);
+        } else {
+            result[0] = vdupq_n_u16(0);
+            result[1] = vdupq_n_u16(0);
+            result[2] = vdupq_n_u16(0);
+            result[3] = vdupq_n_u16(0);
+        }
+
+        /* main loop */
+        for (int sq = 2; sq < nsq - 2; sq += 2) {
+            uint8x16_t mask0_1 = vsliq_n_u8(mask0, maskone, 4);
+            uint8x16_t mask0_2 = vsriq_n_u8(mask16, mask0, 4);
+            mask0 = vld1q_u8(codes);
+            uint8x16_t mask1_1 = vsliq_n_u8(mask1, maskone, 4);
+            uint8x16_t mask1_2 = vsriq_n_u8(mask16, mask1, 4);
+            mask1 = vld1q_u8(codes + 16);
+            codes += 32;
+
+            TBL2_LOOKUP_ASM(mask0_1, dictCombine, mask0_1);
+            TBL2_LOOKUP_ASM(mask0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(mask1_1, dictCombine, mask1_1);
+            TBL2_LOOKUP_ASM(mask1_2, dictCombine, mask1_2);
+
+            dictCombine = vld1q_u8_x2(LUT);
+            LUT += 32;
+
+            result[0] = vpadalq_u8(result[0], mask0_1);
+            result[1] = vpadalq_u8(result[1], mask0_2);
+            result[2] = vpadalq_u8(result[2], mask1_1);
+            result[3] = vpadalq_u8(result[3], mask1_2);
+        }
+
+        /* last loop without preload */
+        {
+            uint8x16_t mask0_1 = vsliq_n_u8(mask0, maskone, 4);
+            uint8x16_t mask0_2 = vsriq_n_u8(mask16, mask0, 4);
+            uint8x16_t mask1_1 = vsliq_n_u8(mask1, maskone, 4);
+            uint8x16_t mask1_2 = vsriq_n_u8(mask16, mask1, 4);
+
+            TBL2_LOOKUP_ASM(mask0_1, dictCombine, mask0_1);
+            TBL2_LOOKUP_ASM(mask0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(mask1_1, dictCombine, mask1_1);
+            TBL2_LOOKUP_ASM(mask1_2, dictCombine, mask1_2);
+
+            result[0] = vpadalq_u8(result[0], mask0_1);
+            result[1] = vpadalq_u8(result[1], mask0_2);
+            result[2] = vpadalq_u8(result[2], mask1_1);
+            result[3] = vpadalq_u8(result[3], mask1_2);
+        }
+    }
+
+    if constexpr (keep_min == 0) {
+        const uint16x8_t threshold_simd = vdupq_n_u16(threshold);
+        constexpr uint16x8_t offset = FILTER_OFFSET;
+
+        uint16x8_t cmp0_0 = vcgtq_u16(result[0], threshold_simd);
+        uint16x8_t cmp0_1 = vcgtq_u16(result[1], threshold_simd);
+        uint16x8_t cmp0_2 = vcgtq_u16(result[2], threshold_simd);
+        uint16x8_t cmp0_3 = vcgtq_u16(result[3], threshold_simd);
+
+        cmp0_0 = vsliq_n_u16(cmp0_0, cmp0_1, 8);
+        cmp0_2 = vsliq_n_u16(cmp0_2, cmp0_3, 8);
+        cmp0_0 = vandq_u16(cmp0_0, offset);
+        cmp0_2 = vandq_u16(cmp0_2, offset);
+
+        lt_mask[0] = vaddvq_u16(cmp0_0) | (((uint32_t)vaddvq_u16(cmp0_2)) << 16);
+        if (lt_mask[0]) {
+            vst1q_u16(distance, result[0]);
+            vst1q_u16(distance + 8, result[1]);
+            vst1q_u16(distance + 16, result[2]);
+            vst1q_u16(distance + 24, result[3]);
+        }
+    } else {
+        const uint16x8_t threshold_simd = vdupq_n_u16(threshold);
+        constexpr uint16x8_t offset = FILTER_OFFSET;
+
+        uint16x8_t cmp0_0 = vcltq_u16(result[0], threshold_simd);
+        uint16x8_t cmp0_1 = vcltq_u16(result[1], threshold_simd);
+        uint16x8_t cmp0_2 = vcltq_u16(result[2], threshold_simd);
+        uint16x8_t cmp0_3 = vcltq_u16(result[3], threshold_simd);
+
+        cmp0_0 = vsliq_n_u16(cmp0_0, cmp0_1, 8);
+        cmp0_2 = vsliq_n_u16(cmp0_2, cmp0_3, 8);
+        cmp0_0 = vandq_u16(cmp0_0, offset);
+        cmp0_2 = vandq_u16(cmp0_2, offset);
+
+        lt_mask[0] = vaddvq_u16(cmp0_0) | (((uint32_t)vaddvq_u16(cmp0_2)) << 16);
+        if (lt_mask[0]) {
+            vst1q_u16(distance, result[0]);
+            vst1q_u16(distance + 8, result[1]);
+            vst1q_u16(distance + 16, result[2]);
+            vst1q_u16(distance + 24, result[3]);
+        }
+    }
 }
 
 /*
@@ -298,47 +412,15 @@ static inline void krl_table_lookup_fast_scan_bs64(
             /* preload */
             codes += 64;
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask0_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask0_1)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask0_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask0_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask1_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask1_1)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask1_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask1_2)
-                :);
+            TBL2_LOOKUP_ASM(mask0_1, dictCombine, mask0_1);
+            TBL2_LOOKUP_ASM(mask0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(mask1_1, dictCombine, mask1_1);
+            TBL2_LOOKUP_ASM(mask1_2, dictCombine, mask1_2);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask2_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask2_1)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask2_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask2_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask3_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask3_1)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask3_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask3_2)
-                :);
+            TBL2_LOOKUP_ASM(mask2_1, dictCombine, mask2_1);
+            TBL2_LOOKUP_ASM(mask2_2, dictCombine, mask2_2);
+            TBL2_LOOKUP_ASM(mask3_1, dictCombine, mask3_1);
+            TBL2_LOOKUP_ASM(mask3_2, dictCombine, mask3_2);
 
             dictCombine = vld1q_u8_x2(LUT);
             LUT += 32;
@@ -379,47 +461,15 @@ static inline void krl_table_lookup_fast_scan_bs64(
             /* preload */
             codes += 64;
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask0_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask0_1)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask0_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask0_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask1_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask1_1)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask1_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask1_2)
-                :);
+            TBL2_LOOKUP_ASM(mask0_1, dictCombine, mask0_1);
+            TBL2_LOOKUP_ASM(mask0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(mask1_1, dictCombine, mask1_1);
+            TBL2_LOOKUP_ASM(mask1_2, dictCombine, mask1_2);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask2_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask2_1)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask2_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask2_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask3_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask3_1)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask3_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask3_2)
-                :);
+            TBL2_LOOKUP_ASM(mask2_1, dictCombine, mask2_1);
+            TBL2_LOOKUP_ASM(mask2_2, dictCombine, mask2_2);
+            TBL2_LOOKUP_ASM(mask3_1, dictCombine, mask3_1);
+            TBL2_LOOKUP_ASM(mask3_2, dictCombine, mask3_2);
 
             dictCombine = vld1q_u8_x2(LUT);
             LUT += 32;
@@ -444,47 +494,15 @@ static inline void krl_table_lookup_fast_scan_bs64(
             uint8x16_t mask3_1 = vsliq_n_u8(mask3, maskone, 4);
             uint8x16_t mask3_2 = vsriq_n_u8(mask16, mask3, 4);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask0_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask0_1)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask0_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask0_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask1_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask1_1)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask1_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask1_2)
-                :);
+            TBL2_LOOKUP_ASM(mask0_1, dictCombine, mask0_1);
+            TBL2_LOOKUP_ASM(mask0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(mask1_1, dictCombine, mask1_1);
+            TBL2_LOOKUP_ASM(mask1_2, dictCombine, mask1_2);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask2_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask2_1)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask2_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask2_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask3_1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask3_1)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask3_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask3_2)
-                :);
+            TBL2_LOOKUP_ASM(mask2_1, dictCombine, mask2_1);
+            TBL2_LOOKUP_ASM(mask2_2, dictCombine, mask2_2);
+            TBL2_LOOKUP_ASM(mask3_1, dictCombine, mask3_1);
+            TBL2_LOOKUP_ASM(mask3_2, dictCombine, mask3_2);
 
             result[0] = vpadalq_u8(result[0], mask0_1);
             result[1] = vpadalq_u8(result[1], mask0_2);
@@ -613,68 +631,20 @@ static inline void krl_table_lookup_fast_scan_bs96(
             mask4 = vsliq_n_u8(mask4, maskone, 4);
             mask5 = vsliq_n_u8(mask5, maskone, 4);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask0)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask0)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask0_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask0_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask1)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask1_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask1_2)
-                :);
+            TBL2_LOOKUP_ASM(mask0, dictCombine, mask0);
+            TBL2_LOOKUP_ASM(mask0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(mask1, dictCombine, mask1);
+            TBL2_LOOKUP_ASM(mask1_2, dictCombine, mask1_2);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask2)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask2_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask2_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask3)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask3)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask3_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask3_2)
-                :);
+            TBL2_LOOKUP_ASM(mask2, dictCombine, mask2);
+            TBL2_LOOKUP_ASM(mask2_2, dictCombine, mask2_2);
+            TBL2_LOOKUP_ASM(mask3, dictCombine, mask3);
+            TBL2_LOOKUP_ASM(mask3_2, dictCombine, mask3_2);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask4)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask4)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask4_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask4_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask5)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask5)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask5_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask5_2)
-                :);
+            TBL2_LOOKUP_ASM(mask4, dictCombine, mask4);
+            TBL2_LOOKUP_ASM(mask4_2, dictCombine, mask4_2);
+            TBL2_LOOKUP_ASM(mask5, dictCombine, mask5);
+            TBL2_LOOKUP_ASM(mask5_2, dictCombine, mask5_2);
 
             dictCombine = vld1q_u8_x2(LUT);
             LUT += 32;
@@ -730,68 +700,20 @@ static inline void krl_table_lookup_fast_scan_bs96(
             mask4 = vsliq_n_u8(mask4, maskone, 4);
             mask5 = vsliq_n_u8(mask5, maskone, 4);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask0)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask0)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask0_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask0_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask1)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask1_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask1_2)
-                :);
+            TBL2_LOOKUP_ASM(mask0, dictCombine, mask0);
+            TBL2_LOOKUP_ASM(mask0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(mask1, dictCombine, mask1);
+            TBL2_LOOKUP_ASM(mask1_2, dictCombine, mask1_2);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask2)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask2_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask2_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask3)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask3)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask3_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask3_2)
-                :);
+            TBL2_LOOKUP_ASM(mask2, dictCombine, mask2);
+            TBL2_LOOKUP_ASM(mask2_2, dictCombine, mask2_2);
+            TBL2_LOOKUP_ASM(mask3, dictCombine, mask3);
+            TBL2_LOOKUP_ASM(mask3_2, dictCombine, mask3_2);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask4)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask4)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask4_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask4_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask5)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask5)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask5_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask5_2)
-                :);
+            TBL2_LOOKUP_ASM(mask4, dictCombine, mask4);
+            TBL2_LOOKUP_ASM(mask4_2, dictCombine, mask4_2);
+            TBL2_LOOKUP_ASM(mask5, dictCombine, mask5);
+            TBL2_LOOKUP_ASM(mask5_2, dictCombine, mask5_2);
 
             dictCombine = vld1q_u8_x2(LUT);
             LUT += 32;
@@ -834,68 +756,20 @@ static inline void krl_table_lookup_fast_scan_bs96(
             mask4 = vsliq_n_u8(mask4, maskone, 4);
             mask5 = vsliq_n_u8(mask5, maskone, 4);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask0)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask0)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask0_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask0_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask1)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask1)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask1_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask1_2)
-                :);
+            TBL2_LOOKUP_ASM(mask0, dictCombine, mask0);
+            TBL2_LOOKUP_ASM(mask0_2, dictCombine, mask0_2);
+            TBL2_LOOKUP_ASM(mask1, dictCombine, mask1);
+            TBL2_LOOKUP_ASM(mask1_2, dictCombine, mask1_2);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask2)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask2_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask2_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask3)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask3)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask3_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask3_2)
-                :);
+            TBL2_LOOKUP_ASM(mask2, dictCombine, mask2);
+            TBL2_LOOKUP_ASM(mask2_2, dictCombine, mask2_2);
+            TBL2_LOOKUP_ASM(mask3, dictCombine, mask3);
+            TBL2_LOOKUP_ASM(mask3_2, dictCombine, mask3_2);
 
-            asm volatile(
-                "tbl %[res0].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0].16B"
-                : [res0] "=w"(mask4)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0] "w"(mask4)
-                :);
-            asm volatile(
-                "tbl %[res1].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1].16B"
-                : [res1] "=w"(mask4_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1] "w"(mask4_2)
-                :);
-            asm volatile(
-                "tbl %[res0_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask0_2].16B"
-                : [res0_2] "=w"(mask5)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask0_2] "w"(mask5)
-                :);
-            asm volatile(
-                "tbl %[res1_2].16B, { %[dictCombine1].16B - %[dictCombine2].16B }, %[mask1_2].16B"
-                : [res1_2] "=w"(mask5_2)
-                : [dictCombine1] "w"(dictCombine.val[0]), [dictCombine2] "w"(dictCombine.val[1]), [mask1_2] "w"(mask5_2)
-                :);
+            TBL2_LOOKUP_ASM(mask4, dictCombine, mask4);
+            TBL2_LOOKUP_ASM(mask4_2, dictCombine, mask4_2);
+            TBL2_LOOKUP_ASM(mask5, dictCombine, mask5);
+            TBL2_LOOKUP_ASM(mask5_2, dictCombine, mask5_2);
 
             result[0] = vpadalq_u8(result[0], mask0);
             result[1] = vpadalq_u8(result[1], mask0_2);
@@ -1017,6 +891,44 @@ static inline void krl_table_lookup_fast_scan_bs96(
 }
 
 /*
+ * @brief Perform fast L2 table lookup and filtering operations for single query with batch size 32.
+ * @param nsq Number of subquantizers.
+ * @param codes Pointer to the codes array, layout (nsq, batch=32).
+ * @param LUT Pointer to the precomputed distances array, layout (nsq, ksub=16).
+ * @param distance Pointer to the array storing computed distances, length 32.
+ * @param threshold Filter threshold value.
+ * @param lt_mask Pointer to the array storing filter results, length 1.
+ * @param codes_size Length of codes.
+ * @param LUT_size Length of LUT.
+ * @param lt_mask_size Length of lt_mask.
+ */
+int krl_L2_table_lookup_fast_scan_bs32(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size)
+{
+    krl_table_lookup_fast_scan_bs32<1>(nsq, codes, LUT, dis, threshold, lt_mask);
+    return SUCCESS;
+}
+
+/*
+ * @brief Perform fast IP table lookup and filtering operations for single query with batch size 32.
+ * @param nsq Number of subquantizers.
+ * @param codes Pointer to the codes array, layout (nsq, batch=32).
+ * @param LUT Pointer to the precomputed distances array, layout (nsq, ksub=16).
+ * @param distance Pointer to the array storing computed distances, length 32.
+ * @param threshold Filter threshold value.
+ * @param lt_mask Pointer to the array storing filter results, length 1.
+ * @param codes_size Length of codes.
+ * @param LUT_size Length of LUT.
+ * @param lt_mask_size Length of lt_mask.
+ */
+int krl_IP_table_lookup_fast_scan_bs32(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size)
+{
+    krl_table_lookup_fast_scan_bs32<0>(nsq, codes, LUT, dis, threshold, lt_mask);
+    return SUCCESS;
+}
+
+/*
  * @brief Perform fast L2 table lookup and filtering operations for single query with batch size 64.
  * @param nsq Number of subquantizers.
  * @param codes Pointer to the codes array, layout (nsq, batch=96).
@@ -1026,11 +938,10 @@ static inline void krl_table_lookup_fast_scan_bs96(
  * @param lt_mask Pointer to the array storing filter results, length 3.
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param lt_mask_size Length of lt_mask.
  */
 int krl_L2_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
-    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t dis_size, size_t lt_mask_size)
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size)
 {
     krl_table_lookup_fast_scan_bs64<1>(nsq, codes, LUT, dis, threshold, lt_mask);
     return SUCCESS;
@@ -1046,11 +957,10 @@ int krl_L2_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint
  * @param lt_mask Pointer to the array storing filter results, length 3.
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param lt_mask_size Length of lt_mask.
  */
 int krl_IP_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
-    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t dis_size, size_t lt_mask_size)
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size)
 {
     krl_table_lookup_fast_scan_bs64<0>(nsq, codes, LUT, dis, threshold, lt_mask);
     return SUCCESS;
@@ -1066,11 +976,10 @@ int krl_IP_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint
  * @param lt_mask Pointer to the array storing filter results, length 3.
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param lt_mask_size Length of lt_mask.
  */
 int krl_L2_table_lookup_fast_scan_bs96(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
-    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t dis_size, size_t lt_mask_size)
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size)
 {
     krl_table_lookup_fast_scan_bs96<1>(nsq, codes, LUT, dis, threshold, lt_mask);
     return SUCCESS;
@@ -1086,11 +995,10 @@ int krl_L2_table_lookup_fast_scan_bs96(int nsq, const uint8_t *codes, const uint
  * @param lt_mask Pointer to the array storing filter results, length 3.
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param lt_mask_size Length of lt_mask.
  */
 int krl_IP_table_lookup_fast_scan_bs96(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
-    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t dis_size, size_t lt_mask_size)
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size)
 {
     krl_table_lookup_fast_scan_bs96<0>(nsq, codes, LUT, dis, threshold, lt_mask);
     return SUCCESS;
@@ -1249,10 +1157,146 @@ static int krl_IVFPQ_code_packer_4b(
 int krl_pack_codes_4b(const uint8_t *codes, size_t ncode, size_t nsq, uint8_t *blocks, size_t batchsize, int dim_cross,
     size_t codes_size, size_t blocks_size)
 {
+    int ret = 0;
     if (dim_cross == 0) {
-        int ret = krl_IVFPQ_code_packer_4b(codes, ncode, nsq, blocks, batchsize, blocks_size);
+        ret = krl_IVFPQ_code_packer_4b(codes, ncode, nsq, blocks, batchsize, blocks_size);
     } else {
-        int ret = krl_pqfs_pack_codes(codes, ncode, nsq, blocks, batchsize, blocks_size);
+        ret = krl_pqfs_pack_codes(codes, ncode, nsq, blocks, batchsize, blocks_size);
+    }
+    return ret;
+}
+
+/*
+ * @brief Unpack 4-bit PQFS packed codes into plain code layout.
+ *
+ * This function unpacks 4-bit packed codes produced by PQFS packing.
+ * Each byte contains two 4-bit subquantizer codes. The unpacking
+ * performs a fixed permutation and reorganizes codes back into
+ * subquantizer-major layout.
+ *
+ * @param codes Pointer to the source packed codes.
+ * @param ncodes Total number of vectors to unpack.
+ * @param M Number of subquantizers.
+ * @param blocks Pointer to the destination unpacked code buffer.
+ * @param block_codes Offset (in vectors) for writing unpacked codes.
+ * @param batchsize Batch size used during packing.
+ */
+int krl_pqfs_unpack_codes(
+    const uint8_t *codes,
+    size_t ncodes,
+    size_t M,
+    uint8_t *blocks,
+    size_t block_codes,
+    size_t batchsize) {
+    const uint8_t perm0[16] = {
+            0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13, 15};
+    const int nsq = M + M % 2;
+    const int half_nsq = nsq >> 1;
+    const int blocks_offset = block_codes * half_nsq;
+
+    size_t nb = ncodes / batchsize;
+    const size_t codes_tail = ncodes % batchsize;
+    for (size_t i0 = 0; i0 < nb; i0++) {
+        const uint8_t *codes1 = codes + i0 * batchsize * half_nsq;
+        uint8_t *codes2 = blocks + blocks_offset + i0 * batchsize * half_nsq;
+        uint8_t c0[32], c1[32];
+        for (int sq = 0; sq < half_nsq; sq++) {
+            for (size_t i = 0; i < batchsize; i += 32) {
+                for (int j = 0; j < 32; j++) {
+                    c0[j] = codes1[sq * batchsize + i + j] & 15;
+                    c1[j] = codes1[sq * batchsize + i + j] >> 4;
+                }
+                for (int j = 0; j < 16; j++) {
+                    uint8_t d0 = c0[perm0[j]] | (c0[perm0[j] + 16] << 4);
+                    uint8_t d1 = c1[perm0[j]] | (c1[perm0[j] + 16] << 4);
+                    codes2[sq + (i + j) * half_nsq] = d0;
+                    codes2[sq + (i + j + 16) * half_nsq] = d1;
+                }
+            }
+        }
+    }
+    if (codes_tail > 0) {
+        const uint8_t *codes1 = codes + nb * batchsize * half_nsq;
+        uint8_t *codes2 = blocks + blocks_offset + nb * batchsize * half_nsq;
+        uint8_t c0[32], c1[32];
+        const int tiny_block = codes_tail & (-32);
+        const int tiny_block_tail = codes_tail % 32;
+        for (int sq = 0; sq < half_nsq; sq++) {
+            for (size_t i = 0; i < tiny_block; i += 32) {
+                for (int j = 0; j < 32; j++) {
+                    c0[j] = codes1[sq * batchsize + i + j] & 15;
+                    c1[j] = codes1[sq * batchsize + i + j] >> 4;
+                }
+                for (int j = 0; j < 16; j++) {
+                    uint8_t d0 = c0[perm0[j]] | (c0[perm0[j] + 16] << 4);
+                    uint8_t d1 = c1[perm0[j]] | (c1[perm0[j] + 16] << 4);
+                    codes2[sq + (i + j) * half_nsq] = d0;
+                    codes2[sq + (i + j + 16) * half_nsq] = d1;
+                }
+            }
+            {
+                for (int j = 0; j < 32; j++) {
+                    c0[j] = codes1[sq * batchsize + tiny_block + j] & 15;
+                    c1[j] = codes1[sq * batchsize + tiny_block + j] >> 4;
+                }
+                for (int j = 0; j < 16; j++) {
+                    if (j + 16 < tiny_block_tail) {
+                        uint8_t d0 = c0[perm0[j]] | (c0[perm0[j] + 16] << 4);
+                        uint8_t d1 = c1[perm0[j]] | (c1[perm0[j] + 16] << 4);
+                        codes2[sq + (tiny_block + j) * half_nsq] = d0;
+                        codes2[sq + (tiny_block + j + 16) * half_nsq] = d1;
+                    } else if (j < tiny_block_tail) {
+                        uint8_t d0 = c0[perm0[j]] | (c0[perm0[j] + 16] << 4);
+                        codes2[sq + (tiny_block + j) * half_nsq] = d0;
+                    }
+                }
+            }
+        }
     }
     return SUCCESS;
+}
+
+/*
+ * @brief Repack 4-bit codes with a different batch size.
+ *
+ * This function repacks 4-bit quantization codes from a previous
+ * batch layout into a new batch layout. For IVFPQ (dim_cross == 0),
+ * repacking is done directly. For PQFS, codes are first unpacked
+ * into a temporary buffer and then packed again with the new
+ * batch size.
+ *
+ * @param codes Pointer to the source packed codes.
+ * @param ncode Total number of vectors.
+ * @param nsq Number of subquantizers.
+ * @param blocks Pointer to the destination packed blocks.
+ * @param batchsize Number of blocks in the destination layout.
+ * @param prev_batchsize Batch size used in the source layout.
+ * @param after_batchsize Batch size to use in the destination layout.
+ * @param dim_cross Dimension cross flag (0 for IVFPQ, non-zero for PQFS).
+ */
+int krl_repack_codes_4b(
+    const uint8_t *codes,
+    size_t ncode,
+    size_t nsq,
+    uint8_t *blocks,
+    size_t batchsize,
+    size_t prev_batchsize,
+    size_t after_batchsize,
+    int dim_cross) {
+    const size_t half_nsq = (nsq + 1) / 2;
+    int ret = 0;
+    if (dim_cross == 0) {
+        size_t blocks_size = batchsize * half_nsq;
+        ret = krl_IVFPQ_code_packer_4b(codes, ncode, nsq, blocks, after_batchsize, blocks_size);
+    } else {
+        const size_t prev_ntotal = (ncode + prev_batchsize - 1) / prev_batchsize * prev_batchsize;
+        const size_t after_ntotal = (ncode + after_batchsize - 1) / after_batchsize * after_batchsize;
+        size_t blocks_size = after_ntotal * half_nsq;
+
+        uint8_t *tmp_buffer = (uint8_t *)malloc(prev_ntotal * half_nsq);
+        ret = krl_pqfs_unpack_codes(codes, ncode, nsq, tmp_buffer, 0, prev_batchsize);
+        ret = krl_pqfs_pack_codes(tmp_buffer, ncode, nsq, blocks, after_batchsize, blocks_size);
+        free(tmp_buffer);
+    }
+    return ret;
 }

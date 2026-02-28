@@ -29,7 +29,7 @@
  * @param dis_size Length of dis.
  */
 KRL_IMPRECISE_FUNCTION_BEGIN
-int krl_L2sqr(const float *x, const float *__restrict y, const size_t d, float *dis, size_t dis_size)
+int krl_L2sqr(const float *x, const float *__restrict y, const size_t d, float *dis)
 {
     constexpr size_t single_round = 4;
     constexpr size_t multi_round = 16;
@@ -2854,7 +2854,7 @@ KRL_IMPRECISE_FUNCTION_END
  * @param dis_size Length of dis.
  */
 int krl_L2sqr_by_idx(
-    float *dis, const float *x, const float *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size)
+    float *dis, const float *x, const float *y, const int64_t *ids, size_t d, size_t ny)
 {
     size_t i = 0;
     const float *__restrict listy[24];
@@ -2983,7 +2983,7 @@ int krl_L2sqr_by_idx(
         i += 2;
     }
     if (ny & 1) {
-        krl_L2sqr(x, y + d * ids[i], d, &dis[i], 1);
+        krl_L2sqr(x, y + d * ids[i], d, &dis[i]);
     }
     return SUCCESS;
 }
@@ -2995,9 +2995,8 @@ int krl_L2sqr_by_idx(
  * @param y Pointer to the database vectors (float).
  * @param ny Number of database vectors to process.
  * @param d Dimension of the vectors.
- * @param dis_size Length of dis.
  */
-int krl_L2sqr_ny(float *dis, const float *x, const float *y, const size_t ny, const size_t d, size_t dis_size)
+int krl_L2sqr_ny(float *dis, const float *x, const float *y, const size_t ny, const size_t d)
 {
     size_t i = 0;
 
@@ -3020,7 +3019,7 @@ int krl_L2sqr_ny(float *dis, const float *x, const float *y, const size_t ny, co
     }
     if (ny & 1) {
         const float *y0 = (y + (ny - 1) * d);
-        krl_L2sqr(x, y0, d, &dis[ny - 1], 1);
+        krl_L2sqr(x, y0, d, &dis[ny - 1]);
     }
     return SUCCESS;
 }
@@ -3136,7 +3135,7 @@ int krl_L2sqr_ny_with_handle(const KRLDistanceHandle *kdh, float *dis, const flo
         quant_f16(x, M * dim, quant_x);
         for (size_t m = 0; m < M; ++m) {
             krl_L2sqr_ny_f16f32(
-                dis + m * ny, (const uint16_t *)(quant_x + m * dim), (const uint16_t *)(y + m * ny * dim), ny, dim, ny);
+                dis + m * ny, (const uint16_t *)(quant_x + m * dim), (const uint16_t *)(y + m * ny * dim), ny, dim);
         }
         free(quant_x);
     } else {
@@ -3148,7 +3147,7 @@ int krl_L2sqr_ny_with_handle(const KRLDistanceHandle *kdh, float *dis, const flo
         }
         quant_u8(x, M * dim, quant_x);
         for (size_t m = 0; m < M; ++m) {
-            krl_L2sqr_ny_u8f32(dis + m * ny, quant_x + m * dim, y + m * ny * dim, ny, dim, ny);
+            krl_L2sqr_ny_u8f32(dis + m * ny, quant_x + m * dim, y + m * ny * dim, ny, dim);
         }
         free(quant_x);
     }

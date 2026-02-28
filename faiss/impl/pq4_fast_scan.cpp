@@ -10,12 +10,6 @@
 #include <faiss/impl/simd_result_handlers.h>
 
 #include <array>
-#ifdef KRL
-extern "C" {
-#include <faiss/sra_krl/include/krl.h>
-#include "math.h"
-}
-#endif
 
 namespace faiss {
 
@@ -99,12 +93,6 @@ void pq4_pack_codes_range(
         size_t bbs,
         size_t nsq,
         uint8_t* blocks) {
-#ifdef KRL
-    if(bbs % 32 == 0) {
-        krl_pack_codes_4b(
-            codes, i1 - i0, M, blocks + i0 / 32 * 16 * nsq, bbs, 1, (i0 - i1) * M / 2, ceil((i0 - i1) / bbs) * bbs * M);
-    }
-#else
     const uint8_t perm0[16] = {
             0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15};
 
@@ -135,7 +123,6 @@ void pq4_pack_codes_range(
             }
         }
     }
-#endif
 }
 
 namespace {

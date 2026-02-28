@@ -59,7 +59,9 @@
 
 #ifdef KRL
 extern "C" {
+#include <faiss/invlists/BlockInvertedLists.h>
 #include <faiss/sra_krl/include/krl.h>
+#include <algorithm>
 }
 #endif 
 
@@ -257,12 +259,8 @@ static void read_ProductQuantizer(ProductQuantizer* pq, IOReader* f) {
     pq->set_derived_values();
     READVECTOR(pq->centroids);
 #ifdef KRL
-    READ1(pq->use_transpose);
-    if (pq->use_transpose) {
-        krl_build_distanceHandle_fromfile((dynamic_cast<FileIOReader*>(f))->f, &pq->kdh);
-    } else {
-        pq->kdh = nullptr;
-    }
+    pq->kdh = nullptr;
+    pq->use_transpose = false;
 #endif
 }
 
@@ -539,6 +537,10 @@ static IndexIVFPQ* read_ivfpq(IOReader* f, uint32_t h, int io_flags) {
 #if defined(KRL) || defined(OPTI_IVFPQ)
     ivpq->tmp_buffer_size = ivpq->invlists->initialize_tmp_buffer(64);
 #endif
+
+#ifdef KRL
+    ivpq->pq.initialize_krl_transpose_centroids(64, ivpq->metric_type);
+#endif
     return ivpq;
 }
 
@@ -563,11 +565,13 @@ Index* read_index(IOReader* f, int io_flags) {
         FAISS_THROW_IF_NOT(
                 idxf->codes.size() == idxf->ntotal * idxf->code_size);
 #ifdef KRL
-        READ1(idxf->use_handle);
-        if (idxf->use_handle) {
-            krl_build_distanceHandle_fromfile((dynamic_cast<FileIOReader*>(f))->f, &idxf->kdh);
-        } else {
+        if (idxf->ntotal > 0 && !idxf->codes.empty()) {
             idxf->kdh = nullptr;
+            krl_create_reorder_handle(
+                &idxf->kdh, 1, 3, idxf->ntotal, idxf->d, idxf->metric_type,
+                (const uint8_t*)idxf->codes.data(),
+                idxf->ntotal * idxf->d * sizeof(float));
+            idxf->use_handle = (idxf->kdh != nullptr);
         }
 #endif
         // leak!
@@ -588,15 +592,17 @@ Index* read_index(IOReader* f, int io_flags) {
         FAISS_THROW_IF_NOT(
                 idxf->codes.size() == idxf->ntotal * idxf->code_size);
 #ifdef KRL
-        READ1(idxf->use_handle);
-        if (idxf->use_handle) {
-            krl_build_distanceHandle_fromfile((dynamic_cast<FileIOReader*>(f))->f, &idxf->kdh);
-        } else {
+        if (idxf->ntotal > 0 && !idxf->codes.empty()) {
             idxf->kdh = nullptr;
+            krl_create_reorder_handle(
+                &idxf->kdh, 1, 3, idxf->ntotal, idxf->d, idxf->metric_type,
+                (const uint8_t*)idxf->codes.data(),
+                idxf->ntotal * idxf->d * sizeof(float));
+            idxf->use_handle = (idxf->kdh != nullptr);
         }
+#endif
         // leak!
         idx = idxf;
-#endif
 #endif
     } else if (h == fourcc("IxHE") || h == fourcc("IxHe")) {
         IndexLSH* idxl = new IndexLSH();
@@ -832,6 +838,9 @@ Index* read_index(IOReader* f, int io_flags) {
         read_ivf_header(ivfl, f);
         ivfl->code_size = ivfl->d * sizeof(float);
         read_InvertedLists(ivfl, f, io_flags);
+#ifdef KRL
+        ivfl->tmp_buffer_size = ivfl->invlists->initialize_tmp_buffer(64);
+#endif
         idx = ivfl;
     } else if (h == fourcc("IxSQ")) {
         IndexScalarQuantizer* idxs = new IndexScalarQuantizer();
@@ -972,9 +981,17 @@ Index* read_index(IOReader* f, int io_flags) {
             delete idxrf_old;
 #ifdef KRL
             IndexRefineFlat* idxrft = dynamic_cast<IndexRefineFlat*>(idxrf);
-            READ1(idxrft->full_level);
-            READ1(idxrft->accu_level);
-            krl_build_distanceHandle_fromfile((dynamic_cast<FileIOReader*>(f))->f, &idxrft->kdh);
+            idxrft->full_level = 3;
+            idxrft->accu_level = 1;
+            IndexFlat* refine_flat = dynamic_cast<IndexFlat*>(idxrft->refine_index);
+            if (refine_flat && refine_flat->ntotal > 0) {
+                idxrft->kdh = nullptr;
+                krl_create_reorder_handle(
+                    &idxrft->kdh, idxrft->accu_level, idxrft->full_level,
+                    refine_flat->ntotal, refine_flat->d, idxrft->metric_type,
+                    (const uint8_t*)refine_flat->codes.data(),
+                    refine_flat->ntotal * refine_flat->d * sizeof(float));
+            }
 #endif
         }
         idxrf->own_fields = true;
@@ -1031,13 +1048,27 @@ Index* read_index(IOReader* f, int io_flags) {
             dynamic_cast<IndexPQ*>(idxhnsw->storage)->pq.compute_sdc_table();
         }
 #ifdef KRL
-        READ1(idxhnsw->quant_bits);
-        READ1(idxhnsw->quant_scale);
-        READ1(idxhnsw->apply_reorder);
-        if (idxhnsw->apply_reorder) {
-            READ1(idxhnsw->perm_size);
+        idxhnsw->quant_bits = 32;
+        idxhnsw->quant_scale = 1.0f;
+        idxhnsw->apply_reorder = true;
+
+        if (idxhnsw->ntotal > 0) {
+            idxhnsw->perm_size = idxhnsw->ntotal;
             idxhnsw->perm = new idx_t[idxhnsw->perm_size];
-            READANDCHECK(idxhnsw->perm, idxhnsw->perm_size);
+            graphBFSPerm(idxhnsw, idxhnsw->perm);
+            idxhnsw->permute_entries(idxhnsw->perm);
+
+            HNSW& hnsw = idxhnsw->hnsw;
+            for (size_t vi = 0; vi < idxhnsw->ntotal; ++vi) {
+                for (size_t level = 0; level < hnsw.levels[vi]; level++) {
+                    size_t begin, end;
+                    hnsw.neighbor_range(vi, level, &begin, &end);
+                    while (hnsw.neighbors[end - 1] == -1 && begin < end) {
+                        end--;
+                    }
+                    std::sort(hnsw.neighbors.begin() + begin, hnsw.neighbors.begin() + end);
+                }
+            }
         } else {
             idxhnsw->perm_size = 0;
             idxhnsw->perm = nullptr;
@@ -1088,6 +1119,31 @@ Index* read_index(IOReader* f, int io_flags) {
         idxpqfs->ksub = (1 << pq.nbits);
         idxpqfs->code_size = pq.code_size;
 
+#ifdef KRL
+        idxpqfs->pq.initialize_krl_transpose_centroids(16, idxpqfs->metric_type);
+
+        if (idxpqfs->ntotal > 0 && idxpqfs->bbs % 32 == 0) {
+            size_t nsq = idxpqfs->M;
+            size_t half_nsq = (nsq + 1) / 2;
+            size_t codes_size = idxpqfs->ntotal2 * half_nsq;
+
+            std::vector<uint8_t> repacked_codes(codes_size);
+
+            krl_repack_codes_4b(
+                idxpqfs->codes.get(),
+                idxpqfs->ntotal,
+                nsq,
+                repacked_codes.data(),
+                idxpqfs->ntotal2,
+                idxpqfs->bbs,
+                idxpqfs->bbs,
+                1
+            );
+
+            memcpy(idxpqfs->codes.get(), repacked_codes.data(), codes_size);
+            idxpqfs->apply_repack = true;
+        }
+#endif
         idx = idxpqfs;
 
     } else if (h == fourcc("IwPf")) {
@@ -1110,6 +1166,43 @@ Index* read_index(IOReader* f, int io_flags) {
         ivpq->code_size = pq.code_size;
         ivpq->init_code_packer();
 
+#ifdef KRL
+        ivpq->pq.initialize_krl_transpose_centroids(16, ivpq->metric_type);
+
+        if (ivpq->bbs % 32 == 0) {
+            BlockInvertedLists* bil = dynamic_cast<BlockInvertedLists*>(ivpq->invlists);
+            if (bil) {
+                size_t nsq = ivpq->M;
+                size_t half_nsq = (nsq + 1) / 2;
+
+                bool first_debug = true;
+
+                for (size_t list_no = 0; list_no < bil->nlist; list_no++) {
+                    size_t list_size = bil->ids[list_no].size();
+                    if (list_size == 0) continue;
+
+                    size_t codes_size = bil->codes[list_no].size();
+                    size_t ntotal2 = ((list_size + bil->n_per_block - 1) / bil->n_per_block) * bil->n_per_block;
+
+                    std::vector<uint8_t> repacked_codes(codes_size);
+
+                    krl_repack_codes_4b(
+                        bil->codes[list_no].get(),
+                        list_size,
+                        nsq,
+                        repacked_codes.data(),
+                        ntotal2,
+                        bil->n_per_block,
+                        bil->n_per_block,
+                        1
+                    );
+
+                    memcpy(bil->codes[list_no].get(), repacked_codes.data(), codes_size);
+                }
+                ivpq->apply_repack = true;
+            }
+        }
+#endif
         idx = ivpq;
     } else if (h == fourcc("IRMf")) {
         IndexRowwiseMinMax* imm = new IndexRowwiseMinMax();

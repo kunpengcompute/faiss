@@ -2039,10 +2039,9 @@ KRL_IMPRECISE_FUNCTION_END
  * @param ids Pointer to the indices of the database vectors to be used.
  * @param d Dimension of the vectors.
  * @param ny Number of vectors to compute inner products with.
- * @param dis_size Length of dis.
  */
 int krl_inner_product_by_idx_f16f32(
-    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size)
+    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny)
 {
     size_t i = 0;
     const float16_t *__restrict listy[24];
@@ -2170,9 +2169,8 @@ int krl_inner_product_by_idx_f16f32(
  * @param y Pointer to the database vectors (uint16_t).
  * @param ny Number of vectors to compute inner products with.
  * @param d Dimension of the vectors.
- * @param dis_size Length of dis.
  */
-int krl_inner_product_ny_f16f32(float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d, size_t dis_size)
+int krl_inner_product_ny_f16f32(float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d)
 {
     size_t i = 0;
 

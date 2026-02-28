@@ -328,10 +328,9 @@ void krl_table_lookup_8b_f32_f16(
  * @param dis0 Initial distance for IVF.
  * @param codes_size Length of codes.
  * @param sim_table_size Length of sim_table.
- * @param dis_size Length of dis.
  */
 int krl_table_lookup_8b_f32(const size_t nsq, const size_t ncode, const uint8_t *codes, const float *sim_table,
-    float *dis, const float dis0, size_t codes_size, size_t sim_table_size, size_t dis_size)
+    float *dis, const float dis0, size_t codes_size, size_t sim_table_size)
 {
     size_t j = 0;
     for (; j + 8 <= ncode; j += 8) {
@@ -361,10 +360,9 @@ int krl_table_lookup_8b_f32(const size_t nsq, const size_t ncode, const uint8_t 
  * @param idx Pointer to the indices array.
  * @param codes_size Length of codes.
  * @param sim_table_size Length of sim_table.
- * @param dis_size Length of dis.
  */
 int krl_table_lookup_8b_f32_by_idx(const size_t nsq, const size_t ncode, const uint8_t *codes, const float *sim_table,
-    float *dis, const float dis0, const size_t *idx, size_t codes_size, size_t sim_table_size, size_t dis_size)
+    float *dis, const float dis0, const size_t *idx, size_t codes_size, size_t sim_table_size)
 {
     const uint8_t *__restrict list_codes[16];
 
@@ -415,30 +413,6 @@ int krl_table_lookup_8b_f32_by_idx(const size_t nsq, const size_t ncode, const u
     }
     if (ncode & 1) {
         dis[ncode - 1] = distance_single_code_n8(nsq, sim_table, codes + idx[ncode - 1] * nsq, dis0);
-    }
-    return SUCCESS;
-}
-
-/*
- * @brief Perform table lookup for 8-bit codes with 32-bit floating-point distances using a handle.
- * @param klh Pointer to the handle.
- * @param dim Dimension of the codes.
- * @param ncode Number of codes.
- * @param codes Pointer to the codes.
- * @param sim_table Precomputed distance table, layout (M, ksub).
- * @param dis0 Initial distance for IVF.
- * @param codes_size Length of codes.
- * @param sim_table_size Length of sim_table.
- */
-int krl_table_lookup_8b_f32_with_handle(KRLLUT8bHandle *klh, const size_t dim, const size_t ncode, const uint8_t *codes,
-    const float *sim_table, const float dis0, size_t codes_size, size_t sim_table_size)
-{
-    if (klh->use_idx > 0) {
-        krl_table_lookup_8b_f32_by_idx(
-            dim, ncode, codes, sim_table, klh->distance_buffer, dis0, klh->idx_buffer, dim * ncode, dim * 256, ncode);
-    } else {
-        krl_table_lookup_8b_f32(
-            dim, ncode, codes, sim_table, klh->distance_buffer, dis0, dim * ncode, dim * 256, ncode);
     }
     return SUCCESS;
 }

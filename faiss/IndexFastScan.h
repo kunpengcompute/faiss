@@ -50,6 +50,10 @@ struct IndexFastScan : Index {
 
     AlignedTable<uint8_t> codes;
 
+#ifdef KRL
+    bool apply_repack = false;
+#endif
+
     // this is for testing purposes only
     // (set when initialized by IndexPQ or IndexAQ)
     const uint8_t* orig_codes = nullptr;

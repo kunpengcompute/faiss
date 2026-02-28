@@ -59,6 +59,10 @@ struct IndexIVFFastScan : IndexIVF {
     int qbs = 0;
     size_t qbs2 = 0;
 
+#ifdef KRL
+    bool apply_repack = false;
+#endif
+
     IndexIVFFastScan(
             Index* quantizer,
             size_t d,

@@ -124,28 +124,51 @@ void accumulate_q_4step(
         const uint8_t* codes,
         const uint8_t* LUT0,
         ResultHandler& res,
-        const Scaler& scaler) {
+        const Scaler& scaler
+#ifdef KRL
+        , bool apply_repack
+#endif
+) {
     constexpr int Q1 = QBS & 15;
     constexpr int Q2 = (QBS >> 4) & 15;
     constexpr int Q3 = (QBS >> 8) & 15;
     constexpr int Q4 = (QBS >> 12) & 15;
     constexpr int SQ = Q1 + Q2 + Q3 + Q4;
+
 #ifdef KRL
-    bool keep_min = res.get_keepmin();
-    for (size_t j0 = 0; j0 < ntotal2; j0 += 32) {
-        res.set_block_origin(0, j0);
-        uint16_t distance[32 * SQ];
-        uint32_t lt_mask[SQ];
-        uint16_t threshold[SQ];
-        for (int i = 0; i < SQ; ++i) {
-            threshold[i] = res.get_threshold(i);
+    if (apply_repack) {
+        bool keep_min = res.get_keepmin();
+
+        for (size_t j0 = 0; j0 < ntotal2; j0 += 32) {
+            uint16_t distance[32 * SQ];
+            uint32_t lt_mask[SQ];
+
+            for (int qi = 0; qi < SQ; ++qi) {
+                uint16_t thr = res.get_threshold(qi);
+                const uint8_t* lut = LUT0 + qi * nsq * 16;
+
+                if (keep_min) {
+                    krl_L2_table_lookup_fast_scan_bs32(
+                        nsq, codes, lut,
+                        distance + qi * 32, thr, &lt_mask[qi],
+                        nsq * 16, nsq * 16, 1);
+                } else {
+                    krl_IP_table_lookup_fast_scan_bs32(
+                        nsq, codes, lut,
+                        distance + qi * 32, thr, &lt_mask[qi],
+                        nsq * 16, nsq * 16, 1);
+                }
+            }
+
+            res.set_block_origin(0, j0);
+            res.handle_generic(SQ, 0, distance, lt_mask);
+
+            codes += 16 * nsq;
         }
-        krl_fast_table_lookup_step(SQ, nsq, codes, LUT0, distance, threshold, lt_mask, keep_min, nsq * 16, 
-								   SQ * nsq * 16, SQ * 32, SQ, SQ / 32);
-        res.handle_generic(SQ, 0, distance, lt_mask);
-        codes += 16 * nsq;
-    }
-#else
+        return;
+}
+#endif
+
     for (size_t j0 = 0; j0 < ntotal2; j0 += 32) {
         FixedStorageHandler<SQ, 2> res2;
         const uint8_t* LUT = LUT0;
@@ -169,7 +192,6 @@ void accumulate_q_4step(
         res2.to_other_handler(res);
         codes += 32 * nsq / 2;
     }
-#endif
 }
 
 template <int NQ, class ResultHandler, class Scaler>
@@ -226,17 +248,28 @@ void pq4_accumulate_loop_qbs_fixed_scaler(
         const uint8_t* codes,
         const uint8_t* LUT0,
         ResultHandler& res,
-        const Scaler& scaler) {
+        const Scaler& scaler
+#ifdef KRL
+        , bool apply_repack
+#endif
+) {
     assert(nsq % 2 == 0);
     assert(is_aligned_pointer(codes));
     assert(is_aligned_pointer(LUT0));
 
     // try out optimized versions
     switch (qbs) {
+#ifdef KRL
+#define DISPATCH(QBS)                                                    \
+    case QBS:                                                            \
+        accumulate_q_4step<QBS>(ntotal2, nsq, codes, LUT0, res, scaler, apply_repack); \
+        return;
+#else
 #define DISPATCH(QBS)                                                    \
     case QBS:                                                            \
         accumulate_q_4step<QBS>(ntotal2, nsq, codes, LUT0, res, scaler); \
         return;
+#endif
         DISPATCH(0x3333); // 12
         DISPATCH(0x2333); // 11
         DISPATCH(0x2233); // 10
@@ -295,6 +328,10 @@ void pq4_accumulate_loop_qbs_fixed_scaler(
 }
 
 struct Run_pq4_accumulate_loop_qbs {
+#ifdef KRL
+    bool apply_repack;
+    Run_pq4_accumulate_loop_qbs(bool apply_repack = false) : apply_repack(apply_repack) {}
+#endif
     template <class ResultHandler>
     void f(ResultHandler& res,
            int qbs,
@@ -305,11 +342,19 @@ struct Run_pq4_accumulate_loop_qbs {
            const NormTableScaler* scaler) {
         if (scaler) {
             pq4_accumulate_loop_qbs_fixed_scaler(
-                    qbs, nb, nsq, codes, LUT, res, *scaler);
+                    qbs, nb, nsq, codes, LUT, res, *scaler
+#ifdef KRL
+                    , apply_repack
+#endif
+            );
         } else {
             DummyScaler dummy;
             pq4_accumulate_loop_qbs_fixed_scaler(
-                    qbs, nb, nsq, codes, LUT, res, dummy);
+                    qbs, nb, nsq, codes, LUT, res, dummy
+#ifdef KRL
+                    , apply_repack
+#endif
+            );
         }
     }
 };
@@ -323,8 +368,16 @@ void pq4_accumulate_loop_qbs(
         const uint8_t* codes,
         const uint8_t* LUT,
         SIMDResultHandler& res,
-        const NormTableScaler* scaler) {
+        const NormTableScaler* scaler
+#ifdef KRL
+        , bool apply_repack
+#endif
+) {
+#ifdef KRL
+    Run_pq4_accumulate_loop_qbs consumer(apply_repack);
+#else
     Run_pq4_accumulate_loop_qbs consumer;
+#endif
     dispatch_SIMDResultHanlder(res, consumer, qbs, nb, nsq, codes, LUT, scaler);
 }
 

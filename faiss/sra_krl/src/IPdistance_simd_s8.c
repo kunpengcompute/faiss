@@ -1866,10 +1866,9 @@ KRL_IMPRECISE_FUNCTION_END
  * @param ids Array of indices specifying which vectors to use from y.
  * @param d Dimension of the vectors.
  * @param ny Number of vectors to process.
- * @param dis_size Length of dis.
  */
 int krl_inner_product_by_idx_s8f32(
-    float *dis, const int8_t *x, const int8_t *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size)
+    float *dis, const int8_t *x, const int8_t *y, const int64_t *ids, size_t d, size_t ny)
 {
     size_t i = 0;
     const int8_t *__restrict listy[24];
@@ -2015,9 +2014,8 @@ void krl_inner_product_ny_s8s32(int32_t *dis, const int8_t *x, const int8_t *y, 
  * @param y Pointer to the database vectors (int8_t).
  * @param ny Number of vectors to process.
  * @param d Dimension of the vectors.
- * @param dis_size Length of dis.
  */
-int krl_inner_product_ny_s8f32(float *dis, const int8_t *x, const int8_t *y, size_t ny, size_t d, size_t dis_size)
+int krl_inner_product_ny_s8f32(float *dis, const int8_t *x, const int8_t *y, size_t ny, size_t d)
 {
     size_t i = 0;
 

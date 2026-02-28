@@ -255,7 +255,7 @@ struct FlatL2Dis : FlatCodesDistanceComputer {
 #ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
-        krl_L2sqr_by_idx(dis, q, reinterpret_cast<const float*>(codes), idx, d, ny, ny);
+        krl_L2sqr_by_idx(dis, q, reinterpret_cast<const float*>(codes), idx, d, ny);
     }
 #endif
 };
@@ -332,7 +332,7 @@ struct FlatL2DisFP16 : FlatCodesDistanceComputer {
 #ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
-        krl_L2sqr_by_idx_f16f32(dis, reinterpret_cast<const uint16_t*>(q), reinterpret_cast<const uint16_t*>(codes), idx, d, ny, ny);
+        krl_L2sqr_by_idx_f16f32(dis, reinterpret_cast<const uint16_t*>(q), reinterpret_cast<const uint16_t*>(codes), idx, d, ny);
     }
 #endif
 };
@@ -410,7 +410,7 @@ struct FlatIPDis : FlatCodesDistanceComputer {
 #ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
-        krl_inner_product_by_idx(dis, q, reinterpret_cast<const float*>(codes), idx, d, ny, ny);
+        krl_inner_product_by_idx(dis, q, reinterpret_cast<const float*>(codes), idx, d, ny);
     }
 #endif
 };
@@ -488,7 +488,7 @@ struct FlatIPDisFP16 : FlatCodesDistanceComputer {
 #ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
-        krl_inner_product_by_idx_f16f32(dis, reinterpret_cast<const uint16_t*>(q), reinterpret_cast<const uint16_t*>(codes), idx, d, ny, ny);
+        krl_inner_product_by_idx_f16f32(dis, reinterpret_cast<const uint16_t*>(q), reinterpret_cast<const uint16_t*>(codes), idx, d, ny);
     }
 #endif
 };

@@ -303,6 +303,13 @@ if(FAISS_ENABLE_KRL)
     sra_krl/src/sve_search_codes.c
   )
 
+  set(KRL_HEADERS
+    sra_krl/include/krl.h
+    sra_krl/include/safe_memory.h
+  )
+
+  list(APPEND FAISS_HEADERS ${KRL_HEADERS})
+
   set_source_files_properties(${KRL_SRC} PROPERTIES LANGUAGE CXX)
 
   set(SVE_FILE sra_krl/src/sve_search_codes.c)

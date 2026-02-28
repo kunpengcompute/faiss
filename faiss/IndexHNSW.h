@@ -692,4 +692,8 @@ struct IndexHNSW2Level : IndexHNSW {
 #endif
 };
 
+#ifdef KRL
+void graphBFSPerm(IndexHNSW* index, idx_t* perm);
+#endif
+
 } // namespace faiss

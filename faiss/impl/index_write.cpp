@@ -77,12 +77,6 @@
  * leak memory.
  **************************************************************/
 
-#ifdef KRL
-extern "C" {
-#include <faiss/sra_krl/include/krl.h>
-}
-#endif
-
 namespace faiss {
 
 /*************************************************************
@@ -169,15 +163,6 @@ void write_ProductQuantizer(const ProductQuantizer* pq, IOWriter* f) {
     WRITE1(pq->M);
     WRITE1(pq->nbits);
     WRITEVECTOR(pq->centroids);
-#ifdef KRL
-    if (pq->use_transpose && pq->kdh) {
-        WRITE1(pq->use_transpose);
-        krl_store_distanceHandle((dynamic_cast<FileIOWriter*>(f))->f, pq->kdh);
-    } else {
-        bool btmp = false;
-        WRITE1(btmp);
-    }
-#endif
 }
 
 static void write_AdditiveQuantizer(const AdditiveQuantizer* aq, IOWriter* f) {
@@ -417,15 +402,6 @@ void write_index(const Index* idx, IOWriter* f) {
         WRITE1(h);
         write_index_header(idx, f);
         WRITEXBVECTOR(idxf->codes);
-#ifdef KRL
-        if (idxf->use_handle && idxf->kdh) {
-            WRITE1(idxf->use_handle);
-            krl_store_distanceHandle((dynamic_cast<FileIOWriter*>(f))->f, idxf->kdh);
-        } else {
-            bool btmp = false;
-            WRITE1(btmp);
-        }
-#endif
     } else if (const IndexLSH* idxl = dynamic_cast<const IndexLSH*>(idx)) {
         uint32_t h = fourcc("IxHe");
         WRITE1(h);
@@ -773,13 +749,6 @@ void write_index(const Index* idx, IOWriter* f) {
         write_index(idxrf->base_index, f);
         write_index(idxrf->refine_index, f);
         WRITE1(idxrf->k_factor);
-#ifdef KRL
-        if (const IndexRefineFlat* idxrft = dynamic_cast<const IndexRefineFlat*>(idx)){
-            WRITE1(idxrft->full_level);
-            WRITE1(idxrft->accu_level);
-            krl_store_distanceHandle((dynamic_cast<FileIOWriter*>(f))->f, idxrft->kdh);
-        }
-#endif
     } else if (
             const IndexIDMap* idxmap = dynamic_cast<const IndexIDMap*>(idx)) {
         uint32_t h = dynamic_cast<const IndexIDMap2*>(idx) ? fourcc("IxM2")
@@ -805,18 +774,6 @@ void write_index(const Index* idx, IOWriter* f) {
         write_index_header(idxhnsw, f);
         write_HNSW(&idxhnsw->hnsw, f);
         write_index(idxhnsw->storage, f);
-#ifdef KRL
-        WRITE1(idxhnsw->quant_bits);
-        WRITE1(idxhnsw->quant_scale);
-        if (idxhnsw->apply_reorder && idxhnsw->perm && idxhnsw->perm_size > 0) {
-            WRITE1(idxhnsw->apply_reorder);
-            WRITE1(idxhnsw->perm_size);
-            WRITEANDCHECK(idxhnsw->perm, idxhnsw->perm_size);
-        } else {
-            bool btmp = false;
-            WRITE1(btmp);
-        }
-#endif
     } else if (const IndexNSG* idxnsg = dynamic_cast<const IndexNSG*>(idx)) {
         uint32_t h = dynamic_cast<const IndexNSGFlat*>(idx) ? fourcc("INSf")
                 : dynamic_cast<const IndexNSGPQ*>(idx)      ? fourcc("INSp")

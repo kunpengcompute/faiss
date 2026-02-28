@@ -108,7 +108,7 @@ void fvec_L2sqr_ny_ref(
     L2sqrNy(dis, x, y, ny, d);
     return;
 #elif defined(KRL)
-    krl_L2sqr_ny(dis, x, y, ny, d, ny);
+    krl_L2sqr_ny(dis, x, y, ny, d);
     return;
 #endif
     for (size_t i = 0; i < ny; i++) {
@@ -205,7 +205,7 @@ void fvec_inner_products_ny_ref(
     IPNy(ip, x, y, ny, d);
     return;
 #elif defined(KRL)
-    krl_inner_product_ny(ip, x, y, ny, d, ny);
+    krl_inner_product_ny(ip, x, y, ny, d);
     return;
 #endif
     for (size_t i = 0; i < ny; i++) {

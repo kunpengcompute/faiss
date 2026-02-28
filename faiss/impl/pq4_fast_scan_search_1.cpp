@@ -141,6 +141,36 @@ void accumulate_fixed_blocks(
 
 #ifdef KRL
 template <class ResultHandler>
+inline void accumulate_fixed_blocks32(
+        size_t nb,
+        int nsq,
+        const uint8_t* codes,
+        const uint8_t* LUT,
+        ResultHandler& res) {
+    const bool keep_min = res.get_keepmin();
+    ALIGNED(32) uint16_t distance[32];
+    uint32_t lt_mask[1];
+    if(keep_min) {
+        for (size_t j0 = 0; j0 < nb; j0 += 32) {
+            const uint16_t threshold = res.get_threshold(0);
+            krl_L2_table_lookup_fast_scan_bs32(
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 16, nsq * 16, 1);
+            res.handle_generic1(j0, distance, lt_mask);
+            codes += 16 * nsq;
+            
+        }
+    } else {
+        for (size_t j0 = 0; j0 < nb; j0 += 32) {
+            const uint16_t threshold = res.get_threshold(0);
+            krl_IP_table_lookup_fast_scan_bs32(
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 16, nsq * 16, 1);
+            res.handle_generic1(j0, distance, lt_mask);
+            codes += 16 * nsq;
+        }
+    }
+}
+
+template <class ResultHandler>
 inline void accumulate_fixed_blocks64(
         size_t nb,
         int nsq,
@@ -154,7 +184,7 @@ inline void accumulate_fixed_blocks64(
         for (size_t j0 = 0; j0 < nb; j0 += 64) {
             const uint16_t threshold = res.get_threshold(0);
             krl_L2_table_lookup_fast_scan_bs64(
-				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 32, nsq * 16, 64, 2);
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 32, nsq * 16, 2);
             res.handle_generic2(j0, distance, lt_mask);
             codes += 32 * nsq;
             
@@ -163,7 +193,7 @@ inline void accumulate_fixed_blocks64(
         for (size_t j0 = 0; j0 < nb; j0 += 64) {
             const uint16_t threshold = res.get_threshold(0);
             krl_IP_table_lookup_fast_scan_bs64(
-				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 32, nsq * 16, 64, 2);
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 32, nsq * 16, 2);
             res.handle_generic2(j0, distance, lt_mask);
             codes += 32 * nsq;
         }
@@ -184,7 +214,7 @@ inline void accumulate_fixed_blocks96(
         for (size_t j0 = 0; j0 < nb; j0 += 96) {
             const uint16_t threshold = res.get_threshold(0);
             krl_L2_table_lookup_fast_scan_bs96(
-				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 48, nsq * 16, 96, 3);
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 48, nsq * 16, 3);
             res.handle_generic3(j0, distance, lt_mask);
             codes += 48 * nsq;
         }
@@ -192,7 +222,7 @@ inline void accumulate_fixed_blocks96(
         for (size_t j0 = 0; j0 < nb; j0 += 96) {
             const uint16_t threshold = res.get_threshold(0);
             krl_IP_table_lookup_fast_scan_bs96(
-				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 48, nsq * 16, 96, 3);
+				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 48, nsq * 16, 3);
             res.handle_generic3(j0, distance, lt_mask);
             codes += 48 * nsq;
         }
@@ -210,21 +240,25 @@ void pq4_accumulate_loop_fixed_scaler(
         const uint8_t* LUT,
         ResultHandler& res,
         const Scaler& scaler) {
-#ifdef KRL
-    switch (bbs) {
-        case 64:
-        accumulate_fixed_blocks64(nb, nsq, codes, LUT, res);
-        return;
-        case 96:
-        accumulate_fixed_blocks96(nb, nsq, codes, LUT, res);
-        return;
-
-    }
-#endif
     FAISS_THROW_IF_NOT(is_aligned_pointer(codes));
     FAISS_THROW_IF_NOT(is_aligned_pointer(LUT));
     FAISS_THROW_IF_NOT(bbs % 32 == 0);
     FAISS_THROW_IF_NOT(nb % bbs == 0);
+
+#ifdef KRL
+    switch (bbs) {
+        case 32:
+            accumulate_fixed_blocks32(nb, nsq, codes, LUT, res);
+            return;
+        case 64:
+            accumulate_fixed_blocks64(nb, nsq, codes, LUT, res);
+            return;
+        case 96:
+            accumulate_fixed_blocks96(nb, nsq, codes, LUT, res);
+            return;
+
+    }
+#endif
 
 #define DISPATCH(NQ, BB)                                                   \
     case NQ * 1000 + BB:                                                   \

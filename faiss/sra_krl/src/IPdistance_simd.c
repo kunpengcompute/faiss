@@ -26,10 +26,9 @@
  * @param y Pointer to the second vector (float).
  * @param d Dimension of the vectors.
  * @param dis Stores the inner product result (float).
- * @param dis_size Length of dis.
  */
 KRL_IMPRECISE_FUNCTION_BEGIN
-int krl_ipdis(const float *x, const float *__restrict y, const size_t d, float *dis, size_t dis_size)
+int krl_ipdis(const float *x, const float *__restrict y, const size_t d, float *dis)
 {
     size_t i;
     float res;
@@ -1323,10 +1322,9 @@ KRL_IMPRECISE_FUNCTION_END
  * @param ids Pointer to the indices array for selecting database vectors.
  * @param d Dimension of the vectors.
  * @param ny Number of database vectors to process.
- * @param dis_size Length of dis.
  */
 int krl_inner_product_by_idx(
-    float *dis, const float *x, const float *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size)
+    float *dis, const float *x, const float *y, const int64_t *ids, size_t d, size_t ny)
 {
     size_t i = 0;
     const float *__restrict listy[16];
@@ -1395,7 +1393,7 @@ int krl_inner_product_by_idx(
         i += 2;
     }
     if (ny & 1) {
-        krl_ipdis(x, y + d * ids[i], d, &dis[i], 1);
+        krl_ipdis(x, y + d * ids[i], d, &dis[i]);
     }
     return SUCCESS;
 }
@@ -1408,7 +1406,7 @@ int krl_inner_product_by_idx(
  * @param ny Number of database vectors to process.
  * @param d Dimension of the vectors.
  */
-int krl_inner_product_ny(float *dis, const float *x, const float *y, const size_t ny, const size_t d, size_t dis_size)
+int krl_inner_product_ny(float *dis, const float *x, const float *y, const size_t ny, const size_t d)
 {
     size_t i = 0;
 
@@ -1427,7 +1425,7 @@ int krl_inner_product_ny(float *dis, const float *x, const float *y, const size_
         krl_inner_product_batch2(x, y + i * d, d, dis + i);
     }
     if (ny & 1) {
-        krl_ipdis(x, y + (ny - 1) * d, d, &dis[ny - 1], 1);
+        krl_ipdis(x, y + (ny - 1) * d, d, &dis[ny - 1]);
     }
     return SUCCESS;
 }
@@ -1545,7 +1543,7 @@ int krl_inner_product_ny_with_handle(
         quant_f16(x, M * dim, quant_x);
         for (size_t m = 0; m < M; ++m) {
             krl_inner_product_ny_f16f32(
-                dis + m * ny, (const uint16_t *)quant_x + m * dim, (const uint16_t *)y + m * dim * ny, ny, dim, ny);
+                dis + m * ny, (const uint16_t *)quant_x + m * dim, (const uint16_t *)y + m * dim * ny, ny, dim);
         }
         free(quant_x);
     } else {
@@ -1557,7 +1555,7 @@ int krl_inner_product_ny_with_handle(
         }
         quant_s8(x, M * dim, quant_x);
         for (size_t m = 0; m < M; ++m) {
-            krl_inner_product_ny_s8f32(dis + m * ny, quant_x + m * dim, y + m * dim * ny, ny, dim, ny);
+            krl_inner_product_ny_s8f32(dis + m * ny, quant_x + m * dim, y + m * dim * ny, ny, dim);
         }
         free(quant_x);
     }

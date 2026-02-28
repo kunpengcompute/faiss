@@ -123,32 +123,6 @@ int krl_store_distanceHandle(FILE *f, const KRLDistanceHandle *kdh)
     return SUCCESS;
 }
 
-/*
- * @brief Store 8-bit lookup table handle to file.
- * @param f File pointer.
- * @param klh Pointer to the 8-bit lookup table handle.
- */
-int krl_store_LUT8Handle(FILE *f, const KRLLUT8bHandle *klh)
-{
-    if (f == NULL || klh == NULL) {
-        printf("Error: INVALPOINTER in krl_store_LUT8Handle\n");
-        return INVALPOINTER;
-    }
-    if (store_element(f, sizeof(int), (const uint8_t *)&(klh->use_idx)) != 1)
-        return FAILIO;
-    if (store_element(f, sizeof(size_t), (const uint8_t *)&(klh->capacity)) != 1)
-        return FAILIO;
-    if (klh->capacity > 0) {
-        if (klh->use_idx > 0) {
-            if (store_list(f, klh->capacity, sizeof(size_t), (const uint8_t *)(klh->idx_buffer)) != klh->capacity)
-                return FAILIO;
-        }
-        if (store_list(f, klh->capacity, sizeof(float), (const uint8_t *)(klh->distance_buffer)) != klh->capacity)
-            return FAILIO;
-    }
-    return SUCCESS;
-}
-
 /* ----------------------------------------  read handle  ---------------------------------------- */
 
 /*
@@ -223,58 +197,5 @@ int krl_build_distanceHandle_fromfile(FILE *f, KRLDistanceHandle **kdh)
 FAIL:
     krl_clean_distance_handle(kdh);
     printf("Error: FAILIO in krl_build_distanceHandle_fromfile\n");
-    return FAILIO;
-}
-/*
- * @brief Build 8-bit lookup table handle from file.
- * @param f File pointer.
- * @param klh Pointer to the 8-bit lookup table handle pointer.
- * @return int Status code (SUCCESS, INVALPOINTER, FAILALLOC).
- */
-int krl_build_LUT8Handle_fromfile(FILE *f, KRLLUT8bHandle **klh)
-{
-    if (f == NULL || klh == NULL) {
-        printf("Error: INVALPOINTER in krl_build_LUT8Handle_fromfile\n");
-        return INVALPOINTER;
-    }
-    (*klh) = (KRLLUT8bHandle *)malloc(sizeof(KRLLUT8bHandle));
-    if ((*klh) == NULL) {
-        printf("Error: FAILALLOC in krl_build_LUT8Handle_fromfile\n");
-        return FAILALLOC;
-    }
-    if (read_element(f, sizeof(int), (uint8_t *)&((*klh)->use_idx)) != 1)
-        goto FAIL;
-    if (read_element(f, sizeof(size_t), (uint8_t *)&((*klh)->capacity)) != 1)
-        goto FAIL;
-    if ((*klh)->capacity > 0) {
-        if ((*klh)->use_idx > 0) {
-            (*klh)->idx_buffer = (size_t *)aligned_alloc(KRL_DEFAULT_ALIGNED, (*klh)->capacity * sizeof(size_t));
-            if ((*klh)->idx_buffer == NULL) {
-                krl_clean_LUT8b_handle(klh);
-                printf("Error: FAILALLOC in krl_build_LUT8Handle_fromfile\n");
-                return FAILALLOC;
-            }
-            if (read_list(f, (*klh)->capacity, sizeof(size_t), (uint8_t *)((*klh)->idx_buffer)) != (*klh)->capacity)
-                goto FAIL;
-        } else {
-            (*klh)->idx_buffer = NULL;
-        }
-        (*klh)->distance_buffer = (float *)aligned_alloc(KRL_DEFAULT_ALIGNED, (*klh)->capacity * sizeof(float));
-        if ((*klh)->distance_buffer == NULL) {
-            krl_clean_LUT8b_handle(klh);
-            printf("Error: FAILALLOC in krl_build_LUT8Handle_fromfile\n");
-            return FAILALLOC;
-        }
-        if (read_list(f, (*klh)->capacity, sizeof(float), (uint8_t *)((*klh)->distance_buffer)) != (*klh)->capacity)
-            goto FAIL;
-    } else {
-        (*klh)->idx_buffer = NULL;
-        (*klh)->distance_buffer = NULL;
-    }
-    return SUCCESS;
-
-FAIL:
-    krl_clean_LUT8b_handle(klh);
-    printf("Error: FAILIO in krl_build_LUT8Handle_fromfile\n");
     return FAILIO;
 }

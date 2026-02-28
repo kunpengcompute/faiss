@@ -165,15 +165,6 @@ void IndexIVFPQ::train_encoder(idx_t n, const float* x, const idx_t* assign) {
     if (by_residual) {
         precompute_table();
     }
-#ifdef KRL
-    if (pq.nbits == 8 && pq.dsub <= 64) {
-        if(metric_type == METRIC_L2) {
-            pq.initialize_krl_transpose_centroids(64, metric_type);
-        } else {
-            pq.initialize_krl_transpose_centroids(32, metric_type);
-        }
-    }
-#endif
 }
 
 idx_t IndexIVFPQ::train_encoder_num_vectors() const {
@@ -233,11 +224,6 @@ void IndexIVFPQ::add_core(
         const idx_t* coarse_idx,
         void* inverted_list_context) {
     add_core_o(n, x, xids, nullptr, coarse_idx, inverted_list_context);
-#if defined(KRL) || defined(OPTI_IVFPQ)
-    if(pq.nbits == 8) {
-        tmp_buffer_size = invlists->initialize_tmp_buffer(64);
-    }
-#endif
 }
 
 static std::unique_ptr<float[]> compute_residuals(
@@ -1508,7 +1494,7 @@ struct IVFPQScanner : IVFPQScannerT<idx_t, METRIC_TYPE, PQDecoder>,
                     ncode = j;
                     krl_table_lookup_8b_f32_by_idx(
                         this->pq.M, ncode, codes, this->sim_table, distance_tmp_buffer, this->dis0, idx_tmp_buffer, 
-						this->pq.M * ncode, this->pq.M * 256, ncode);
+						this->pq.M * ncode, this->pq.M * 256);
                     for(size_t i = 0; i < ncode; ++i) {
                         res.add(idx_tmp_buffer[i],distance_tmp_buffer[i]);
                     }
@@ -1516,7 +1502,7 @@ struct IVFPQScanner : IVFPQScannerT<idx_t, METRIC_TYPE, PQDecoder>,
 					float* distance_tmp_buffer = krl_get_dist_pointer(klh);
 					krl_table_lookup_8b_f32(
 						this->pq.M, ncode, codes, this->sim_table, distance_tmp_buffer, this->dis0, this->pq.M * ncode, 
-						this->pq.M * 256, ncode);
+						this->pq.M * 256);
 					size_t i = 0;
 					for(; i + 4 <= ncode; i+=4) {
 						res.add(i, distance_tmp_buffer[i]);

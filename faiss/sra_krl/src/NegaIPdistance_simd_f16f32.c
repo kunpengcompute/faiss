@@ -25,11 +25,10 @@
  * @param u16_y Pointer to the second input float16 vector.
  * @param d Length of the vectors.
  * @param dis Stores the inner product result (float).
- * @param dis_size Length of dis.
  */
 KRL_IMPRECISE_FUNCTION_BEGIN
 int krl_negative_ipdis_f16f32(
-    const uint16_t *u16_x, const uint16_t *__restrict u16_y, const size_t d, float *dis, size_t dis_size)
+    const uint16_t *u16_x, const uint16_t *__restrict u16_y, const size_t d, float *dis)
 {
 	const float16_t *x = (const float16_t *)u16_x;
     const float16_t *y = (const float16_t *)u16_y;
@@ -1050,10 +1049,9 @@ KRL_IMPRECISE_FUNCTION_END
  * @param ids Indices of the reference vectors to be used.
  * @param d Length of the vectors.
  * @param ny Number of reference vectors to compute distances for.
- * @param dis_size Length of dis.
  */
 int krl_negative_inner_product_by_idx_f16f32(
-    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size)
+    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny)
 {
     size_t i = 0;
     const float16_t *__restrict listy[24];
@@ -1173,7 +1171,7 @@ int krl_negative_inner_product_by_idx_f16f32(
         i += 2;
     }
     if (ny & 1) {
-        krl_negative_ipdis_f16f32(x, y + d * ids[i], d, &dis[i], 1);
+        krl_negative_ipdis_f16f32(x, y + d * ids[i], d, &dis[i]);
     }
     return SUCCESS;
 }

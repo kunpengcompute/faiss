@@ -187,6 +187,10 @@ void pq4_accumulate_loop_qbs(
         const uint8_t* codes,
         const uint8_t* LUT,
         SIMDResultHandler& res,
-        const NormTableScaler* scaler = nullptr);
+        const NormTableScaler* scaler = nullptr
+#ifdef KRL
+        , bool apply_repack = false
+#endif
+);
 
 } // namespace faiss

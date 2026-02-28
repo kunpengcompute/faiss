@@ -249,6 +249,7 @@ void IndexRefineFlat::add(idx_t n, const float* x) {
         krl_create_reorder_handle(
             &kdh, accu_level, full_level, n, d, base_index->metric_type, (const uint8_t *)x, n * d * 4);
     }
+    refine_index->add(n,x);
     ntotal = base_index->ntotal;
 }
 

@@ -115,9 +115,8 @@ KRL_API_PUBLIC float *krl_get_dist_pointer(const KRLLUT8bHandle *klh);
  * @param y Pointer to the second vector.
  * @param d Dimension of vectors.
  * @param dis Stores the computed L2 square result (float).
- * @param dis_size Length of dis.
  */
-KRL_API_PUBLIC int krl_L2sqr(const float *x, const float *__restrict y, const size_t d, float *dis, size_t dis_size);
+KRL_API_PUBLIC int krl_L2sqr(const float *x, const float *__restrict y, const size_t d, float *dis);
 
 /*
  * @brief Compute L2 square distance between two 16-bit floating point vectors.
@@ -125,10 +124,9 @@ KRL_API_PUBLIC int krl_L2sqr(const float *x, const float *__restrict y, const si
  * @param y Pointer to the second vector.
  * @param d Dimension of vectors.
  * @param dis Stores the computed L2 square result (float).
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_L2sqr_f16f32(
-    const uint16_t *x, const uint16_t *__restrict y, size_t d, float *dis, size_t dis_size);
+    const uint16_t *x, const uint16_t *__restrict y, size_t d, float *dis);
 
 /*
  * @brief Compute L2 square distance between two 8-bit integer vectors.
@@ -136,10 +134,9 @@ KRL_API_PUBLIC int krl_L2sqr_f16f32(
  * @param y Pointer to the second vector.
  * @param d Dimension of vectors.
  * @param dis Stores the computed L2 square result (uint32_t).
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_L2sqr_u8u32(
-    const uint8_t *x, const uint8_t *__restrict y, size_t d, uint32_t *dis, size_t dis_size);
+    const uint8_t *x, const uint8_t *__restrict y, size_t d, uint32_t *dis);
 
 /*
  * @brief Compute inner product distance between two vectors.
@@ -147,9 +144,8 @@ KRL_API_PUBLIC int krl_L2sqr_u8u32(
  * @param y Pointer to the second vector.
  * @param d Dimension of vectors.
  * @param dis Stores the inner product result (float).
- * @param dis_size Length of dis.
  */
-KRL_API_PUBLIC int krl_ipdis(const float *x, const float *__restrict y, const size_t d, float *dis, size_t dis_size);
+KRL_API_PUBLIC int krl_ipdis(const float *x, const float *__restrict y, const size_t d, float *dis);
 
 /*
  * @brief Compute negative inner product distance between two 16-bit floating point vectors.
@@ -157,21 +153,9 @@ KRL_API_PUBLIC int krl_ipdis(const float *x, const float *__restrict y, const si
  * @param y Pointer to the second vector.
  * @param d Dimension of vectors.
  * @param dis Stores the inner product result (float).
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_negative_ipdis_f16f32(
-    const uint16_t *x, const uint16_t *__restrict y, const size_t d, float *dis, size_t dis_size);
-
-/*
- * @brief Compute negative inner product distance between two 8-bit integer vectors.
- * @param x Pointer to the first vector.
- * @param y Pointer to the second vector.
- * @param d Dimension of vectors.
- * @param dis Stores the inner product result (int32_t).
- * @param dis_size Length of dis.
- */
-KRL_API_PUBLIC int krl_negative_ipdis_s8s32(
-    const int8_t *x, const int8_t *__restrict y, const size_t d, int32_t *dis, size_t dis_size);
+    const uint16_t *x, const uint16_t *__restrict y, const size_t d, float *dis);
 
 /* -------------------------------------- Sparse distance calculation -------------------------------------- */
 
@@ -183,10 +167,9 @@ KRL_API_PUBLIC int krl_negative_ipdis_s8s32(
  * @param ids Indices of vectors.
  * @param d Dimension of vectors.
  * @param ny Number of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_L2sqr_by_idx(
-    float *dis, const float *x, const float *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size);
+    float *dis, const float *x, const float *y, const int64_t *ids, size_t d, size_t ny);
 
 /*
  * @brief Compute L2 square distance between 16-bit floating point vectors using indices.
@@ -196,10 +179,9 @@ KRL_API_PUBLIC int krl_L2sqr_by_idx(
  * @param ids Indices of vectors.
  * @param d Dimension of vectors.
  * @param ny Number of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_L2sqr_by_idx_f16f32(
-    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size);
+    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
 
 /*
  * @brief Compute L2 square distance between 8-bit integer vectors using indices.
@@ -209,10 +191,9 @@ KRL_API_PUBLIC int krl_L2sqr_by_idx_f16f32(
  * @param ids Indices of vectors.
  * @param d Dimension of vectors.
  * @param ny Number of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_L2sqr_by_idx_u8f32(
-    float *dis, const uint8_t *x, const uint8_t *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size);
+    float *dis, const uint8_t *x, const uint8_t *y, const int64_t *ids, size_t d, size_t ny);
 
 /*
  * @brief Compute negative inner product distance between 16-bit floating point vectors using indices.
@@ -222,10 +203,9 @@ KRL_API_PUBLIC int krl_L2sqr_by_idx_u8f32(
  * @param ids Indices of vectors.
  * @param d Dimension of vectors.
  * @param ny Number of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_negative_inner_product_by_idx_f16f32(
-    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size);
+    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
 
 /*
  * @brief Compute inner product distance between 8-bit integer vectors using indices.
@@ -235,10 +215,9 @@ KRL_API_PUBLIC int krl_negative_inner_product_by_idx_f16f32(
  * @param ids Indices of vectors.
  * @param d Dimension of vectors.
  * @param ny Number of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_inner_product_by_idx_s8f32(
-    float *dis, const int8_t *x, const int8_t *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size);
+    float *dis, const int8_t *x, const int8_t *y, const int64_t *ids, size_t d, size_t ny);
 
 /*
  * @brief Compute inner product distance between 16-bit floating point vectors using indices.
@@ -248,10 +227,9 @@ KRL_API_PUBLIC int krl_inner_product_by_idx_s8f32(
  * @param ids Indices of vectors.
  * @param d Dimension of vectors.
  * @param ny Number of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_inner_product_by_idx_f16f32(
-    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size);
+    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
 
 /*
  * @brief Compute inner product distance between vectors using indices.
@@ -261,10 +239,9 @@ KRL_API_PUBLIC int krl_inner_product_by_idx_f16f32(
  * @param ids Indices of vectors.
  * @param d Dimension of vectors.
  * @param ny Number of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_inner_product_by_idx(
-    float *dis, const float *x, const float *y, const int64_t *ids, size_t d, size_t ny, size_t dis_size);
+    float *dis, const float *x, const float *y, const int64_t *ids, size_t d, size_t ny);
 
 /* -------------------------------------- dense distance calculation -------------------------------------- */
 
@@ -275,9 +252,8 @@ KRL_API_PUBLIC int krl_inner_product_by_idx(
  * @param y Pointer to the second set of vectors.
  * @param ny Number of vectors.
  * @param d Dimension of vectors.
- * @param dis_size Length of dis.
  */
-KRL_API_PUBLIC int krl_L2sqr_ny(float *dis, const float *x, const float *y, size_t ny, size_t d, size_t dis_size);
+KRL_API_PUBLIC int krl_L2sqr_ny(float *dis, const float *x, const float *y, size_t ny, size_t d);
 
 /*
  * @brief Compute L2 square distance between multiple 16-bit floating point vectors.
@@ -286,10 +262,9 @@ KRL_API_PUBLIC int krl_L2sqr_ny(float *dis, const float *x, const float *y, size
  * @param y Pointer to the second set of vectors.
  * @param ny Number of vectors.
  * @param d Dimension of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_L2sqr_ny_f16f32(
-    float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d, size_t dis_size);
+    float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
 
 /*
  * @brief Compute L2 square distance between multiple 8-bit integer vectors.
@@ -298,10 +273,9 @@ KRL_API_PUBLIC int krl_L2sqr_ny_f16f32(
  * @param y Pointer to the second set of vectors.
  * @param ny Number of vectors.
  * @param d Dimension of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_L2sqr_ny_u8f32(
-    float *dis, const uint8_t *x, const uint8_t *y, size_t ny, size_t d, size_t dis_size);
+    float *dis, const uint8_t *x, const uint8_t *y, size_t ny, size_t d);
 
 /*
  * @brief Compute L2 square distance using a distance handle.
@@ -321,10 +295,9 @@ KRL_API_PUBLIC int krl_L2sqr_ny_with_handle(
  * @param y Pointer to the second set of vectors.
  * @param ny Number of vectors.
  * @param d Dimension of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_inner_product_ny(
-    float *dis, const float *x, const float *y, size_t ny, size_t d, size_t dis_size);
+    float *dis, const float *x, const float *y, size_t ny, size_t d);
 
 /*
  * @brief Compute inner product distance between multiple 16-bit floating point vectors.
@@ -333,10 +306,9 @@ KRL_API_PUBLIC int krl_inner_product_ny(
  * @param y Pointer to the second set of vectors.
  * @param ny Number of vectors.
  * @param d Dimension of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_inner_product_ny_f16f32(
-    float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d, size_t dis_size);
+    float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
 
 /*
  * @brief Compute inner product distance between multiple 8-bit integer vectors.
@@ -345,10 +317,9 @@ KRL_API_PUBLIC int krl_inner_product_ny_f16f32(
  * @param y Pointer to the second set of vectors.
  * @param ny Number of vectors.
  * @param d Dimension of vectors.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_inner_product_ny_s8f32(
-    float *dis, const int8_t *x, const int8_t *y, size_t ny, size_t d, size_t dis_size);
+    float *dis, const int8_t *x, const int8_t *y, size_t ny, size_t d);
 
 /*
  * @brief Compute inner product distance using a distance handle.
@@ -373,10 +344,9 @@ KRL_API_PUBLIC int krl_inner_product_ny_with_handle(
  * @param dis0 Initial distance value.
  * @param codes_size Length of codes.
  * @param sim_table_size Length of sim_table.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_table_lookup_8b_f32(size_t nsq, size_t ncode, const uint8_t *codes, const float *sim_table,
-    float *dis, float dis0, size_t codes_size, size_t sim_table_size, size_t dis_size);
+    float *dis, float dis0, size_t codes_size, size_t sim_table_size);
 
 /*
  * @brief Lookup table function for 8-bit codes with indices.
@@ -389,25 +359,9 @@ KRL_API_PUBLIC int krl_table_lookup_8b_f32(size_t nsq, size_t ncode, const uint8
  * @param idx Indices of codes.
  * @param codes_size Length of codes.
  * @param sim_table_size Length of sim_table.
- * @param dis_size Length of dis.
  */
 KRL_API_PUBLIC int krl_table_lookup_8b_f32_by_idx(size_t nsq, size_t ncode, const uint8_t *codes,
-    const float *sim_table, float *dis, float dis0, const size_t *idx, size_t codes_size, size_t sim_table_size,
-    size_t dis_size);
-
-/*
- * @brief Lookup table function for 8-bit codes with a handle.
- * @param klh Pointer to the lookup table handle.
- * @param dim Dimension of vectors.
- * @param ncode Number of codes.
- * @param codes Input codes.
- * @param sim_table Similarity table.
- * @param dis0 Initial distance value.
- * @param codes_size Length of codes.
- * @param sim_table_size Length of sim_table.
- */
-KRL_API_PUBLIC int krl_table_lookup_8b_f32_with_handle(KRLLUT8bHandle *klh, size_t dim, size_t ncode,
-    const uint8_t *codes, const float *sim_table, float dis0, size_t codes_size, size_t sim_table_size);
+    const float *sim_table, float *dis, float dis0, const size_t *idx, size_t codes_size, size_t sim_table_size);
 
 /* -------------------------------------- 4-bits table lookup -------------------------------------- */
 
@@ -423,13 +377,44 @@ KRL_API_PUBLIC int krl_table_lookup_8b_f32_with_handle(KRLLUT8bHandle *klh, size
  * @param keep_min Whether to keep minimum values.
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param threshold_size Length of threshold.
  * @param lt_mask_size Length of lt_mask.
  */
 KRL_API_PUBLIC int krl_fast_table_lookup_step(int nq, int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
-    const uint16_t *threshold, uint32_t *lt_mask, int keep_min, size_t codes_size, size_t LUT_size, size_t dis_size,
-    size_t threshold_size, size_t lt_mask_size);
+    const uint16_t *threshold, uint32_t *lt_mask, int keep_min, size_t codes_size, size_t LUT_size, size_t threshold_size,
+    size_t lt_mask_size);
+
+/*
+ * @brief Perform fast L2 table lookup and filtering operations for single query with batch size 32.
+ * @param nsq Number of subquantizers.
+ * @param codes Pointer to the codes array, layout (nsq, batch=32).
+ * @param LUT Pointer to the precomputed distances array, layout (nsq, ksub=16).
+ * @param distance Pointer to the array storing computed distances, length 32.
+ * @param threshold Filter threshold value.
+ * @param lt_mask Pointer to the array storing filter results, length 1.
+ * @param codes_size Length of codes.
+ * @param LUT_size Length of LUT.
+ * @param dis_size Length of dis.
+ * @param lt_mask_size Length of lt_mask.
+ */
+KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs32(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
+
+/*
+ * @brief Perform fast IP table lookup and filtering operations for single query with batch size 32.
+ * @param nsq Number of subquantizers.
+ * @param codes Pointer to the codes array, layout (nsq, batch=32).
+ * @param LUT Pointer to the precomputed distances array, layout (nsq, ksub=16).
+ * @param distance Pointer to the array storing computed distances, length 32.
+ * @param threshold Filter threshold value.
+ * @param lt_mask Pointer to the array storing filter results, length 1.
+ * @param codes_size Length of codes.
+ * @param LUT_size Length of LUT.
+ * @param dis_size Length of dis.
+ * @param lt_mask_size Length of lt_mask.
+ */
+KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs32(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 64).
@@ -441,11 +426,10 @@ KRL_API_PUBLIC int krl_fast_table_lookup_step(int nq, int nsq, const uint8_t *co
  * @param lt_mask Filter result mask.
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param lt_mask_size Length of lt_mask.
  */
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
-    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t dis_size, size_t lt_mask_size);
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 64, inner product).
@@ -457,11 +441,10 @@ KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs64(int nsq, const uint8_t *co
  * @param lt_mask Filter result mask.
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param lt_mask_size Length of lt_mask.
  */
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
-    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t dis_size, size_t lt_mask_size);
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 96).
@@ -473,11 +456,10 @@ KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs64(int nsq, const uint8_t *co
  * @param lt_mask Filter result mask.
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param lt_mask_size Length of lt_mask.
  */
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs96(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dise,
-    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t dis_size, size_t lt_mask_size);
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 96, inner product).
@@ -489,26 +471,10 @@ KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs96(int nsq, const uint8_t *co
  * @param lt_mask Filter result mask.
  * @param codes_size Length of codes.
  * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
  * @param lt_mask_size Length of lt_mask.
  */
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs96(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
-    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t dis_size, size_t lt_mask_size);
-
-/*
- * @brief Lookup table function for 4-bit codes.
- * @param nsq Number of subquantizers.
- * @param ncode Number of codes.
- * @param codes Input codes.
- * @param LUT Precomputed distances.
- * @param dis Output distances.
- * @param dis0 Distance between query and the center of the bucket.
- * @param codes_size Length of codes.
- * @param LUT_size Length of LUT.
- * @param dis_size Length of dis.
- */
-KRL_API_PUBLIC int krl_table_lookup_4b_f16(size_t nsq, size_t ncode, const uint8_t *codes, const uint16_t *LUT,
-    float *dis, uint16_t dis0, size_t codes_size, size_t LUT_size, size_t dis_size);
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
 /*
  * @brief Pack 4-bit codes into blocks.
@@ -523,6 +489,27 @@ KRL_API_PUBLIC int krl_table_lookup_4b_f16(size_t nsq, size_t ncode, const uint8
  */
 KRL_API_PUBLIC int krl_pack_codes_4b(const uint8_t *codes, size_t ncode, size_t nsq, uint8_t *blocks, size_t batchsize,
     int dim_cross, size_t codes_size, size_t blocks_size);
+
+/*
+ * @brief Repack 4-bit codes with a different batch size.
+ *
+ * This function repacks 4-bit quantization codes from a previous
+ * batch layout into a new batch layout. For IVFPQ (dim_cross == 0),
+ * repacking is done directly. For PQFS, codes are first unpacked
+ * into a temporary buffer and then packed again with the new
+ * batch size.
+ *
+ * @param codes Pointer to the source packed codes.
+ * @param ncode Total number of vectors.
+ * @param nsq Number of subquantizers.
+ * @param blocks Pointer to the destination packed blocks.
+ * @param batchsize Number of blocks in the destination layout.
+ * @param prev_batchsize Batch size used in the source layout.
+ * @param after_batchsize Batch size to use in the destination layout.
+ * @param dim_cross Dimension cross flag (0 for IVFPQ, non-zero for PQFS).
+ */
+KRL_API_PUBLIC int krl_repack_codes_4b(const uint8_t* codes, size_t ncode, size_t nsq, uint8_t* blocks, 
+    size_t batchsize, size_t prev_batchsize, size_t after_batchsize, int dim_cross);
 
 /* -------------------------------------- reorder function -------------------------------------- */
 
@@ -559,21 +546,6 @@ KRL_API_PUBLIC int krl_reorder_2_vector_continuous_f16(const KRLDistanceHandle *
     const float16_t *query_vector, int64_t k, float *dis, int64_t *idx, size_t query_vector_size);
 
 /* -------------------------------------- handle IO function -------------------------------------- */
-
-/*
- * @brief Store the 8-bit lookup table handle to a file.
- * @param f File pointer.
- * @param klh Pointer to the lookup table handle.
- */
-KRL_API_PUBLIC int krl_store_LUT8Handle(FILE *f, const KRLLUT8bHandle *klh);
-
-/*
- * @brief Build the 8-bit lookup table handle from a file.
- * @param f File pointer.
- * @param klh Pointer to the lookup table handle.
- * @return int 0 on success, non-zero on failure.
- */
-KRL_API_PUBLIC int krl_build_LUT8Handle_fromfile(FILE *f, KRLLUT8bHandle **klh);
 
 /*
  * @brief Store the distance handle to a file.

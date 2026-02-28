@@ -78,6 +78,50 @@ using NodeDistFarther = HNSW::NodeDistFarther;
 
 HNSWStats hnsw_stats;
 
+#ifdef KRL
+void graphBFSPerm(faiss::IndexHNSW *index, faiss::idx_t* perm)
+{
+    size_t permInd = 0;
+    const auto hnsw = index->hnsw;
+    const size_t nV = hnsw.levels.size();
+    std::vector<bool> visited(nV, false);
+
+    std::queue<faiss::idx_t> BFSQueue;
+    for (size_t v = 0; v < nV; ++v) {
+        if (hnsw.levels[v] > 1) {
+            BFSQueue.push(v);
+            perm[permInd++] = v;
+            visited[v] = true;
+        }
+    }
+
+    while (!BFSQueue.empty()) {
+        const auto v = BFSQueue.front();
+        BFSQueue.pop();
+
+        size_t begin, end;
+        hnsw.neighbor_range(v, 0, &begin, &end);
+        for (size_t v = begin; v < end; ++v) {
+            const auto vNeighbor = hnsw.neighbors[v];
+            if (vNeighbor < 0) {
+                break;
+            }
+            if (!visited[vNeighbor]) {
+                BFSQueue.push(vNeighbor);
+                perm[permInd++] = vNeighbor;
+                visited[vNeighbor] = true;
+            }   
+        }
+    }
+
+    for(int i = 0; i < nV; ++i) {
+        if(visited[i] == false) {
+            perm[permInd++] = i;
+        }
+    }
+}
+#endif
+
 /**************************************************************
  * add / search blocks of descriptors
  **************************************************************/
@@ -158,49 +202,6 @@ DistanceComputer* storage_distance_computer(const Index* storage) {
     }
 }
 
-#ifdef KRL
-void graphBFSPerm(faiss::IndexHNSW *index, faiss::idx_t* perm)
-{
-    size_t permInd = 0;
-    const auto hnsw = index->hnsw;
-    const size_t nV = hnsw.levels.size();
-    std::vector<bool> visited(nV, false);
-    
-    std::queue<faiss::idx_t> BFSQueue;
-    for (size_t v = 0; v < nV; ++v) {
-        if (hnsw.levels[v] > 1) {
-            BFSQueue.push(v);
-            perm[permInd++] = v;
-            visited[v] = true;
-        }
-    }
-
-    while (!BFSQueue.empty()) {
-        const auto v = BFSQueue.front();
-        BFSQueue.pop();
-
-        size_t begin, end;
-        hnsw.neighbor_range(v, 0, &begin, &end);
-        for (size_t v = begin; v < end; ++v) {
-            const auto vNeighbor = hnsw.neighbors[v];
-            if (vNeighbor < 0) {
-                break;
-            }
-            if (!visited[vNeighbor]) {
-                BFSQueue.push(vNeighbor);
-                perm[permInd++] = vNeighbor;
-                visited[vNeighbor] = true;
-            }   
-        }
-    }
-
-    for(int i = 0; i < nV; ++i) {
-        if(visited[i] == false) {
-            perm[permInd++] = i;
-        }
-    }
-}
-#endif
 template<typename T>
 void hnsw_add_vertices(
         IndexHNSW& index_hnsw,
@@ -337,27 +338,6 @@ void hnsw_add_vertices(
     for (int i = 0; i < ntotal; i++) {
         omp_destroy_lock(&locks[i]);
     }
-
-#ifdef KRL
-    if (index_hnsw.apply_reorder) {
-        index_hnsw.perm_size = ntotal;
-        index_hnsw.perm = new faiss::idx_t[ntotal];
-        faiss::graphBFSPerm(&index_hnsw, index_hnsw.perm);
-        index_hnsw.permute_entries(index_hnsw.perm);
-
-        for (size_t vi = 0; vi < ntotal; ++vi) {
-            for (size_t level = 0; level < hnsw.levels[vi]; level++) {
-                size_t begin, end;
-                hnsw.neighbor_range(vi, level, &begin, &end);
-                while(hnsw.neighbors[end - 1] == -1 && begin < end) {
-                    end--;
-                }
-                auto hnswNeighborsStart = hnsw.neighbors.begin();
-                std::sort(hnswNeighborsStart + begin, hnswNeighborsStart + end);
-            }
-        }
-    }
-#endif
 }
 
 } // namespace
@@ -431,19 +411,19 @@ struct FlatL2DisSQ8 : DistanceComputer {
 
     float operator()(idx_t i) override {
 		uint32_t ret;
-		krl_L2sqr_u8u32(q8, b8 + i * d, d, &ret, 1);
+		krl_L2sqr_u8u32(q8, b8 + i * d, d, &ret);
         return (float)ret;
     }
 
     float symmetric_dis(idx_t i, idx_t j) override {
 		uint32_t ret;
-		krl_L2sqr_u8u32(q8 + i * d, q8 + j * d, d, &ret, 1);
+		krl_L2sqr_u8u32(q8 + i * d, q8 + j * d, d, &ret);
         return (float)ret;
     }
 
     // compute with krl
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) final override {
-        krl_L2sqr_by_idx_u8f32(dis, q8, b8, idx, d, ny, ny);
+        krl_L2sqr_by_idx_u8f32(dis, q8, b8, idx, d, ny);
     }
 
     virtual ~FlatL2DisSQ8() { };
@@ -474,19 +454,19 @@ struct FlatL2DisSQ16 : DistanceComputer {
 
     float operator()(idx_t i) override {
 		float ret;
-		krl_L2sqr_f16f32((const uint16_t*)q16, (const uint16_t*)b16 + i * d, d, &ret, 1);
+		krl_L2sqr_f16f32((const uint16_t*)q16, (const uint16_t*)b16 + i * d, d, &ret);
         return ret;
     }
 
     float symmetric_dis(idx_t i, idx_t j) override {
 		float ret;
-		krl_L2sqr_f16f32((const uint16_t*)b16 + i * d, (const uint16_t*)b16 + j * d, d, &ret, 1);
+		krl_L2sqr_f16f32((const uint16_t*)b16 + i * d, (const uint16_t*)b16 + j * d, d, &ret);
         return ret;
     }
 
     // compute with krl
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) final override {
-        krl_L2sqr_by_idx_f16f32(dis, (const uint16_t*)q16, (const uint16_t*)b16, idx, d, ny, ny);
+        krl_L2sqr_by_idx_f16f32(dis, (const uint16_t*)q16, (const uint16_t*)b16, idx, d, ny);
     }
 
     virtual ~FlatL2DisSQ16() {};
@@ -509,19 +489,19 @@ struct FlatIPDisSQ16 : DistanceComputer {
 
     float operator()(idx_t i) override {
 		float ret;
-		krl_negative_ipdis_f16f32((const uint16_t*)q16, (const uint16_t*)b16 + i * d, d, &ret, 1);
+		krl_negative_ipdis_f16f32((const uint16_t*)q16, (const uint16_t*)b16 + i * d, d, &ret);
         return ret;
     }
 
     float symmetric_dis(idx_t i, idx_t j) override {
 		float ret;
-		krl_negative_ipdis_f16f32((const uint16_t*)b16 + i * d, (const uint16_t*)b16 + j * d, d, &ret, 1);
+		krl_negative_ipdis_f16f32((const uint16_t*)b16 + i * d, (const uint16_t*)b16 + j * d, d, &ret);
         return ret;
     }
 
     // compute with krl
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) final override {
-        krl_negative_inner_product_by_idx_f16f32(dis, (const uint16_t*)q16, (const uint16_t*)b16, idx, d, ny, ny);
+        krl_negative_inner_product_by_idx_f16f32(dis, (const uint16_t*)q16, (const uint16_t*)b16, idx, d, ny);
     }
 
     virtual ~FlatIPDisSQ16() { };
@@ -890,7 +870,7 @@ void IndexHNSW::search(
         }
     }
 #ifdef KRL
-    if (apply_reorder) {
+    if (apply_reorder && perm != nullptr) {
         std::vector<idx_t> labels_permuted(n * k);
         for (size_t i = 0; i < n * k; ++i) {
             labels_permuted[i] = perm[labels[i]];
@@ -1243,7 +1223,7 @@ void IndexHNSW::search(
     }
 #ifdef KRL
     // *** add for reordering ***
-    if (apply_reorder) {
+    if (apply_reorder && perm != nullptr) {
         std::vector<idx_t> labels_permuted(n * k);
         for (size_t i = 0; i < n * k; ++i) {
             labels_permuted[i] = perm[labels[i]];

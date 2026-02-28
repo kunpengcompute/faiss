@@ -721,7 +721,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/.github/workflows/update-d
 -          fi
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/.gitignore faiss-patch/.gitignore
 --- faiss/.gitignore	2026-02-05 11:42:15.835958200 +0800
-+++ faiss-patch/.gitignore	2026-02-10 10:37:53.340904900 +0800
++++ faiss-patch/.gitignore	2026-02-27 18:24:15.073538000 +0800
 @@ -1,20 +1,32 @@
 -*.swp
 -*.swo
@@ -774,7 +774,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/.gitignore faiss-patch/.gi
 +*.app
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/CMakeLists.txt faiss-patch/CMakeLists.txt
 --- faiss/CMakeLists.txt	2026-02-05 11:42:15.836958000 +0800
-+++ faiss-patch/CMakeLists.txt	2026-02-10 10:37:53.341918500 +0800
++++ faiss-patch/CMakeLists.txt	2026-02-27 18:24:15.074531700 +0800
 @@ -20,6 +20,36 @@
  
  cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)
@@ -814,7 +814,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/CMakeLists.txt faiss-patch
  if(FAISS_ENABLE_GPU)
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/README.en.md faiss-patch/README.en.md
 --- faiss/README.en.md	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/README.en.md	2026-02-10 10:37:53.344905100 +0800
++++ faiss-patch/README.en.md	2026-02-27 18:24:15.078538300 +0800
 @@ -0,0 +1,36 @@
 +# faiss
 +
@@ -854,7 +854,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/README.en.md faiss-patch/R
 +6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/CMakeLists.txt faiss-patch/faiss/CMakeLists.txt
 --- faiss/faiss/CMakeLists.txt	2026-02-05 11:42:15.938148500 +0800
-+++ faiss-patch/faiss/CMakeLists.txt	2026-02-10 10:37:53.436904900 +0800
++++ faiss-patch/faiss/CMakeLists.txt	2026-02-27 18:24:15.243531200 +0800
 @@ -221,16 +221,159 @@
    utils/hamming_distance/avx2-inl.h
  )
@@ -1017,7 +1017,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/CMakeLists.txt faiss
    set_target_properties(faiss_avx2 PROPERTIES EXCLUDE_FROM_ALL TRUE)
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index.cpp faiss-patch/faiss/Index.cpp
 --- faiss/faiss/Index.cpp	2026-02-05 11:42:15.941148500 +0800
-+++ faiss-patch/faiss/Index.cpp	2026-02-10 10:37:53.439905400 +0800
++++ faiss-patch/faiss/Index.cpp	2026-02-27 18:24:15.246540000 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -1066,7 +1066,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index.cpp faiss-patc
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index.h faiss-patch/faiss/Index.h
 --- faiss/faiss/Index.h	2026-02-05 11:42:15.941148500 +0800
-+++ faiss-patch/faiss/Index.h	2026-02-10 10:37:53.439905400 +0800
++++ faiss-patch/faiss/Index.h	2026-02-27 18:24:15.246540000 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -1362,7 +1362,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index.h faiss-patch/
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index2Layer.cpp faiss-patch/faiss/Index2Layer.cpp
 --- faiss/faiss/Index2Layer.cpp	2026-02-05 11:42:15.942148700 +0800
-+++ faiss-patch/faiss/Index2Layer.cpp	2026-02-10 10:37:53.440956100 +0800
++++ faiss-patch/faiss/Index2Layer.cpp	2026-02-27 18:24:15.247531400 +0800
 @@ -160,6 +160,10 @@
      void set_query(const float* x) override {
          q = x;
@@ -1376,7 +1376,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index2Layer.cpp fais
  // well optimized for xNN+PQNN
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexBinaryHNSW.cpp faiss-patch/faiss/IndexBinaryHNSW.cpp
 --- faiss/faiss/IndexBinaryHNSW.cpp	2026-02-05 11:42:15.948148400 +0800
-+++ faiss-patch/faiss/IndexBinaryHNSW.cpp	2026-02-10 10:37:53.445905500 +0800
++++ faiss-patch/faiss/IndexBinaryHNSW.cpp	2026-02-27 18:24:15.252538900 +0800
 @@ -278,6 +278,10 @@
          hc.set((uint8_t*)x, code_size);
      }
@@ -1390,7 +1390,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexBinaryHNSW.cpp 
          { hnsw_stats.ndis += ndis; }
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFastScan.cpp faiss-patch/faiss/IndexFastScan.cpp
 --- faiss/faiss/IndexFastScan.cpp	2026-02-05 11:42:15.951148300 +0800
-+++ faiss-patch/faiss/IndexFastScan.cpp	2026-02-10 10:37:53.448905200 +0800
++++ faiss-patch/faiss/IndexFastScan.cpp	2026-02-27 18:24:15.255531300 +0800
 @@ -471,7 +471,11 @@
                  codes.get(),
                  LUT.get(),
@@ -1406,7 +1406,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFastScan.cpp fa
          handler->end();
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFastScan.h faiss-patch/faiss/IndexFastScan.h
 --- faiss/faiss/IndexFastScan.h	2026-02-05 11:42:15.952156600 +0800
-+++ faiss-patch/faiss/IndexFastScan.h	2026-02-10 10:37:53.449905100 +0800
++++ faiss-patch/faiss/IndexFastScan.h	2026-02-27 18:24:15.256531400 +0800
 @@ -50,6 +50,10 @@
  
      AlignedTable<uint8_t> codes;
@@ -1420,7 +1420,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFastScan.h fais
      const uint8_t* orig_codes = nullptr;
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlat.cpp faiss-patch/faiss/IndexFlat.cpp
 --- faiss/faiss/IndexFlat.cpp	2026-02-05 11:42:15.952156600 +0800
-+++ faiss-patch/faiss/IndexFlat.cpp	2026-02-10 10:37:53.449905100 +0800
++++ faiss-patch/faiss/IndexFlat.cpp	2026-02-27 18:24:15.256531400 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -2033,7 +2033,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlat.cpp faiss-
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlat.h faiss-patch/faiss/IndexFlat.h
 --- faiss/faiss/IndexFlat.h	2026-02-05 11:42:15.953148300 +0800
-+++ faiss-patch/faiss/IndexFlat.h	2026-02-10 10:37:53.450905300 +0800
++++ faiss-patch/faiss/IndexFlat.h	2026-02-27 18:24:15.257532000 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -2207,7 +2207,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlat.h faiss-pa
  };
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlatCodes.cpp faiss-patch/faiss/IndexFlatCodes.cpp
 --- faiss/faiss/IndexFlatCodes.cpp	2026-02-05 11:42:15.953148300 +0800
-+++ faiss-patch/faiss/IndexFlatCodes.cpp	2026-02-10 10:37:53.450905300 +0800
++++ faiss-patch/faiss/IndexFlatCodes.cpp	2026-02-27 18:24:15.257532000 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -2332,7 +2332,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlatCodes.cpp f
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlatCodes.h faiss-patch/faiss/IndexFlatCodes.h
 --- faiss/faiss/IndexFlatCodes.h	2026-02-05 11:42:15.954148900 +0800
-+++ faiss-patch/faiss/IndexFlatCodes.h	2026-02-10 10:37:53.450905300 +0800
++++ faiss-patch/faiss/IndexFlatCodes.h	2026-02-27 18:24:15.258531400 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -2493,7 +2493,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlatCodes.h fai
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexHNSW.cpp faiss-patch/faiss/IndexHNSW.cpp
 --- faiss/faiss/IndexHNSW.cpp	2026-02-05 11:42:15.954442300 +0800
-+++ faiss-patch/faiss/IndexHNSW.cpp	2026-02-10 10:37:53.451905200 +0800
++++ faiss-patch/faiss/IndexHNSW.cpp	2026-02-27 18:24:15.258531400 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -3714,7 +3714,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexHNSW.cpp faiss-
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexHNSW.h faiss-patch/faiss/IndexHNSW.h
 --- faiss/faiss/IndexHNSW.h	2026-02-05 11:42:15.954442300 +0800
-+++ faiss-patch/faiss/IndexHNSW.h	2026-02-10 10:37:53.452905200 +0800
++++ faiss-patch/faiss/IndexHNSW.h	2026-02-27 18:24:15.259531400 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -4323,7 +4323,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexHNSW.h faiss-pa
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVF.cpp faiss-patch/faiss/IndexIVF.cpp
 --- faiss/faiss/IndexIVF.cpp	2026-02-05 11:42:15.956510100 +0800
-+++ faiss-patch/faiss/IndexIVF.cpp	2026-02-10 10:37:53.453905200 +0800
++++ faiss-patch/faiss/IndexIVF.cpp	2026-02-27 18:24:15.260531800 +0800
 @@ -29,6 +29,12 @@
  #include <faiss/impl/FaissAssert.h>
  #include <faiss/impl/IDSelector.h>
@@ -4413,7 +4413,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVF.cpp faiss-p
              FAISS_THROW_FMT(
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVF.h faiss-patch/faiss/IndexIVF.h
 --- faiss/faiss/IndexIVF.h	2026-02-05 11:42:15.957538900 +0800
-+++ faiss-patch/faiss/IndexIVF.h	2026-02-10 10:37:53.454905400 +0800
++++ faiss-patch/faiss/IndexIVF.h	2026-02-27 18:24:15.261538700 +0800
 @@ -22,6 +22,14 @@
  #include <faiss/invlists/DirectMap.h>
  #include <faiss/invlists/InvertedLists.h>
@@ -4472,7 +4472,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVF.h faiss-pat
  // whether to check that coarse quantizers are the same
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.cpp faiss-patch/faiss/IndexIVFFastScan.cpp
 --- faiss/faiss/IndexIVFFastScan.cpp	2026-02-05 11:42:15.960455300 +0800
-+++ faiss-patch/faiss/IndexIVFFastScan.cpp	2026-02-10 10:37:53.456905300 +0800
++++ faiss-patch/faiss/IndexIVFFastScan.cpp	2026-02-27 18:24:15.263539900 +0800
 @@ -94,6 +94,7 @@
          const idx_t* xids) {
      FAISS_THROW_IF_NOT(is_trained);
@@ -4517,7 +4517,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.cpp
          // labels is in-place for HeapHC
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.h faiss-patch/faiss/IndexIVFFastScan.h
 --- faiss/faiss/IndexIVFFastScan.h	2026-02-05 11:42:15.960455300 +0800
-+++ faiss-patch/faiss/IndexIVFFastScan.h	2026-02-10 10:37:53.457905400 +0800
++++ faiss-patch/faiss/IndexIVFFastScan.h	2026-02-27 18:24:15.264531600 +0800
 @@ -59,6 +59,10 @@
      int qbs = 0;
      size_t qbs2 = 0;
@@ -4531,7 +4531,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.h f
              size_t d,
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFlat.cpp faiss-patch/faiss/IndexIVFFlat.cpp
 --- faiss/faiss/IndexIVFFlat.cpp	2026-02-05 11:42:15.961455200 +0800
-+++ faiss-patch/faiss/IndexIVFFlat.cpp	2026-02-10 10:37:53.457905400 +0800
++++ faiss-patch/faiss/IndexIVFFlat.cpp	2026-02-27 18:24:15.264531600 +0800
 @@ -88,6 +88,9 @@
                 n);
      }
@@ -4544,7 +4544,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFlat.cpp fai
  void IndexIVFFlat::encode_vectors(
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFPQ.cpp faiss-patch/faiss/IndexIVFPQ.cpp
 --- faiss/faiss/IndexIVFPQ.cpp	2026-02-05 11:42:15.963521200 +0800
-+++ faiss-patch/faiss/IndexIVFPQ.cpp	2026-02-10 10:37:53.459905000 +0800
++++ faiss-patch/faiss/IndexIVFPQ.cpp	2026-02-27 18:24:15.266531300 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -4899,7 +4899,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFPQ.cpp faiss
          } else if (precompute_mode == 0) {
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexNNDescent.cpp faiss-patch/faiss/IndexNNDescent.cpp
 --- faiss/faiss/IndexNNDescent.cpp	2026-02-05 11:42:15.969529100 +0800
-+++ faiss-patch/faiss/IndexNNDescent.cpp	2026-02-10 10:37:53.465914400 +0800
++++ faiss-patch/faiss/IndexNNDescent.cpp	2026-02-27 18:24:15.273531500 +0800
 @@ -71,7 +71,9 @@
      void set_query(const float* x) override {
          basedis->set_query(x);
@@ -4913,7 +4913,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexNNDescent.cpp f
          return -(*basedis)(i);
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexPreTransform.cpp faiss-patch/faiss/IndexPreTransform.cpp
 --- faiss/faiss/IndexPreTransform.cpp	2026-02-05 11:42:15.973521000 +0800
-+++ faiss-patch/faiss/IndexPreTransform.cpp	2026-02-10 10:37:53.469914600 +0800
++++ faiss-patch/faiss/IndexPreTransform.cpp	2026-02-27 18:24:15.278532700 +0800
 @@ -314,7 +314,9 @@
              sub_dc->set_query(xt);
          }
@@ -4927,7 +4927,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexPreTransform.cp
      }
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexRefine.cpp faiss-patch/faiss/IndexRefine.cpp
 --- faiss/faiss/IndexRefine.cpp	2026-02-05 11:42:15.974521000 +0800
-+++ faiss-patch/faiss/IndexRefine.cpp	2026-02-10 10:37:53.469914600 +0800
++++ faiss-patch/faiss/IndexRefine.cpp	2026-02-27 18:24:15.279531600 +0800
 @@ -13,6 +13,9 @@
  #include <faiss/utils/Heap.h>
  #include <faiss/utils/distances.h>
@@ -5055,7 +5055,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexRefine.cpp fais
  
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexRefine.h faiss-patch/faiss/IndexRefine.h
 --- faiss/faiss/IndexRefine.h	2026-02-05 11:42:15.975521200 +0800
-+++ faiss-patch/faiss/IndexRefine.h	2026-02-10 10:37:53.470914300 +0800
++++ faiss-patch/faiss/IndexRefine.h	2026-02-27 18:24:15.279531600 +0800
 @@ -9,6 +9,13 @@
  
  #include <faiss/Index.h>
@@ -5091,7 +5091,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexRefine.h faiss-
              const float* x,
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/DistanceComputer.h faiss-patch/faiss/impl/DistanceComputer.h
 --- faiss/faiss/impl/DistanceComputer.h	2026-02-05 11:42:16.113704300 +0800
-+++ faiss-patch/faiss/impl/DistanceComputer.h	2026-02-10 10:37:53.582907600 +0800
++++ faiss-patch/faiss/impl/DistanceComputer.h	2026-02-27 18:24:15.430228800 +0800
 @@ -8,6 +8,9 @@
  #pragma once
  
@@ -5152,7 +5152,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/DistanceCompute
  
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/HNSW.cpp faiss-patch/faiss/impl/HNSW.cpp
 --- faiss/faiss/impl/HNSW.cpp	2026-02-05 11:42:16.116703600 +0800
-+++ faiss-patch/faiss/impl/HNSW.cpp	2026-02-10 10:37:53.584905500 +0800
++++ faiss-patch/faiss/impl/HNSW.cpp	2026-02-27 18:24:15.433229500 +0800
 @@ -397,11 +397,38 @@
          int level,
          storage_idx_t& nearest,
@@ -5265,7 +5265,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/HNSW.cpp faiss-
          if (!do_dis_check && nstep > efSearch) {
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/NSG.cpp faiss-patch/faiss/impl/NSG.cpp
 --- faiss/faiss/impl/NSG.cpp	2026-02-05 11:42:16.122905000 +0800
-+++ faiss-patch/faiss/impl/NSG.cpp	2026-02-10 10:37:53.588905600 +0800
++++ faiss-patch/faiss/impl/NSG.cpp	2026-02-27 18:24:15.446228400 +0800
 @@ -38,7 +38,9 @@
      void set_query(const float* x) override {
          basedis->set_query(x);
@@ -5279,7 +5279,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/NSG.cpp faiss-p
          return -(*basedis)(i);
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/ProductQuantizer.cpp faiss-patch/faiss/impl/ProductQuantizer.cpp
 --- faiss/faiss/impl/ProductQuantizer.cpp	2026-02-05 11:42:16.126920000 +0800
-+++ faiss-patch/faiss/impl/ProductQuantizer.cpp	2026-02-10 10:37:53.592905400 +0800
++++ faiss-patch/faiss/impl/ProductQuantizer.cpp	2026-02-27 18:24:15.453237100 +0800
 @@ -24,6 +24,9 @@
  extern "C" {
  
@@ -5350,7 +5350,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/ProductQuantize
          compute_PQ_dis_tables_dsub2(
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/ProductQuantizer.h faiss-patch/faiss/impl/ProductQuantizer.h
 --- faiss/faiss/impl/ProductQuantizer.h	2026-02-05 11:42:16.126920000 +0800
-+++ faiss-patch/faiss/impl/ProductQuantizer.h	2026-02-10 10:37:53.592905400 +0800
++++ faiss-patch/faiss/impl/ProductQuantizer.h	2026-02-27 18:24:15.454241200 +0800
 @@ -18,6 +18,11 @@
  #include <faiss/impl/Quantizer.h>
  #include <faiss/impl/platform_macros.h>
@@ -5432,7 +5432,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/ProductQuantize
      /// Layout: (M, ksub, dsub)
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/index_read.cpp faiss-patch/faiss/impl/index_read.cpp
 --- faiss/faiss/impl/index_read.cpp	2026-02-05 11:42:16.133920400 +0800
-+++ faiss-patch/faiss/impl/index_read.cpp	2026-02-10 10:37:53.599905200 +0800
++++ faiss-patch/faiss/impl/index_read.cpp	2026-02-27 18:24:15.467229300 +0800
 @@ -57,6 +57,14 @@
  #include <faiss/IndexBinaryHash.h>
  #include <faiss/IndexBinaryIVF.h>
@@ -5686,7 +5686,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/index_read.cpp 
          IndexRowwiseMinMax* imm = new IndexRowwiseMinMax();
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/index_write.cpp faiss-patch/faiss/impl/index_write.cpp
 --- faiss/faiss/impl/index_write.cpp	2026-02-05 11:42:16.134920700 +0800
-+++ faiss-patch/faiss/impl/index_write.cpp	2026-02-10 10:37:53.600905800 +0800
++++ faiss-patch/faiss/impl/index_write.cpp	2026-02-27 18:24:15.467229300 +0800
 @@ -392,10 +392,13 @@
  
  void write_index(const Index* idx, IOWriter* f) {
@@ -5727,21 +5727,8 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/index_write.cpp
          write_index(idxhnsw->storage, f);
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan.cpp faiss-patch/faiss/impl/pq4_fast_scan.cpp
 --- faiss/faiss/impl/pq4_fast_scan.cpp	2026-02-05 11:42:16.138921200 +0800
-+++ faiss-patch/faiss/impl/pq4_fast_scan.cpp	2026-02-10 10:37:53.604905500 +0800
-@@ -10,6 +10,12 @@
- #include <faiss/impl/simd_result_handlers.h>
- 
- #include <array>
-+#ifdef KRL
-+extern "C" {
-+#include <faiss/sra_krl/include/krl.h>
-+#include "math.h"
-+}
-+#endif
- 
- namespace faiss {
- 
-@@ -245,10 +251,7 @@
++++ faiss-patch/faiss/impl/pq4_fast_scan.cpp	2026-02-27 18:24:15.475328900 +0800
+@@ -245,10 +245,7 @@
          for (int sq = 0; sq < nsq; sq += 2) {
              memcpy(dest + (sq / 2 * nq + q) * 32,
                     src + (q * nsq + sq) * 16,
@@ -5755,7 +5742,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan.c
  }
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan.h faiss-patch/faiss/impl/pq4_fast_scan.h
 --- faiss/faiss/impl/pq4_fast_scan.h	2026-02-05 11:42:16.138921200 +0800
-+++ faiss-patch/faiss/impl/pq4_fast_scan.h	2026-02-10 10:37:53.604905500 +0800
++++ faiss-patch/faiss/impl/pq4_fast_scan.h	2026-02-27 18:24:15.476328800 +0800
 @@ -187,6 +187,10 @@
          const uint8_t* codes,
          const uint8_t* LUT,
@@ -5770,7 +5757,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan.h
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_search_1.cpp faiss-patch/faiss/impl/pq4_fast_scan_search_1.cpp
 --- faiss/faiss/impl/pq4_fast_scan_search_1.cpp	2026-02-05 11:42:16.139929300 +0800
-+++ faiss-patch/faiss/impl/pq4_fast_scan_search_1.cpp	2026-02-10 10:37:53.611904700 +0800
++++ faiss-patch/faiss/impl/pq4_fast_scan_search_1.cpp	2026-02-27 18:24:15.476328800 +0800
 @@ -10,6 +10,11 @@
  #include <faiss/impl/FaissAssert.h>
  #include <faiss/impl/LookupTableScaler.h>
@@ -5881,10 +5868,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
  template <class ResultHandler, class Scaler>
  void pq4_accumulate_loop_fixed_scaler(
          int nq,
-@@ -144,6 +240,20 @@
-         const uint8_t* LUT,
-         ResultHandler& res,
-         const Scaler& scaler) {
+@@ -149,6 +245,21 @@
+     FAISS_THROW_IF_NOT(bbs % 32 == 0);
+     FAISS_THROW_IF_NOT(nb % bbs == 0);
+ 
 +#ifdef KRL
 +    switch (bbs) {
 +        case 32:
@@ -5899,12 +5886,13 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
 +
 +    }
 +#endif
-     FAISS_THROW_IF_NOT(is_aligned_pointer(codes));
-     FAISS_THROW_IF_NOT(is_aligned_pointer(LUT));
-     FAISS_THROW_IF_NOT(bbs % 32 == 0);
++
+ #define DISPATCH(NQ, BB)                                                   \
+     case NQ * 1000 + BB:                                                   \
+         accumulate_fixed_blocks<NQ, BB>(nb, nsq, codes, LUT, res, scaler); \
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_search_qbs.cpp faiss-patch/faiss/impl/pq4_fast_scan_search_qbs.cpp
 --- faiss/faiss/impl/pq4_fast_scan_search_qbs.cpp	2026-02-05 11:42:16.140920500 +0800
-+++ faiss-patch/faiss/impl/pq4_fast_scan_search_qbs.cpp	2026-02-10 10:37:53.612905200 +0800
++++ faiss-patch/faiss/impl/pq4_fast_scan_search_qbs.cpp	2026-02-27 18:24:15.477328000 +0800
 @@ -11,6 +11,11 @@
  #include <faiss/impl/LookupTableScaler.h>
  #include <faiss/impl/simd_result_handlers.h>
@@ -5917,7 +5905,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
  
  namespace faiss {
  
-@@ -119,13 +124,35 @@
+@@ -119,13 +124,51 @@
          const uint8_t* codes,
          const uint8_t* LUT0,
          ResultHandler& res,
@@ -5932,38 +5920,45 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
      constexpr int Q3 = (QBS >> 8) & 15;
      constexpr int Q4 = (QBS >> 12) & 15;
      constexpr int SQ = Q1 + Q2 + Q3 + Q4;
--
+ 
 +#ifdef KRL
 +    if (apply_repack) {
 +        bool keep_min = res.get_keepmin();
++
 +        for (size_t j0 = 0; j0 < ntotal2; j0 += 32) {
-+            res.set_block_origin(0, j0);
 +            uint16_t distance[32 * SQ];
 +            uint32_t lt_mask[SQ];
-+            uint16_t threshold[SQ];
-+            for (int i = 0; i < SQ; ++i) {
-+                threshold[i] = res.get_threshold(i);
++
++            for (int qi = 0; qi < SQ; ++qi) {
++                uint16_t thr = res.get_threshold(qi);
++                const uint8_t* lut = LUT0 + qi * nsq * 16;
++
++                if (keep_min) {
++                    krl_L2_table_lookup_fast_scan_bs32(
++                        nsq, codes, lut,
++                        distance + qi * 32, thr, &lt_mask[qi],
++                        nsq * 16, nsq * 16, 1);
++                } else {
++                    krl_IP_table_lookup_fast_scan_bs32(
++                        nsq, codes, lut,
++                        distance + qi * 32, thr, &lt_mask[qi],
++                        nsq * 16, nsq * 16, 1);
++                }
 +            }
-+            krl_fast_table_lookup_step(SQ, nsq, codes, LUT0, distance, threshold, lt_mask, keep_min, nsq * 16, 
-+                                    SQ * nsq * 16, SQ, SQ / 32);
++
++            res.set_block_origin(0, j0);
 +            res.handle_generic(SQ, 0, distance, lt_mask);
++
 +            codes += 16 * nsq;
 +        }
 +        return;
-+    }
-+#else
++}
++#endif
++
      for (size_t j0 = 0; j0 < ntotal2; j0 += 32) {
          FixedStorageHandler<SQ, 2> res2;
          const uint8_t* LUT = LUT0;
-@@ -149,6 +176,7 @@
-         res2.to_other_handler(res);
-         codes += 32 * nsq / 2;
-     }
-+#endif
- }
- 
- template <int NQ, class ResultHandler, class Scaler>
-@@ -205,17 +233,28 @@
+@@ -205,17 +248,28 @@
          const uint8_t* codes,
          const uint8_t* LUT0,
          ResultHandler& res,
@@ -5993,7 +5988,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
          DISPATCH(0x3333); // 12
          DISPATCH(0x2333); // 11
          DISPATCH(0x2233); // 10
-@@ -274,6 +313,10 @@
+@@ -274,6 +328,10 @@
  }
  
  struct Run_pq4_accumulate_loop_qbs {
@@ -6004,7 +5999,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
      template <class ResultHandler>
      void f(ResultHandler& res,
             int qbs,
-@@ -284,11 +327,19 @@
+@@ -284,11 +342,19 @@
             const NormTableScaler* scaler) {
          if (scaler) {
              pq4_accumulate_loop_qbs_fixed_scaler(
@@ -6026,7 +6021,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
          }
      }
  };
-@@ -302,8 +353,16 @@
+@@ -302,8 +368,16 @@
          const uint8_t* codes,
          const uint8_t* LUT,
          SIMDResultHandler& res,
@@ -6046,7 +6041,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
  
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/simd_result_handlers.h faiss-patch/faiss/impl/simd_result_handlers.h
 --- faiss/faiss/impl/simd_result_handlers.h	2026-02-05 11:42:16.141919100 +0800
-+++ faiss-patch/faiss/impl/simd_result_handlers.h	2026-02-10 10:37:53.613905400 +0800
++++ faiss-patch/faiss/impl/simd_result_handlers.h	2026-02-27 18:24:15.479327900 +0800
 @@ -38,7 +38,14 @@
              size_t b,
              simd16uint16 d0,
@@ -6203,7 +6198,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/simd_result_han
                  C::is_max,
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/index_factory.cpp faiss-patch/faiss/index_factory.cpp
 --- faiss/faiss/index_factory.cpp	2026-02-05 11:42:16.142919300 +0800
-+++ faiss-patch/faiss/index_factory.cpp	2026-02-10 10:37:53.614905500 +0800
++++ faiss-patch/faiss/index_factory.cpp	2026-02-27 18:24:15.479327900 +0800
 @@ -253,6 +253,14 @@
          int hnsw_M = sm[2].length() > 0 ? std::stoi(sm[2]) : 32;
          return new IndexHNSWFlat(d, hnsw_M, mt);
@@ -6234,7 +6229,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/index_factory.cpp fa
      }
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/invlists/InvertedLists.cpp faiss-patch/faiss/invlists/InvertedLists.cpp
 --- faiss/faiss/invlists/InvertedLists.cpp	2026-02-05 11:42:16.146177000 +0800
-+++ faiss-patch/faiss/invlists/InvertedLists.cpp	2026-02-10 10:37:53.617905700 +0800
++++ faiss-patch/faiss/invlists/InvertedLists.cpp	2026-02-27 18:24:15.486328600 +0800
 @@ -78,6 +78,12 @@
      }
  }
@@ -6269,7 +6264,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/invlists/InvertedLis
  /*****************************************************************
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/invlists/InvertedLists.h faiss-patch/faiss/invlists/InvertedLists.h
 --- faiss/faiss/invlists/InvertedLists.h	2026-02-05 11:42:16.146177000 +0800
-+++ faiss-patch/faiss/invlists/InvertedLists.h	2026-02-10 10:37:53.618905300 +0800
++++ faiss-patch/faiss/invlists/InvertedLists.h	2026-02-27 18:24:15.487328900 +0800
 @@ -124,6 +124,9 @@
      virtual void resize(size_t list_no, size_t new_size) = 0;
  
@@ -6292,7 +6287,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/invlists/InvertedLis
  /*****************************************************************
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/krl.h faiss-patch/faiss/sra_krl/include/krl.h
 --- faiss/faiss/sra_krl/include/krl.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/include/krl.h	2026-02-10 10:37:53.626905400 +0800
++++ faiss-patch/faiss/sra_krl/include/krl.h	2026-02-27 18:24:15.496328000 +0800
 @@ -0,0 +1,569 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -6866,7 +6861,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/krl.
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/krl_internal.h faiss-patch/faiss/sra_krl/include/krl_internal.h
 --- faiss/faiss/sra_krl/include/krl_internal.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/include/krl_internal.h	2026-02-10 10:37:53.627905200 +0800
++++ faiss-patch/faiss/sra_krl/include/krl_internal.h	2026-02-27 18:24:15.497327900 +0800
 @@ -0,0 +1,309 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -7180,7 +7175,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/krl_
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/platform_macros.h faiss-patch/faiss/sra_krl/include/platform_macros.h
 --- faiss/faiss/sra_krl/include/platform_macros.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/include/platform_macros.h	2026-02-10 10:37:53.627905200 +0800
++++ faiss-patch/faiss/sra_krl/include/platform_macros.h	2026-02-27 18:24:15.498328100 +0800
 @@ -0,0 +1,61 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -7246,7 +7241,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/plat
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/safe_memory.h faiss-patch/faiss/sra_krl/include/safe_memory.h
 --- faiss/faiss/sra_krl/include/safe_memory.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/include/safe_memory.h	2026-02-10 10:37:53.628905200 +0800
++++ faiss-patch/faiss/sra_krl/include/safe_memory.h	2026-02-27 18:24:15.498328100 +0800
 @@ -0,0 +1,56 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -7307,7 +7302,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/safe
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/Heap_sort.c faiss-patch/faiss/sra_krl/src/Heap_sort.c
 --- faiss/faiss/sra_krl/src/Heap_sort.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/Heap_sort.c	2026-02-10 10:37:53.628905200 +0800
++++ faiss-patch/faiss/sra_krl/src/Heap_sort.c	2026-02-27 18:24:15.499328000 +0800
 @@ -0,0 +1,437 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -7749,7 +7744,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/Heap_sor
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistance_simd.c faiss-patch/faiss/sra_krl/src/IPdistance_simd.c
 --- faiss/faiss/sra_krl/src/IPdistance_simd.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/IPdistance_simd.c	2026-02-10 10:37:53.629905300 +0800
++++ faiss-patch/faiss/sra_krl/src/IPdistance_simd.c	2026-02-27 18:24:15.499328000 +0800
 @@ -0,0 +1,1563 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -9317,7 +9312,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistance_simd_f16.c faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16.c
 --- faiss/faiss/sra_krl/src/IPdistance_simd_f16.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16.c	2026-02-10 10:37:53.630905400 +0800
++++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16.c	2026-02-27 18:24:15.500329100 +0800
 @@ -0,0 +1,1565 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -10887,7 +10882,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistance_simd_f16f32.c faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16f32.c
 --- faiss/faiss/sra_krl/src/IPdistance_simd_f16f32.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16f32.c	2026-02-10 10:37:53.631913900 +0800
++++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16f32.c	2026-02-27 18:24:15.501328600 +0800
 @@ -0,0 +1,2219 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -13111,7 +13106,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistance_simd_s8.c faiss-patch/faiss/sra_krl/src/IPdistance_simd_s8.c
 --- faiss/faiss/sra_krl/src/IPdistance_simd_s8.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_s8.c	2026-02-10 10:37:53.631913900 +0800
++++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_s8.c	2026-02-27 18:24:15.502330200 +0800
 @@ -0,0 +1,2044 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -15160,7 +15155,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distance_simd.c faiss-patch/faiss/sra_krl/src/L2distance_simd.c
 --- faiss/faiss/sra_krl/src/L2distance_simd.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/L2distance_simd.c	2026-02-10 10:37:53.632907300 +0800
++++ faiss-patch/faiss/sra_krl/src/L2distance_simd.c	2026-02-27 18:24:15.503328200 +0800
 @@ -0,0 +1,3155 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -18320,7 +18315,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distance_simd_f16.c faiss-patch/faiss/sra_krl/src/L2distance_simd_f16.c
 --- faiss/faiss/sra_krl/src/L2distance_simd_f16.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/L2distance_simd_f16.c	2026-02-10 10:37:53.633905200 +0800
++++ faiss-patch/faiss/sra_krl/src/L2distance_simd_f16.c	2026-02-27 18:24:15.503328200 +0800
 @@ -0,0 +1,2672 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -20997,7 +20992,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distance_simd_f16f32.c faiss-patch/faiss/sra_krl/src/L2distance_simd_f16f32.c
 --- faiss/faiss/sra_krl/src/L2distance_simd_f16f32.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/L2distance_simd_f16f32.c	2026-02-10 10:37:53.633905200 +0800
++++ faiss-patch/faiss/sra_krl/src/L2distance_simd_f16f32.c	2026-02-27 18:24:15.504327900 +0800
 @@ -0,0 +1,3102 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -24104,7 +24099,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distance_simd_u8.c faiss-patch/faiss/sra_krl/src/L2distance_simd_u8.c
 --- faiss/faiss/sra_krl/src/L2distance_simd_u8.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/L2distance_simd_u8.c	2026-02-10 10:37:53.634905300 +0800
++++ faiss-patch/faiss/sra_krl/src/L2distance_simd_u8.c	2026-02-27 18:24:15.505336000 +0800
 @@ -0,0 +1,2631 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -26740,7 +26735,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/MinMax_quant.c faiss-patch/faiss/sra_krl/src/MinMax_quant.c
 --- faiss/faiss/sra_krl/src/MinMax_quant.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/MinMax_quant.c	2026-02-10 10:37:53.635905300 +0800
++++ faiss-patch/faiss/sra_krl/src/MinMax_quant.c	2026-02-27 18:24:15.505336000 +0800
 @@ -0,0 +1,570 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -27315,7 +27310,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/MinMax_q
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c
 --- faiss/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c	2026-02-10 10:37:53.635905300 +0800
++++ faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c	2026-02-27 18:24:15.506328100 +0800
 @@ -0,0 +1,1177 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -28497,7 +28492,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/NegaIPdi
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/NegaIPdistance_simd_s8.c faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_s8.c
 --- faiss/faiss/sra_krl/src/NegaIPdistance_simd_s8.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_s8.c	2026-02-10 10:37:53.636912400 +0800
++++ faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_s8.c	2026-02-27 18:24:15.506328100 +0800
 @@ -0,0 +1,474 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -28975,7 +28970,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/NegaIPdi
 +KRL_IMPRECISE_FUNCTION_END
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/handle_IO.c faiss-patch/faiss/sra_krl/src/handle_IO.c
 --- faiss/faiss/sra_krl/src/handle_IO.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/handle_IO.c	2026-02-10 10:37:53.636912400 +0800
++++ faiss-patch/faiss/sra_krl/src/handle_IO.c	2026-02-27 18:24:15.507328100 +0800
 @@ -0,0 +1,201 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -29180,7 +29175,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/handle_I
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/krl_handles.c faiss-patch/faiss/sra_krl/src/krl_handles.c
 --- faiss/faiss/sra_krl/src/krl_handles.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/krl_handles.c	2026-02-10 10:37:53.637905300 +0800
++++ faiss-patch/faiss/sra_krl/src/krl_handles.c	2026-02-27 18:24:15.507328100 +0800
 @@ -0,0 +1,394 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -29578,7 +29573,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/krl_hand
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/matrix_block_transpose.c faiss-patch/faiss/sra_krl/src/matrix_block_transpose.c
 --- faiss/faiss/sra_krl/src/matrix_block_transpose.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/matrix_block_transpose.c	2026-02-10 10:37:53.637905300 +0800
++++ faiss-patch/faiss/sra_krl/src/matrix_block_transpose.c	2026-02-27 18:24:15.508328000 +0800
 @@ -0,0 +1,108 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -29691,8 +29686,8 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/matrix_b
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_search_with_table_4bit.c faiss-patch/faiss/sra_krl/src/pq_search_with_table_4bit.c
 --- faiss/faiss/sra_krl/src/pq_search_with_table_4bit.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_4bit.c	2026-02-10 10:37:53.641904800 +0800
-@@ -0,0 +1,1292 @@
++++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_4bit.c	2026-02-27 18:24:15.509328100 +0800
+@@ -0,0 +1,1302 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
 +
@@ -29721,6 +29716,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_searc
 +        0x101, 0x202, 0x404, 0x808, 0x1010, 0x2020, 0x4040, 0x8080 \
 +    }
 +
++#if defined(__GNUC__) && !defined(__clang__)
 +#define TBL2_LOOKUP_ASM(result, dict, indices) do { \
 +    uint8x16_t _tmp_result; \
 +    asm volatile( \
@@ -29731,8 +29727,17 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_searc
 +        : [d0] "w"((dict).val[0]), [d1] "w"((dict).val[1]), [idx] "w"(indices) \
 +        : "v16", "v17" \
 +    ); \
-+    (result) = _tmp_result; \
++    result = _tmp_result; \
 +} while(0)
++#else
++#define TBL2_LOOKUP_ASM(result, dict, indices) do { \
++    asm volatile( \
++        "tbl %[res].16B, { %[d0].16B, %[d1].16B }, %[idx].16B" \
++        : [res] "=w"(result) \
++        : [d0] "w"((dict).val[0]), [d1] "w"((dict).val[1]), [idx] "w"(indices) \
++    ); \
++} while(0)
++#endif
 +
 +/*
 + * @brief Accumulate lookup table (LUT) results and apply filtering based on thresholds.
@@ -30988,7 +30993,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_searc
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_search_with_table_8bit.c faiss-patch/faiss/sra_krl/src/pq_search_with_table_8bit.c
 --- faiss/faiss/sra_krl/src/pq_search_with_table_8bit.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_8bit.c	2026-02-10 10:37:53.641904800 +0800
++++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_8bit.c	2026-02-27 18:24:15.509328100 +0800
 @@ -0,0 +1,418 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -31410,7 +31415,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_searc
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/reorder_2_vectors.c faiss-patch/faiss/sra_krl/src/reorder_2_vectors.c
 --- faiss/faiss/sra_krl/src/reorder_2_vectors.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/reorder_2_vectors.c	2026-02-10 10:37:53.642905700 +0800
++++ faiss-patch/faiss/sra_krl/src/reorder_2_vectors.c	2026-02-27 18:24:15.510328200 +0800
 @@ -0,0 +1,345 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -31760,7 +31765,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/reorder_
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/sve_search_codes.c faiss-patch/faiss/sra_krl/src/sve_search_codes.c
 --- faiss/faiss/sra_krl/src/sve_search_codes.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/sve_search_codes.c	2026-02-10 10:37:53.642905700 +0800
++++ faiss-patch/faiss/sra_krl/src/sve_search_codes.c	2026-02-27 18:24:15.510328200 +0800
 @@ -0,0 +1,129 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -31893,7 +31898,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/sve_sear
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/arm/asm/distances_simd.cpp faiss-patch/faiss/utils/arm/asm/distances_simd.cpp
 --- faiss/faiss/utils/arm/asm/distances_simd.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/utils/arm/asm/distances_simd.cpp	2026-02-10 10:37:53.649905900 +0800
++++ faiss-patch/faiss/utils/arm/asm/distances_simd.cpp	2026-02-27 18:24:15.517328500 +0800
 @@ -0,0 +1,4949 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
@@ -36847,7 +36852,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/arm/asm/distan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/arm/asm/distances_simd.h faiss-patch/faiss/utils/arm/asm/distances_simd.h
 --- faiss/faiss/utils/arm/asm/distances_simd.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/utils/arm/asm/distances_simd.h	2026-02-10 10:37:53.649905900 +0800
++++ faiss-patch/faiss/utils/arm/asm/distances_simd.h	2026-02-27 18:24:15.518328800 +0800
 @@ -0,0 +1,67 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
@@ -36918,7 +36923,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/arm/asm/distan
 +#endif
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/arm/asm/scan_list_with_table.S faiss-patch/faiss/utils/arm/asm/scan_list_with_table.S
 --- faiss/faiss/utils/arm/asm/scan_list_with_table.S	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/utils/arm/asm/scan_list_with_table.S	2026-02-10 10:37:53.650905300 +0800
++++ faiss-patch/faiss/utils/arm/asm/scan_list_with_table.S	2026-02-27 18:24:15.518328800 +0800
 @@ -0,0 +1,696 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
@@ -37618,7 +37623,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/arm/asm/scan_l
 +.size DistanceCodesN8x1S, .-DistanceCodesN8x1S
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/distances.cpp faiss-patch/faiss/utils/distances.cpp
 --- faiss/faiss/utils/distances.cpp	2026-02-05 11:42:16.162480900 +0800
-+++ faiss-patch/faiss/utils/distances.cpp	2026-02-10 10:37:53.650905300 +0800
++++ faiss-patch/faiss/utils/distances.cpp	2026-02-27 18:24:15.519329100 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -38391,7 +38396,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/distances.cpp 
          int64_t nq,
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/distances.h faiss-patch/faiss/utils/distances.h
 --- faiss/faiss/utils/distances.h	2026-02-05 11:42:16.162480900 +0800
-+++ faiss-patch/faiss/utils/distances.h	2026-02-10 10:37:53.651905300 +0800
++++ faiss-patch/faiss/utils/distances.h	2026-02-27 18:24:15.520328900 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -38568,7 +38573,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/distances.h fa
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/distances_simd.cpp faiss-patch/faiss/utils/distances_simd.cpp
 --- faiss/faiss/utils/distances_simd.cpp	2026-02-05 11:42:16.166784000 +0800
-+++ faiss-patch/faiss/utils/distances_simd.cpp	2026-02-10 10:37:53.655905400 +0800
++++ faiss-patch/faiss/utils/distances_simd.cpp	2026-02-27 18:24:15.523328400 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -38913,7 +38918,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/distances_simd
  void fvec_madd(size_t n, const float* a, float bf, const float* b, float* c) {
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/fp16-arm.h faiss-patch/faiss/utils/fp16-arm.h
 --- faiss/faiss/utils/fp16-arm.h	2026-02-05 11:42:16.168854900 +0800
-+++ faiss-patch/faiss/utils/fp16-arm.h	2026-02-10 10:37:53.657905400 +0800
++++ faiss-patch/faiss/utils/fp16-arm.h	2026-02-27 18:24:15.525328100 +0800
 @@ -1,4 +1,16 @@
  /**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -39105,7 +39110,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/fp16-arm.h fai
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/CMakeLists.txt faiss-patch/tests/CMakeLists.txt
 --- faiss/tests/CMakeLists.txt	2026-02-05 11:42:16.185462600 +0800
-+++ faiss-patch/tests/CMakeLists.txt	2026-02-10 10:37:53.672906900 +0800
++++ faiss-patch/tests/CMakeLists.txt	2026-02-27 18:24:15.540328200 +0800
 @@ -34,6 +34,31 @@
    test_fastscan_perf.cpp
  )
@@ -39140,7 +39145,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/CMakeLists.txt faiss
  if(NOT FAISS_OPT_LEVEL STREQUAL "avx2" AND NOT FAISS_OPT_LEVEL STREQUAL "avx512")
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/common_test_functions.cpp faiss-patch/tests/common_test_functions.cpp
 --- faiss/tests/common_test_functions.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/common_test_functions.cpp	2026-02-10 10:37:53.673916300 +0800
++++ faiss-patch/tests/common_test_functions.cpp	2026-02-27 18:24:15.541328200 +0800
 @@ -0,0 +1,410 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -39555,7 +39560,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/common_test_function
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/common_test_functions.h faiss-patch/tests/common_test_functions.h
 --- faiss/tests/common_test_functions.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/common_test_functions.h	2026-02-10 10:37:53.674914900 +0800
++++ faiss-patch/tests/common_test_functions.h	2026-02-27 18:24:15.542328100 +0800
 @@ -0,0 +1,70 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -39630,7 +39635,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/common_test_function
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_distances_fp16.cpp faiss-patch/tests/test_distances_fp16.cpp
 --- faiss/tests/test_distances_fp16.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/test_distances_fp16.cpp	2026-02-10 10:37:53.682915800 +0800
++++ faiss-patch/tests/test_distances_fp16.cpp	2026-02-27 18:24:15.552330200 +0800
 @@ -0,0 +1,667 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -40302,7 +40307,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_distances_fp16.
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_flat_fp16.cpp faiss-patch/tests/test_index_flat_fp16.cpp
 --- faiss/tests/test_index_flat_fp16.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/test_index_flat_fp16.cpp	2026-02-10 10:37:53.691914300 +0800
++++ faiss-patch/tests/test_index_flat_fp16.cpp	2026-02-27 18:24:15.584330300 +0800
 @@ -0,0 +1,228 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -40534,7 +40539,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_flat_fp16
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_hnsw2level_fp16.cpp faiss-patch/tests/test_index_hnsw2level_fp16.cpp
 --- faiss/tests/test_index_hnsw2level_fp16.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/test_index_hnsw2level_fp16.cpp	2026-02-10 10:37:53.691914300 +0800
++++ faiss-patch/tests/test_index_hnsw2level_fp16.cpp	2026-02-27 18:24:15.585330900 +0800
 @@ -0,0 +1,301 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -40839,7 +40844,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_hnsw2leve
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_hnsw_fp16.cpp faiss-patch/tests/test_index_hnsw_fp16.cpp
 --- faiss/tests/test_index_hnsw_fp16.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/test_index_hnsw_fp16.cpp	2026-02-10 10:37:53.692905300 +0800
++++ faiss-patch/tests/test_index_hnsw_fp16.cpp	2026-02-27 18:24:15.586329300 +0800
 @@ -0,0 +1,408 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -41252,7 +41257,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_hnsw_fp16
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_hnswpq_fp16.cpp faiss-patch/tests/test_index_hnswpq_fp16.cpp
 --- faiss/tests/test_index_hnswpq_fp16.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/test_index_hnswpq_fp16.cpp	2026-02-10 10:37:53.692905300 +0800
++++ faiss-patch/tests/test_index_hnswpq_fp16.cpp	2026-02-27 18:24:15.586329300 +0800
 @@ -0,0 +1,324 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -41581,7 +41586,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_hnswpq_fp
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_hnswsq_fp16.cpp faiss-patch/tests/test_index_hnswsq_fp16.cpp
 --- faiss/tests/test_index_hnswsq_fp16.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/test_index_hnswsq_fp16.cpp	2026-02-10 10:37:53.693905700 +0800
++++ faiss-patch/tests/test_index_hnswsq_fp16.cpp	2026-02-27 18:24:15.587329700 +0800
 @@ -0,0 +1,329 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2026.
@@ -41914,7 +41919,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_hnswsq_fp
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_refine.cpp faiss-patch/tests/test_index_refine.cpp
 --- faiss/tests/test_index_refine.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/test_index_refine.cpp	2026-02-10 10:37:53.693905700 +0800
++++ faiss-patch/tests/test_index_refine.cpp	2026-02-27 18:24:15.588329100 +0800
 @@ -0,0 +1,211 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
@@ -42130,7 +42135,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_refine.cp
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_params_override.cpp faiss-patch/tests/test_params_override.cpp
 --- faiss/tests/test_params_override.cpp	2026-02-05 11:42:16.209472200 +0800
-+++ faiss-patch/tests/test_params_override.cpp	2026-02-10 10:37:53.701905600 +0800
++++ faiss-patch/tests/test_params_override.cpp	2026-02-27 18:24:15.597328900 +0800
 @@ -150,7 +150,51 @@
      auto new_result = search_index_with_params(index.get(), xq.data(), &params);
  
@@ -42222,7 +42227,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_params_override
  /*************************************************************
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/ut_test_hnsw.sh faiss-patch/tests/ut_test_hnsw.sh
 --- faiss/tests/ut_test_hnsw.sh	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/ut_test_hnsw.sh	2026-02-10 10:37:53.708905300 +0800
++++ faiss-patch/tests/ut_test_hnsw.sh	2026-02-27 18:24:15.629330000 +0800
 @@ -0,0 +1,201 @@
 +#!/usr/bin/env bash
 +set -euo pipefail
@@ -42428,7 +42433,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/ut_test_hnsw.sh fais
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/ut_test_ivfpq.sh faiss-patch/tests/ut_test_ivfpq.sh
 --- faiss/tests/ut_test_ivfpq.sh	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/ut_test_ivfpq.sh	2026-02-10 10:37:53.709905400 +0800
++++ faiss-patch/tests/ut_test_ivfpq.sh	2026-02-27 18:24:15.629330000 +0800
 @@ -0,0 +1,222 @@
 +#!/usr/bin/env bash
 +set -euo pipefail

@@ -157,6 +157,19 @@ IndexHNSW新增的构造函数。
 </tbody>
 </table>
 
+**使用示例<a name="section14731398327"></a>**
+
+```cpp
+// 创建一个FP16类型的IndexHNSW索引，维度为128，每个节点最大连接数为32，使用L2距离
+int d = 128;
+int M = 32;
+faiss::IndexHNSW index(d, M, faiss::NumericType::Float16, faiss::METRIC_L2);
+
+// 或者使用现有的存储索引创建IndexHNSW
+faiss::IndexHNSWFlat* storage = new faiss::IndexHNSWFlat(d, M, faiss::NumericType::Float16);
+faiss::IndexHNSW index_with_storage(storage, faiss::NumericType::Float16);
+```
+
 
 ## IndexHNSWFlat<a name="ZH-CN_TOPIC_0000002553549129"></a>
 
@@ -220,8 +233,15 @@ IndexHNSWFlat新增的构造函数。
 </tbody>
 </table>
 
+**使用示例<a name="section14731398328"></a>**
 
-## train\_ex<a name="ZH-CN_TOPIC_0000002553669171"></a>
+```cpp
+// 创建一个FP16类型的IndexHNSWFlat索引，维度为128，每个节点最大连接数为32，使用内积距离
+faiss::IndexHNSWFlat index_fp16(d, M, faiss::NumericType::Float16, faiss::METRIC_INNER_PRODUCT);
+```
+
+
+## train_ex<a name="ZH-CN_TOPIC_0000002553669171"></a>
 
 **接口定义<a name="section55611644173112"></a>**
 
@@ -274,8 +294,25 @@ void train\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\);
 </tbody>
 </table>
 
+**使用示例<a name="section14731398329"></a>**
 
-## add\_ex<a name="ZH-CN_TOPIC_0000002522429230"></a>
+```cpp
+// 假设已经创建了一个FP16类型的IndexHNSWFlat索引
+int d = 128;
+int M = 32;
+faiss::IndexHNSWFlat index(d, M, faiss::NumericType::Float16);
+
+// 创建训练数据 (1000个128维的FP16向量)
+int n_train = 1000;
+std::vector<faiss::float16_t> train_data(n_train * d);
+// 填充训练数据...
+
+// 调用train_ex接口进行训练
+index.train_ex(n_train, train_data.data(), faiss::NumericType::Float16);
+```
+
+
+## add_ex<a name="ZH-CN_TOPIC_0000002522429230"></a>
 
 **接口定义<a name="section55611644173112"></a>**
 
@@ -328,8 +365,25 @@ void add\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\);
 </tbody>
 </table>
 
+**使用示例<a name="section14731398330"></a>**
 
-## search\_ex<a name="ZH-CN_TOPIC_0000002522589214"></a>
+```cpp
+// 假设已经创建并训练了一个FP16类型的IndexHNSWFlat索引
+int d = 128;
+int M = 32;
+faiss::IndexHNSWFlat index(d, M, faiss::NumericType::Float16);
+
+// 创建要添加的数据 (500个128维的FP16向量)
+int n_add = 500;
+std::vector<faiss::float16_t> add_data(n_add * d);
+// 填充要添加的数据...
+
+// 调用add_ex接口向索引中添加向量
+index.add_ex(n_add, add_data.data(), faiss::NumericType::Float16);
+```
+
+
+## search_ex<a name="ZH-CN_TOPIC_0000002522589214"></a>
 
 **接口定义<a name="section55611644173112"></a>**
 
@@ -418,8 +472,40 @@ void search\_ex\(idx\_t n, const void\* x, idx\_t k, float\* distances, idx\_t\*
 </tbody>
 </table>
 
+**使用示例<a name="section14731398331"></a>**
 
-## range\_search\_ex<a name="ZH-CN_TOPIC_0000002553549131"></a>
+```cpp
+// 假设已经创建、训练并添加了向量的FP16类型IndexHNSWFlat索引
+int d = 128;
+int M = 32;
+faiss::IndexHNSWFlat index(d, M, faiss::NumericType::Float16);
+
+// 创建查询数据 (10个128维的FP16向量)
+int n_query = 10;
+std::vector<faiss::float16_t> query_data(n_query * d);
+// 填充查询数据...
+
+// 设置返回结果数量
+int k = 5;
+
+// 准备输出结果的内存
+std::vector<float> distances(n_query * k);
+std::vector<faiss::idx_t> labels(n_query * k);
+
+// 调用search_ex接口进行查询
+index.search_ex(n_query, query_data.data(), k, distances.data(), labels.data(), faiss::NumericType::Float16);
+
+// 处理查询结果
+for (int i = 0; i < n_query; i++) {
+    printf("Query %d:\n", i);
+    for (int j = 0; j < k; j++) {
+        printf("  Neighbor %d: label=%lld, distance=%.4f\n", j, labels[i * k + j], distances[i * k + j]);
+    }
+}
+```
+
+
+## range_search_ex<a name="ZH-CN_TOPIC_0000002553549131"></a>
 
 **接口定义<a name="section55611644173112"></a>**
 
@@ -499,8 +585,43 @@ void range\_search\_ex\(idx\_t n, const void\* x, float radius, RangeSearchResul
 </tbody>
 </table>
 
+**使用示例<a name="section14731398332"></a>**
 
-## reconstruct\_ex<a name="ZH-CN_TOPIC_0000002553669173"></a>
+```cpp
+// 假设已经创建、训练并添加了向量的FP16类型IndexHNSWFlat索引
+int d = 128;
+int M = 32;
+faiss::IndexHNSWFlat index(d, M, faiss::NumericType::Float16);
+
+// 创建查询数据 (5个128维的FP16向量)
+int n_query = 5;
+std::vector<faiss::float16_t> query_data(n_query * d);
+// 填充查询数据...
+
+// 设置搜索半径
+float radius = 10.0f;
+
+// 创建RangeSearchResult对象来存储结果
+faiss::RangeSearchResult result(n_query);
+
+// 调用range_search_ex接口进行范围搜索
+index.range_search_ex(n_query, query_data.data(), radius, &result, faiss::NumericType::Float16);
+
+// 处理查询结果
+for (int i = 0; i < n_query; i++) {
+    // 获取每个查询结果的偏移量和数量
+    size_t begin = result.lims[i];
+    size_t end = result.lims[i + 1];
+    printf("Query %d found %lld results:\n", i, end - begin);
+    
+    for (size_t j = begin; j < end; j++) {
+        printf("  Neighbor: label=%lld, distance=%.4f\n", result.labels[j], result.distances[j]);
+    }
+}
+```
+
+
+## reconstruct_ex<a name="ZH-CN_TOPIC_0000002553669173"></a>
 
 **接口定义<a name="section55611644173112"></a>**
 
@@ -553,8 +674,34 @@ void reconstruct\_ex\(idx\_t key, void\* recons, NumericType numeric\_type\);
 </tbody>
 </table>
 
+**使用示例<a name="section14731398333"></a>**
 
-## search\_level\_0\_ex<a name="ZH-CN_TOPIC_0000002522429232"></a>
+```cpp
+// 假设已经创建、训练并添加了向量的FP16类型IndexHNSWFlat索引
+int d = 128;
+int M = 32;
+faiss::IndexHNSWFlat index(d, M, faiss::NumericType::Float16);
+
+// 假设索引中已有向量，我们要重建ID为10的向量
+faiss::idx_t key = 10;
+
+// 准备存储重建后的向量内存 (FP16类型)
+std::vector<faiss::float16_t> recons(d);
+
+// 调用reconstruct_ex接口重建向量
+index.reconstruct_ex(key, recons.data(), faiss::NumericType::Float16);
+
+// 打印重建后的向量前几个元素
+printf("Reconstructed vector for key %lld:\n", key);
+for (int i = 0; i < std::min(5, d); i++) {
+    // 将float16_t转换为float以便打印
+    float value = (float)recons[i];
+    printf("  %d: %.4f\n", i, value);
+}
+```
+
+
+## search_level_0_ex<a name="ZH-CN_TOPIC_0000002522429232"></a>
 
 **接口定义<a name="section55611644173112"></a>**
 
@@ -670,4 +817,47 @@ HNSW索引在第0层执行批量近似最近邻搜索。
 </tbody>
 </table>
 
+**使用示例<a name="section14731398334"></a>**
 
+```cpp
+// 假设已经创建、训练并添加了向量的FP16类型IndexHNSWFlat索引
+int d = 128;
+int M = 32;
+faiss::IndexHNSWFlat index(d, M, faiss::NumericType::Float16);
+
+// 创建查询数据 (3个128维的FP16向量)
+int n_query = 3;
+std::vector<faiss::float16_t> query_data(n_query * d);
+// 填充查询数据...
+
+// 设置返回结果数量
+int k = 4;
+
+// 准备预计算的近邻信息 (这里简化处理，实际应用中需要预先计算)
+std::vector<faiss::storage_idx_t> nearest(n_query);
+std::vector<float> nearest_d(n_query);
+// 填充预计算的近邻索引和距离...
+for (int i = 0; i < n_query; i++) {
+    nearest[i] = 0; // 假设每个查询的初始近邻是索引0
+    nearest_d[i] = 0.0f;
+}
+
+// 准备输出结果的内存
+std::vector<float> distances(n_query * k);
+std::vector<faiss::idx_t> labels(n_query * k);
+
+// 调用search_level_0_ex接口在第0层执行搜索
+int nprobe = 2;
+int search_type = 1;
+index.search_level_0_ex(n_query, query_data.data(), k, nearest.data(), nearest_d.data(), 
+                       distances.data(), labels.data(), faiss::NumericType::Float16, 
+                       nprobe, search_type);
+
+// 处理查询结果
+for (int i = 0; i < n_query; i++) {
+    printf("Query %d (level 0 search):\n", i);
+    for (int j = 0; j < k; j++) {
+        printf("  Neighbor %d: label=%lld, distance=%.4f\n", j, labels[i * k + j], distances[i * k + j]);
+    }
+}
+```

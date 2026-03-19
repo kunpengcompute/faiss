@@ -41,49 +41,30 @@
 <td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p19219164917914"><a name="p19219164917914"></a><a name="p19219164917914"></a>CMake&gt;=3.25.1</p>
 </td>
 </tr>
-</tbody>
-</table>
-
-**表 2** Faiss已验证环境<a id="Faiss已验证环境_1"></a>
-
-<a name="table09590142055"></a>
-<table><thead align="left"><tr id="row11959514551"><th class="cellrowborder" valign="top" width="20.86%" id="mcps1.2.6.1.1"><p id="p109591714153"><a name="p109591714153"></a><a name="p109591714153"></a>操作系统</p>
-</th>
-<th class="cellrowborder" valign="top" width="20.150000000000002%" id="mcps1.2.6.1.2"><p id="p795901410513"><a name="p795901410513"></a><a name="p795901410513"></a>CPU类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.86%" id="mcps1.2.6.1.3"><p id="p8959314652"><a name="p8959314652"></a><a name="p8959314652"></a>内存</p>
-</th>
-<th class="cellrowborder" valign="top" width="17.549999999999997%" id="mcps1.2.6.1.4"><p id="p119593143519"><a name="p119593143519"></a><a name="p119593143519"></a>编译器</p>
-</th>
-<th class="cellrowborder" valign="top" width="27.58%" id="mcps1.2.6.1.5"><p id="p15959114856"><a name="p15959114856"></a><a name="p15959114856"></a>其他</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row159615141350"><td class="cellrowborder" valign="top" width="20.86%" headers="mcps1.2.6.1.1 "><p id="p179611141352"><a name="p179611141352"></a><a name="p179611141352"></a>openEuler 24.03 LTS SP3</p>
+<tr id="row159615141350"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p179611141352"><a name="p179611141352"></a><a name="p179611141352"></a>openEuler 24.03 LTS SP3</p>
 </td>
-<td class="cellrowborder" valign="top" width="20.150000000000002%" headers="mcps1.2.6.1.2 "><p id="p8961314756"><a name="p8961314756"></a><a name="p8961314756"></a>鲲鹏950 7592C处理器</p>
+<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p8961314756"><a name="p8961314756"></a><a name="p8961314756"></a>鲲鹏950 7592C处理器</p>
 </td>
-<td class="cellrowborder" valign="top" width="13.86%" headers="mcps1.2.6.1.3 "><p id="p15961191418510"><a name="p15961191418510"></a><a name="p15961191418510"></a>24*64GB</p>
+<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p15961191418510"><a name="p15961191418510"></a><a name="p15961191418510"></a>24*64GB</p>
 </td>
-<td class="cellrowborder" valign="top" width="17.549999999999997%" headers="mcps1.2.6.1.4 "><p id="p496115148515"><a name="p496115148515"></a><a name="p496115148515"></a>GCC 12.3.1</p>
+<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p496115148515"><a name="p496115148515"></a><a name="p496115148515"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p109611114654"><a name="p109611114654"></a><a name="p109611114654"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p109611114654"><a name="p109611114654"></a><a name="p109611114654"></a>CMake&gt;=3.22.0</p>
 </td>
 </tr>
-<tr id="row1837942531312"><td class="cellrowborder" valign="top" width="20.86%" headers="mcps1.2.6.1.1 "><p id="p1438015251131"><a name="p1438015251131"></a><a name="p1438015251131"></a>Debian 12</p>
+<tr id="row1837942531312"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p1438015251131"><a name="p1438015251131"></a><a name="p1438015251131"></a>Debian 12</p>
 </td>
-<td class="cellrowborder" valign="top" width="20.150000000000002%" headers="mcps1.2.6.1.2 "><p id="p578363871318"><a name="p578363871318"></a><a name="p578363871318"></a>鲲鹏950 7592C处理器</p>
+<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p578363871318"><a name="p578363871318"></a><a name="p578363871318"></a>鲲鹏950 7592C处理器</p>
 </td>
-<td class="cellrowborder" valign="top" width="13.86%" headers="mcps1.2.6.1.3 "><p id="p127833389131"><a name="p127833389131"></a><a name="p127833389131"></a>24*64GB</p>
+<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p127833389131"><a name="p127833389131"></a><a name="p127833389131"></a>24*64GB</p>
 </td>
-<td class="cellrowborder" valign="top" width="17.549999999999997%" headers="mcps1.2.6.1.4 "><p id="p821894241316"><a name="p821894241316"></a><a name="p821894241316"></a>GCC 12.2.0 / LLVM 16.0.6</p>
+<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p821894241316"><a name="p821894241316"></a><a name="p821894241316"></a>GCC 12.2.0 / LLVM 16.0.6</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p1021810427131"><a name="p1021810427131"></a><a name="p1021810427131"></a>CMake&gt;=3.25.1</p>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p1021810427131"><a name="p1021810427131"></a><a name="p1021810427131"></a>CMake&gt;=3.25.1</p>
 </td>
 </tr>
 </tbody>
 </table>
-
 
 ## 编译安装<a name="ZH-CN_TOPIC_0000002522575578"></a>
 
@@ -103,10 +84,10 @@
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
     >鲲鹏优化补丁文件描述如下，请根据需要自行选择：
-    >-   0001-faiss\_1.8.0-optimize-neq.patch：全量优化补丁，性能最优，保证精度，但不保证Top-K的值或顺序与原生完全一致。
-    >-   0002-faiss\_1.8.0-optimize-eqv.patch：等价优化补丁，保证Top-K的值与顺序与原生保持完全一致。
+    >- 0001-faiss\_1.8.0-optimize-neq.patch：全量优化补丁，性能最优，保证精度，但不保证Top-K的值或顺序与原生完全一致。
+    >- 0002-faiss\_1.8.0-optimize-eqv.patch：等价优化补丁，保证Top-K的值与顺序与原生保持完全一致。
 
-3. 安装Make、CMake、GCC。
+3. 安装Make、CMake、GCC。GCC 12安装步骤适用于openEuler 22.03 LTS SP3系统，openEuler 24.03 LTS SP3系统自带GCC 12，仅安装Make、CMake。
 
     ```bash
     yum install make cmake gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
@@ -157,17 +138,16 @@
 
     >![](public_sys-resources/icon-note.gif) **说明：**  
     >若您选择使用全量优化补丁0001-faiss\_1.8.0-optimize-neq.patch，可选择开启以下宏获得性能提升（二者不可同时开启）：
-    >-   **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，性能最优，保证精度，但不保证Top-K的值或顺序与原生完全一致；
-    >-   **-DOPTI\_IVFPQ=ON**：针对IVFPQ的独特优化，在IVFPQ索引上性能优于KRL宏，保证Top-K的值与顺序与原生保持完全一致。
+    >- **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，性能最优，保证精度，但不保证Top-K的值或顺序与原生完全一致；
+    >- **-DOPTI\_IVFPQ=ON**：针对IVFPQ的独特优化，在IVFPQ索引上性能优于KRL宏，保证Top-K的值与顺序与原生保持完全一致。
 
     >若您选择使用等价优化补丁0002-faiss\_1.8.0-optimize-eqv.patch，可选择开启以下宏获得性能提升：
-    >-   **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，保证Top-K的值与顺序与原生保持完全一致。
+    >- **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，保证Top-K的值与顺序与原生保持完全一致。
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
-    >-   您可通过在编译时添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
-    >-   编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
-    >-   若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt“文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)“修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)“。
-
+    >- 您可通过在编译时添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
+    >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
+    >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt“文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)“修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)“。
 
 ## 兼容性验证<a name="ZH-CN_TOPIC_0000002522623864"></a>
 
@@ -219,23 +199,25 @@
 2. 请编译安装Faiss。注意，作为开源Faiss兼容性验证，不需开启与鲲鹏优化相关的宏。
 3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。
 
-    ```
+    ```bash
     make hnsw_test
     ```
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
     >测试时不同的算法需要选择不同的编译指令：
-    >-   HNSW算法：**make hnsw\_test**
-    >-   PQFS算法：**make pqfs\_test**
-    >-   IVFPQ算法：**make ivfpq\_test**
-    >-   IVFPQFS算法：**make ivfpqfs\_test**
-    >-   IVFFLAT算法：**make ivfflat\_test**
+    >- HNSW算法：**make hnsw\_test**
+    >- PQFS算法：**make pqfs\_test**
+    >- IVFPQ算法：**make ivfpq\_test**
+    >- IVFPQFS算法：**make ivfpqfs\_test**
+    >- IVFFLAT算法：**make ivfflat\_test**
 
 4. 若是第一次执行，确保hnsw\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
 5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
 
-    ```
+    ```bash
     numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
     ```
 
+运行结果如下所示：
 
+<img src="figures/faiss-installation_guide.jpg" alt="faiss-installation_guide-运行结果" width="800"/>

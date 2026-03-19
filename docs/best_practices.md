@@ -50,25 +50,29 @@
 2. 请参考[《Faiss安装指南》](./installation_guide.md)编译安装Faiss。注意，作为全量优化后Faiss测试，需开启与鲲鹏优化相关的宏，此处以 **-DOPTI\_IVFPQ=ON**为例。
 3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开 **-DOPTI\_IVFPQ=ON** 。若步骤[2](#li1673311431218)选择开启  **-DKRL=ON**，则此处也需同步开启。
 
-    ```
+    ```bash
     make ivfpq_test
     ```
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
     >测试时不同的算法需要选择不同的编译指令：
-    >-   HNSW算法：**make hnsw\_test**
-    >-   PQFS算法：**make pqfs\_test**
-    >-   IVFPQ算法：**make ivfpq\_test**
-    >-   IVFPQFS算法：**make ivfpqfs\_test**
-    >-   IVFFLAT算法：**make ivfflat\_test**
+    >- HNSW算法：**make hnsw\_test**
+    >- HNSW算法（FP16）：**make hnsw\_fp16_test**
+    >- PQFS算法：**make pqfs\_test**
+    >- IVFPQ算法：**make ivfpq\_test**
+    >- IVFPQFS算法：**make ivfpqfs\_test**
+    >- IVFFLAT算法：**make ivfflat\_test**
 
 4. 若是第一次执行，确保ivfpq\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
 5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
 
-    ```
+    ```bash
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
+测试结果如下所示：
+
+<img src="figures/faiss-best_practices-neq.jpg" alt="faiss-best_practices-neq" width="800"/>
 
 ## 等价优化<a name="ZH-CN_TOPIC_0000002553546131"></a>
 
@@ -117,28 +121,32 @@
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. 请参考[《Faiss安装指南》](./installation_guide.md)编译安装Faiss。注意，作为等价优化后Faiss测试，需开启与鲲鹏优化相关的宏**-DKRL=ON**。
-3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开启**-DKRL=ON**。
+2. 请参考[《Faiss安装指南》](./installation_guide.md)编译安装Faiss。注意，作为等价优化后Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
+3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开启 **-DKRL=ON**。
 
-    ```
+    ```bash
     make ivfpq_test
     ```
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
     >测试时不同的算法需要选择不同的编译指令：
-    >-   HNSW算法：**make hnsw\_test**
-    >-   PQFS算法：**make pqfs\_test**
-    >-   IVFPQ算法：**make ivfpq\_test**
-    >-   IVFPQFS算法：**make ivfpqfs\_test**
-    >-   IVFFLAT算法：**make ivfflat\_test**
+    >- HNSW算法：**make hnsw\_test**
+    >- HNSW算法（FP16）：**make hnsw\_fp16_test**
+    >- PQFS算法：**make pqfs\_test**
+    >- IVFPQ算法：**make ivfpq\_test**
+    >- IVFPQFS算法：**make ivfpqfs\_test**
+    >- IVFFLAT算法：**make ivfflat\_test**
 
 4. 若是第一次执行，确保ivfpq\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
 5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
 
-    ```
+    ```bash
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
+测试结果如下所示：
+
+<img src="figures/faiss-best_practices-eqv.jpg" alt="faiss-best_practices-eqv" width="800"/>
 
 ## HNSW FP16支持<a name="ZH-CN_TOPIC_0000002522586222"></a>
 
@@ -167,9 +175,9 @@
     ├── data                                                      // 存放数据集（需手动创建并存放数据集）
           └── sift-128-euclidean.hdf5
     ├── indexes
-          └── hnsw                                                // 存放构建好的索引（需手动创建）
+          └── hnsw-fp16                                           // 存放构建好的索引（需手动创建）
                 └── sift.faiss                                    // 构建好的索引，当运行可执行文件hnsw_test且数据集配置文件中save_or_load参数设置为save时生成
-    └── hnsw_test                                                 // 编译后生成的可执行文件
+    └── hnsw_fp16_test                                            // 编译后生成的可执行文件
     ```
 
 2. 获取数据集，存放于“/path/to/sra\_test/data“。
@@ -188,24 +196,28 @@
     ```
 
 2. 请参考[《Faiss安装指南》](./installation_guide.md)编译安装Faiss。
-3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开启**-DUSE\_FP16=ON**。
+3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开启 **-DKRL=ON -DUSE\_FP16=ON**。
 
-    ```
-    make hnsw_test
+    ```bash
+    make hnsw_fp16_test
     ```
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
     >测试时不同的算法需要选择不同的编译指令：
-    >-   HNSW算法：**make hnsw\_test**
-    >-   PQFS算法：**make pqfs\_test**
-    >-   IVFPQ算法：**make ivfpq\_test**
-    >-   IVFPQFS算法：**make ivfpqfs\_test**
-    >-   IVFFLAT算法：**make ivfflat\_test**
+    >- HNSW算法：**make hnsw\_test**
+    >- HNSW算法（FP16）：**make hnsw\_fp16_test**
+    >- PQFS算法：**make pqfs\_test**
+    >- IVFPQ算法：**make ivfpq\_test**
+    >- IVFPQFS算法：**make ivfpqfs\_test**
+    >- IVFFLAT算法：**make ivfflat\_test**
 
 4. 若是第一次执行，确保hnsw\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
 5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
 
-    ```
-    numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
+    ```bash
+    numactl -C 0-31 -m 0 ./hnsw_fp16_test hnsw_fp16 sift-128-euclidean
     ```
 
+测试结果如下所示：
+
+<img src="figures/faiss-best_practices-fp16.jpg" alt="faiss-best_practices-fp16" width="800"/>

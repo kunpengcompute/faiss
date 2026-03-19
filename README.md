@@ -19,6 +19,15 @@ HNSW是Faiss提供的一种近似最近邻（ANN）图检索算法，开源Faiss
 faiss/
 ├─ 0001-faiss_1.8.0-optimize-neq.patch         // 全量优化补丁
 ├─ 0002-faiss_1.8.0-optimize-eqv.patch         // 等价优化补丁
+└── docs
+   ├── public_sys-resources
+   ├── api_reference.md                        // API参考
+   ├── feature_introduction.md                 // 特性介绍
+   ├── best_practices.md                       // 最佳实现
+   ├── installation_guide.md                   // 安装指南
+   ├── quick_start.md                          // 快速上手
+   ├── release_notes.md                        // 版本说明书
+   └── LICENSE
 ```
 
 使用补丁后Faiss完整的目录结构如下所示：
@@ -171,7 +180,7 @@ faiss/
 
 ## License<a name="ZH-CN_TOPIC_0000002550046411"></a>
 
-Faiss采用MIT License许可证授权，支持修改代码和再开源。
+Faiss采用MIT License许可证授权，支持修改代码和再开源，具体请参见[LICENSE](./LICENSE)文件。
 
 本项目的文档适用CC-BY 4.0许可证，具体请参见[LICENSE](./docs/LICENSE)文件。
 
@@ -186,4 +195,3 @@ Faiss由华为公司的下列部门联合贡献：
 - 鲲鹏计算Boostkit开发部
 
 感谢来自社区的每一个PR，欢迎贡献Faiss！
-

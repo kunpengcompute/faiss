@@ -1,8 +1,8 @@
-# 版本说明书<a name="ZH-CN_TOPIC_0000002552674525"></a>
+# 版本说明书
 
-## 版本配套说明<a name="ZH-CN_TOPIC_0000002549871189"></a>
+## 版本配套说明
 
-### 产品版本信息<a name="ZH-CN_TOPIC_0000002518231428"></a>
+### 产品版本信息
 
 <a name="table62675726"></a>
 <table><tbody><tr id="row41561572"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.1.1"><p id="p11044137"><a name="p11044137"></a><a name="p11044137"></a>产品名称</p>
@@ -23,7 +23,7 @@
 </tbody>
 </table>
 
-### 与操作系统、编译器和CPU配套说明<a name="ZH-CN_TOPIC_0000002518231424"></a>
+### 与操作系统、编译器和CPU配套说明
 
 **表 1** Faiss已验证环境<a id="Faiss已验证环境"></a>
 
@@ -61,26 +61,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p19219164917914"><a name="p19219164917914"></a><a name="p19219164917914"></a>CMake&gt;=3.25.1</p>
 </td>
-</tr>
-</tbody>
-</table>
-
-**表 2** Faiss已验证环境<a id="Faiss已验证环境_1"></a>
-
-<a name="table09590142055"></a>
-<table><thead align="left"><tr id="row11959514551"><th class="cellrowborder" valign="top" width="20.86%" id="mcps1.2.6.1.1"><p id="p109591714153"><a name="p109591714153"></a><a name="p109591714153"></a>操作系统</p>
-</th>
-<th class="cellrowborder" valign="top" width="20.150000000000002%" id="mcps1.2.6.1.2"><p id="p795901410513"><a name="p795901410513"></a><a name="p795901410513"></a>CPU类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="13.86%" id="mcps1.2.6.1.3"><p id="p8959314652"><a name="p8959314652"></a><a name="p8959314652"></a>内存</p>
-</th>
-<th class="cellrowborder" valign="top" width="17.549999999999997%" id="mcps1.2.6.1.4"><p id="p119593143519"><a name="p119593143519"></a><a name="p119593143519"></a>编译器</p>
-</th>
-<th class="cellrowborder" valign="top" width="27.58%" id="mcps1.2.6.1.5"><p id="p15959114856"><a name="p15959114856"></a><a name="p15959114856"></a>其他</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row159615141350"><td class="cellrowborder" valign="top" width="20.86%" headers="mcps1.2.6.1.1 "><p id="p179611141352"><a name="p179611141352"></a><a name="p179611141352"></a>openEuler 24.03 LTS SP3</p>
+<tr id="row159615141350"><td class="cellrowborder" valign="top" width="20.86%" headers="mcps1.2.6.1.1 "><p id="p179611141352"><a name="p179611141352"></a><a name="p179611141352"></a>openEuler 24.03 LTS SP3</p>
 </td>
 <td class="cellrowborder" valign="top" width="20.150000000000002%" headers="mcps1.2.6.1.2 "><p id="p8961314756"><a name="p8961314756"></a><a name="p8961314756"></a>鲲鹏950 7592C处理器</p>
 </td>
@@ -105,19 +86,19 @@
 </tbody>
 </table>
 
-## 版本使用注意事项<a name="ZH-CN_TOPIC_0000002518231462"></a>
+## 版本使用注意事项
 
-### 使用注意事项<a name="ZH-CN_TOPIC_0000002549751189"></a>
+### 使用注意事项
 
-请参见[《Faiss安装指南》](./installation_guide.md)。
+请参见[《Faiss 安装指南》](./installation_guide.md)。
 
-## v1.8.0-2603<a name="ZH-CN_TOPIC_0000002549871207"></a>
+## v1.8.0-2603
 
-### 更新说明<a name="ZH-CN_TOPIC_0000002518391348"></a>
+### 更新说明
 
 **新增特性<a name="section11862975"></a>**
 
-- Faiss提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。补丁发布至Gitcode上，代码分支版本号为**v1.8.0-2603**。
+提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。补丁发布至Gitcode上，代码分支版本号为**v1.8.0-2603**。
 
 **修改特性<a name="section16450949161512"></a>**
 
@@ -127,21 +108,21 @@
 
 无
 
-### 已解决的问题<a name="ZH-CN_TOPIC_0000002549751183"></a>
+### 已解决的问题
 
 无
 
-### 遗留问题<a name="ZH-CN_TOPIC_0000002549751209"></a>
+### 遗留问题
 
 无
 
-## V25.3.0<a name="ZH-CN_TOPIC_0000002549871207"></a>
+## V25.3.0
 
-### 更新说明<a name="ZH-CN_TOPIC_0000002518391348"></a>
+### 更新说明
 
 **新增特性<a name="section11862975"></a>**
 
-- 新增Faiss子库，代码开源发布，需要通过源代码编译后使用。补丁发布至Gitcode上，代码分支版本号为**v1.8.0-2512**。
+新增Faiss子库，代码开源发布，需要通过源代码编译后使用。补丁发布至Gitcode上，代码分支版本号为**v1.8.0-2512**。
 
 **修改特性<a name="section16450949161512"></a>**
 
@@ -151,17 +132,17 @@
 
 无
 
-### 已解决的问题<a name="ZH-CN_TOPIC_0000002549751183"></a>
+### 已解决的问题
 
 无
 
-### 遗留问题<a name="ZH-CN_TOPIC_0000002549751209"></a>
+### 遗留问题
 
 无
 
-## 版本配套文档<a name="ZH-CN_TOPIC_0000002518231454"></a>
+## 版本配套文档
 
-### v1.8.0-2603版本配套文档<a name="ZH-CN_TOPIC_0000002518391330"></a>
+### v1.8.0-2603版本配套文档
 
 <a name="table1191773710200"></a>
 <table><thead align="left"><tr id="row1291816372202"><th class="cellrowborder" valign="top" width="45.019999999999996%" id="mcps1.1.4.1.1"><p id="p291823714205"><a name="p291823714205"></a><a name="p291823714205"></a>文档名称</p>
@@ -217,6 +198,5 @@
 </tbody>
 </table>
 
-### 获取文档的方法<a name="ZH-CN_TOPIC_0000002518391368"></a>
-
+### 获取文档的方法
 您可以通过访问[开源仓](https://gitcode.com/boostkit/faiss)浏览和获取相关文档。

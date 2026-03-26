@@ -1,18 +1,18 @@
-# 快速入门<a name="ZH-CN_TOPIC_0000002552674671"></a>
+# 快速入门
 
 本节提供快速上手Faiss核心功能的简易指导。
 
-## 核心概念<a name="ZH-CN_TOPIC_0000002552616795"></a>
+## 核心概念
 
-Faiss的核心是索引（Index），即专门用于存储向量并高效执行相似性搜索的结构：
+Faiss的核心是索引（Index），即专门用于存储向量并高效执行相似性搜索的结构。
 
-- 向量：原生Faiss支持float32类型的向量。
+- 向量：开源Faiss支持float32类型的向量。
 - 索引类型：入门优先用IndexFlatL2（暴力搜索，无近似，结果精确，适合学习），后续可尝试IndexIVFFlat（近似搜索，速度更快）。
 - 核心流程：创建索引 → 向索引添加向量 → 执行相似性搜索
 
-## 快速入门示例<a name="ZH-CN_TOPIC_0000002552616795"></a>
+## 快速入门示例
 
-以下是覆盖Faiss核心使用场景的完整代码，包含注释和结果解析：
+以下是覆盖Faiss核心使用场景的完整代码，包含注释和结果解析。
 
 ```cpp
 #include <faiss/IndexFlat.h>
@@ -66,7 +66,7 @@ int main() {
 
 <img src="figures/faiss-quick_start.jpg" alt="faiss-quick_start" width="600"/>
 
-## 进阶扩展<a name="ZH-CN_TOPIC_0000002552616795"></a>
+## 进阶扩展
 
 近似搜索索引（IndexIVFFlat）：适合大数据集，核心是先聚类再搜索。
 

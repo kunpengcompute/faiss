@@ -1,8 +1,8 @@
-# 最佳实践<a name="ZH-CN_TOPIC_0000002553666485"></a>
+# 最佳实践
 
-## 全量优化<a name="ZH-CN_TOPIC_0000002553666167"></a>
+## 全量优化
 
-本节介绍在鲲鹏平台测试全量优化后Faiss的方法。本节依赖鲲鹏的全量优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
+本节介绍在鲲鹏平台测试全量优化后Faiss的方法，依赖鲲鹏的全量优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
@@ -47,7 +47,8 @@
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. 请参考[《Faiss安装指南》](./installation_guide.md)编译安装Faiss。注意，作为全量优化后Faiss测试，需开启与鲲鹏优化相关的宏，此处以 **-DOPTI\_IVFPQ=ON**为例。
+2. 请参考[《Faiss 安装指南》](./installation_guide.md)编译安装Faiss。
+   >**说明：** 作为全量优化后Faiss测试，需开启与鲲鹏优化相关的宏，此处以 **-DOPTI\_IVFPQ=ON**为例。
 3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开 **-DOPTI\_IVFPQ=ON** 。若步骤[2](#li1673311431218)选择开启  **-DKRL=ON**，则此处也需同步开启。
 
     ```bash
@@ -74,9 +75,9 @@
 
 <img src="figures/faiss-best_practices-neq.jpg" alt="faiss-best_practices-neq" width="800"/>
 
-## 等价优化<a name="ZH-CN_TOPIC_0000002553546131"></a>
+## 等价优化
 
-本节介绍在鲲鹏平台测试等价优化后Faiss的方法。本节依赖鲲鹏的等价优化补丁文件0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
+本节介绍在鲲鹏平台测试等价优化后Faiss的方法，依赖鲲鹏的等价优化补丁文件0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
@@ -121,7 +122,8 @@
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. 请参考[《Faiss安装指南》](./installation_guide.md)编译安装Faiss。注意，作为等价优化后Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
+2. 请参考[《Faiss 安装指南》](./installation_guide.md)编译安装Faiss。
+   > **说明：** 作为等价优化后Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
 3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开启 **-DKRL=ON**。
 
     ```bash
@@ -148,9 +150,9 @@
 
 <img src="figures/faiss-best_practices-eqv.jpg" alt="faiss-best_practices-eqv" width="800"/>
 
-## HNSW FP16支持<a name="ZH-CN_TOPIC_0000002522586222"></a>
+## HNSW FP16支持
 
-本节介绍在鲲鹏平台测试HNSW支持FP16接口后Faiss的方法。本节依赖鲲鹏的优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（HNSW）算法，线程数32。
+本节介绍在鲲鹏平台测试HNSW支持FP16接口后Faiss的方法，依赖鲲鹏的优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（HNSW）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
@@ -195,7 +197,7 @@
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. 请参考[《Faiss安装指南》](./installation_guide.md)编译安装Faiss。
+2. 请参考[《Faiss 安装指南》](./installation_guide.md)编译安装Faiss。
 3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开启 **-DKRL=ON -DUSE\_FP16=ON**。
 
     ```bash

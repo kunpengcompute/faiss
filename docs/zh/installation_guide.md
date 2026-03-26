@@ -1,6 +1,6 @@
-# 安装指南<a name="ZH-CN_TOPIC_0000002521634720"></a>
+# 安装指南
 
-## 已验证环境<a name="ZH-CN_TOPIC_0000002553655517"></a>
+## 已验证环境
 
 为保证您可以顺利安全地使用Faiss，请确保所使用的环境信息在已验证环境范围内。
 
@@ -66,7 +66,7 @@
 </tbody>
 </table>
 
-## 编译安装<a name="ZH-CN_TOPIC_0000002522575578"></a>
+## 编译安装
 
 从GitCode获取Faiss开源代码，安装必要的依赖工具、库，以及基于鲲鹏平台优化后的Patch然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
 
@@ -136,26 +136,25 @@
     make -C build install
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：**  
-    >若您选择使用全量优化补丁0001-faiss\_1.8.0-optimize-neq.patch，可选择开启以下宏获得性能提升（二者不可同时开启）：
-    >- **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，性能最优，保证精度，但不保证Top-K的值或顺序与原生完全一致；
-    >- **-DOPTI\_IVFPQ=ON**：针对IVFPQ的独特优化，在IVFPQ索引上性能优于KRL宏，保证Top-K的值与顺序与原生保持完全一致。
-
-    >若您选择使用等价优化补丁0002-faiss\_1.8.0-optimize-eqv.patch，可选择开启以下宏获得性能提升：
-    >- **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，保证Top-K的值与顺序与原生保持完全一致。
-
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >- 您可通过在编译时添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
+   - 若您选择使用全量优化补丁0001-faiss\_1.8.0-optimize-neq.patch，可选择开启以下宏获得性能提升（二者不可同时开启）：
+     - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，性能最优，保证精度，但不保证Top-K的值或顺序与原生完全一致；
+     - **-DOPTI\_IVFPQ=ON**：针对IVFPQ的独特优化，在IVFPQ索引上性能优于KRL宏，保证Top-K的值与顺序与原生保持完全一致。
+   - 若您选择使用等价优化补丁0002-faiss\_1.8.0-optimize-eqv.patch，可选择开启以下宏获得性能提升：
+     - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，保证Top-K的值与顺序与原生保持完全一致。
+    >
+    >**说明：** 
+    >
+    >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
     >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
     >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt“文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)“修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)“。
 
-## 兼容性验证<a name="ZH-CN_TOPIC_0000002522623864"></a>
+## 兼容性验证
 
 本节介绍在鲲鹏平台进行开源Faiss兼容性验证的方法。使用示例为sift-128-euclidean.hdf5数据集，Faiss（HNSW）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
-1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.0.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示：
+1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.0.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示。
 
     ```text
     ├── configs                                                   // 存放对应算法和数据集配置文件

@@ -1,198 +1,197 @@
-# 项目介绍<a name="ZH-CN_TOPIC_0000002442478428"></a>
+# Faiss介绍
 
-本仓库用于存放针对鲲鹏平台进行优化的补丁，补丁文件可应用于由Facebook研发的Faiss开源代码。
+## 最新消息
 
-# 环境部署<a name="ZH-CN_TOPIC_0000002442489280"></a>
+- \[2026.03.30\]：Faiss提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。
+- \[2025.12.30\]：Faiss发布于Gitcode平台，实现IVFFLAT、IVFPQ、IVFPQFS、PQFS、HNSW优化。
 
-## 已验证环境<a name="ZH-CN_TOPIC_0000002476009237"></a>
+## 项目介绍
 
-<a name="table11553123194615"></a>
-<table><thead align="left"><tr id="row1955333144612"><th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.1"><p id="p145531431174615"><a name="p145531431174615"></a><a name="p145531431174615"></a>操作系统</p>
+Faiss是由facebook开发的用于高效相似搜索和密集向量聚类的算法库，其核心采用C++编写，并为Python/numpy提供完整封装接口。Faiss提供IVFFlat、IVFPQ、HNSW、IVFPQFS、PQFS等索引方式。鲲鹏优化基于开源Faiss代码做侵入式修改，保持原有接口。
+
+HNSW是Faiss提供的一种近似最近邻（ANN）图检索算法，开源Faiss\(HNSW\)接口支持FP32数据类型。为优化计算效率与内存占用，对原生faiss进行适配改造，增加FP16接口，使其在鲲鹏ARM架构下同样支持基于FP16的高效召回计算。
+
+## 目录结构
+
+代码仓目录结构如下：
+
+```text
+faiss/
+├─ 0001-faiss_1.8.0-optimize-neq.patch         // 全量优化补丁
+├─ 0002-faiss_1.8.0-optimize-eqv.patch         // 等价优化补丁
+└── docs
+   ├── LICENSE
+   └── zh
+      ├── api_reference.md                        // API参考
+      ├── feature_introduction.md                 // 特性介绍
+      ├── best_practices.md                       // 最佳实现
+      ├── installation_guide.md                   // 安装指南
+      ├── quick_start.md                          // 快速上手
+      └── release_notes.md                        // 版本说明书
+```
+
+使用补丁后Faiss完整的目录结构如下所示：
+
+```text
+faiss/
+├─ benchs/                                     // 基准测试
+├─ c_api/                                      // C语言API封装
+├─ cmake/                                      // CMake配置模块
+├─ conda/                                      // Conda构建脚本
+├─ contrib/                                    // Python贡献模块
+├─ demos/                                      // 示例程序
+├─ faiss/
+│   ├─ CMakeLists.txt                          // 构建配置
+│   ├─ Index.h                                 // 抽象基类，统一接口
+│   ├─ IndexFlat.cpp                           // 暴力搜索实现
+│   ├─ IndexFlatCodes.h                        // 统一码存储基类（用于PQ、SQ 等）
+│   ├─ IndexFlatCodes.cpp                      // 统一码存储基类实现
+│   ├─ IndexFastScan.h                         // 4‑bit PQ/AQ快速扫描通用接口
+│   ├─ IndexFastScan.cpp                       // 4‑bit PQ/AQ快速扫描通用实现
+│   ├─ IndexIVF.h                              // IVF基类接口
+│   ├─ IndexIVF.cpp                            // IVF基类+具体实现
+│   ├─ IndexIVFFlat.cpp                        // IVFFlat具体实现
+│   ├─ IndexIVFPQ.cpp                          // IVFPQ实现
+│   ├─ IndexIVFFastScan.h                      // IVFPQFastScan接口
+│   ├─ IndexIVFFastScan.cpp                    // IVFPQFastScan（CPU）实现
+│   ├─ IndexHNSW.h                             // HNSW索引接口
+│   ├─ IndexHNSW.cpp                           // HNSW索引实现
+│   ├─ IndexRefine.h                           // 基准+细化组合索引接口
+│   ├─ IndexRefine.cpp                         // 基准+细化组合索引实现
+│   ├─ impl/
+│   │   ├─ DistanceComputer.h                  // 距离计算抽象接口
+│   │   ├─ ProductQuantizer.h                  // 乘积量化器接口
+│   │   ├─ ProductQuantizer.cpp                // 乘积量化器实现
+│   │   ├─ pq4_fast_scan.h                     // 4‑bit PQ快速扫描接口
+│   │   ├─ pq4_fast_scan_search_1.cpp          // 4‑bit PQ快速扫描单查询实现
+│   │   ├─ pq4_fast_scan_search_qbs.cpp        // 4‑bit PQ快速扫描批量查询实现
+│   │   ├─ HNSW.cpp                            // HNSW图结构实现
+│   │   ├─ index_read.cpp                      // 索引反序列化实现
+│   │   └─ simd_result_handlers.h              // SIMD结果处理器
+│   ├─ invlists/
+│   │   ├─ InvertedLists.h                     // 倒排列表抽象接口
+│   │   └─ InvertedLists.cpp                   // 倒排列表实现
+│   ├─ utils/
+│   │   └─ distances_simd.cpp                  // SIMD L2/IP/L1/Linf实现
+│   ├─ sra_krl/
+│   │   ├─ include/
+│   │   │   ├─ krl.h                           // 对外统一API声明
+│   │   │   ├─ krl_internal.h                  // 内部结构体、宏、SIMD辅助实现
+│   │   │   ├─ platform_macros.h               // 错误码、度量常量、平台宏
+│   │   │   └─ safe_memory.h                   // 安全内存操作
+│   │   └─ src/
+│   │       ├─ Heap_sort.c                     // Top‑K堆构建、双堆重排实现
+│   │       ├─ IPdistance_simd.c               // 单精度向量内积SIMD实现（batch 2/4/8/16）
+│   │       ├─ IPdistance_simd_f16.c           // float16 IP距离计算实现
+│   │       ├─ IPdistance_simd_f16f32.c        // float16 IP距离计算实现（float输出）
+│   │       ├─ IPdistance_simd_s8.c            // int8 IP距离计算实现（int32/float输出）
+│   │       ├─ L2distance_simd.c               // float L2距离计算实现（batch 2/4/8/16/24）
+│   │       ├─ L2distance_simd_f16.c           // float16 L2距离计算实现
+│   │       ├─ L2distance_simd_f16f32.c        // float16 L2距离计算实现（float输出）
+│   │       ├─ L2distance_simd_u8.c            // uint8 L2距离计算实现（uint32/float输出）
+│   │       ├─ matrix_block_transpose.c        // 4×4块转置kernel
+│   │       ├─ MinMax_quant.c                  // 量化（fp16/u8/s8）
+│   │       ├─ NegaIPdistance_simd_f16f32.c    // float16 IP距离计算实现（取反，float输出）
+│   │       ├─ NegaIPdistance_simd_s8.c        // int8 IP距离计算实现（取反，int32/float输出）
+│   │       ├─ handle_IO.c                     // 句柄序列化/反序列化（文件I/O）
+│   │       ├─ krl_handles.c                   // 句柄创建、初始化、清理、指针访问
+│   │       ├─ pq_search_with_table_4bit.c     // 4‑bit查表
+│   │       ├─ pq_search_with_table_8bit.c     // 8‑bit查表
+│   │       ├─ reorder_2_vectors.c             // 稀疏/连续重排
+│   │       └─ sve_search_codes.c              // 4‑bit fp16查表（sve）
+│   ├─ cppcontrib/                             // C++贡献模块
+│   ├─ gpu/                                    // GPU子系统
+│   └─ python/                                 // Python绑定
+├─ misc/                                       // 杂项测试
+├─ tests/                                      // 单元测试
+├─ tutorial/                                   // 教程示例
+├─ CMakeLists.txt                              // 顶层构建配置
+├─ CHANGELOG.md
+├─ CODE_OF_CONDUCT.md
+├─ CONTRIBUTING.md
+├─ INSTALL.md
+├─ LICENSE
+└─ README.md
+```
+
+## 版本说明
+
+关于Faiss的版本更新情况请参见[《Faiss 版本说明书》](./docs/zh/release_notes.md)。
+
+## 学习文档
+
+<a name="table1191773710200"></a>
+<table><thead align="left"><tr id="row1291816372202"><th class="cellrowborder" valign="top" width="9.780978097809781%" id="mcps1.1.4.1.1"><p id="p291823714205"><a name="p291823714205"></a><a name="p291823714205"></a>学习资源类别</p>
 </th>
-<th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.2"><p id="p455313316464"><a name="p455313316464"></a><a name="p455313316464"></a>CPU类型</p>
+<th class="cellrowborder" valign="top" width="17.64176417641764%" id="mcps1.1.4.1.2"><p id="p13918183762016"><a name="p13918183762016"></a><a name="p13918183762016"></a>学习资源名称</p>
 </th>
-<th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.3"><p id="p2055318318466"><a name="p2055318318466"></a><a name="p2055318318466"></a>内存</p>
-</th>
-<th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.4"><p id="p25531231134616"><a name="p25531231134616"></a><a name="p25531231134616"></a>编译器</p>
-</th>
-<th class="cellrowborder" valign="top" width="20%" id="mcps1.1.6.1.5"><p id="p12553153118462"><a name="p12553153118462"></a><a name="p12553153118462"></a>其他依赖</p>
+<th class="cellrowborder" valign="top" width="72.57725772577258%" id="mcps1.1.4.1.3"><p id="p89181437152019"><a name="p89181437152019"></a><a name="p89181437152019"></a>学习资源简介</p>
 </th>
 </tr>
 </thead>
-<tbody><tr id="row13553153110469"><td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.1 "><p id="p631524754610"><a name="p631524754610"></a><a name="p631524754610"></a>openEuler 24.03 LTS SP3</p>
+<tbody><tr id="row2918153732020"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211217"><a name="p598512211217"></a><a name="p598512211217"></a>文档</p>
 </td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.2 "><p id="p18315184774614"><a name="p18315184774614"></a><a name="p18315184774614"></a>鲲鹏920 7592C处理器</p>
+<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172023"><a name="p17918337172023"></a><a name="p17918337172023"></a><a href="./docs/zh/feature_introduction.md">特性介绍</a></p>
 </td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.3 "><p id="p83151347184614"><a name="p83151347184614"></a><a name="p83151347184614"></a>24 * 64G</p>
-</td>
-<td class="cellrowborder" rowspan="2" valign="top" width="20%" headers="mcps1.1.6.1.4 "><p id="p831564711465"><a name="p831564711465"></a><a name="p831564711465"></a>GCC 12.3.1</p>
-</td>
-<td class="cellrowborder" rowspan="2" valign="top" width="20%" headers="mcps1.1.6.1.5 "><p id="p13315124713463"><a name="p13315124713463"></a><a name="p13315124713463"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742021"><a name="p15918183742021"></a><a name="p15918183742021"></a>提供Faiss架构介绍及优化说明。</p>
 </td>
 </tr>
-<tr id="row47712054131620"><td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.3 "><p id="p631524754611"><a name="p631524754611"></a><a name="p631524754611"></a>openEuler 22.03 LTS SP3</p>
+<tr id="row179181137112015"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p1918123710208"><a name="p1918123710208"></a><a name="p1918123710208"></a>文档</p>
 </td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.6 "><p id="p18315184774615"><a name="p18315184774615"></a><a name="p18315184774615"></a>鲲鹏920 7282C处理器</p>
+<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p2091893722011"><a name="p2091893722011"></a><a name="p2091893722011"></a><a href="./docs/zh/release_notes.md">版本说明书</a></p>
 </td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.1.6.1.3 "><p id="p83151347184615"><a name="p83151347184615"></a><a name="p83151347184615"></a>16 * 32G</p>
+<td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p491893752010"><a name="p491893752010"></a><a name="p491893752010"></a>提供Faiss每个发布版本的基础信息和特性更新信息。</p>
+</td>
+</tr>
+<tr id="row939116371143"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p1039163711413"><a name="p1039163711413"></a><a name="p1039163711413"></a>文档</p>
+</td>
+<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p03913372046"><a name="p03913372046"></a><a name="p03913372046"></a><a href="./docs/zh/quick_start.md">快速入门</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p1139217371746"><a name="p1139217371746"></a><a name="p1139217371746"></a>提供Faiss快速入门指导。</p>
+</td>
+</tr>
+<tr id="row2918153732017"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211214"><a name="p598512211214"></a><a name="p598512211214"></a>文档</p>
+</td>
+<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172020"><a name="p17918337172020"></a><a name="p17918337172020"></a><a href="./docs/zh/installation_guide.md">安装指南</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742018"><a name="p15918183742018"></a><a name="p15918183742018"></a>提供Faiss编译安装方法指导。</p>
+</td>
+</tr>
+<tr id="row2918153732018"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211215"><a name="p598512211215"></a><a name="p598512211215"></a>文档</p>
+</td>
+<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172021"><a name="p17918337172021"></a><a name="p17918337172021"></a><a href="./docs/zh/api_reference.md">API参考</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742019"><a name="p15918183742019"></a><a name="p15918183742019"></a>提供Faiss新增API接口定义、接口说明。</p>
+</td>
+</tr>
+<tr id="row2918153732019"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211216"><a name="p598512211216"></a><a name="p598512211216"></a>文档</p>
+</td>
+<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172022"><a name="p17918337172022"></a><a name="p17918337172022"></a><a href="./docs/zh/best_practices.md">最佳实践</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742020"><a name="p15918183742020"></a><a name="p15918183742020"></a>提供Faiss使用的实践案例。</p>
 </td>
 </tr>
 </tbody>
 </table>
 
-# 快速上手<a name="ZH-CN_TOPIC_0000002442649136"></a>
+## 免责声明
 
+此代码仓计划参与Faiss开源组件，编码风格遵照原生开源软件，继承原生开源软件安全设计，不破坏原生开源软件设计及编码风格和方式，软件的任何漏洞与安全问题，均由相应的上游社区根据其漏洞和安全响应机制解决。请密切关注上游社区发布的通知和版本更新。鲲鹏计算社区对软件的漏洞及安全问题不承担任何责任。
 
-## Faiss编译<a name="ZH-CN_TOPIC_0000002476009241"></a>
+## License
 
-1.  获取开源Faiss代码，假设代码存放于“/path/to/faiss-1.8.0“。
+Faiss采用MIT License许可证授权，支持修改代码和再开源，具体请参见[LICENSE](./LICENSE)文件。
 
-    ```
-    git clone --branch v1.8.0 --single-branch https://github.com/facebookresearch/faiss.git
-    ```
+本项目的文档适用CC-BY 4.0许可证，具体请参见[LICENSE](./docs/LICENSE)文件。
 
-2.  安装Make、CMake、GCC。
+## 贡献声明
 
-    ```
-    yum install make cmake gcc-toolset-12-gcc*
-    export PATH=/opt/openEuler/gcc-toolset-12/root/usr/bin/:$PATH
-    export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
-    ```
+欢迎大家为社区做贡献，如果使用过程中有任何问题/建议，或者需要反馈特性需求和bug报告，可以提交[Issues](https://gitcode.com/boostkit/community/blob/master/docs/contributor/issue-submit.md)联系我们，具体贡献方法可参考[这里](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md)。同时也欢迎大家在[讨论专区](https://gitcode.com/boostkit/community/discussions)展开讨论交流。感谢您的支持。
 
-3.  Faiss依赖数学库，从Github仓下载开源OpenBLAS源代码，标签为v0.3.29。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
+## 致谢
 
-    ```
-    git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
-    cd OpenBLAS
-    make
-    make install
-    # 可通过make install PREFIX=/path/to/openblas/install设置/path/to/openblas/install以指定安装路径，默认安装路径为/opt/OpenBLAS。
-    ```
+Faiss由华为公司的下列部门联合贡献：
 
-4.  安装补丁文件，以0001-faiss_1.8.0-optimize-neq.patch为例。
+- 鲲鹏计算Boostkit开发部
 
-    ```
-    cd /path/to/faiss-1.8.0/faiss
-    patch -p1 < 0001-faiss_1.8.0-optimize-neq.patch
-    ```
-
-5.  编译Faiss代码获取libfaiss.so。
-    GCC编译：
-
-    ```
-    cd /path/to/faiss-1.8.0/faiss
-    cmake -B build . \
-      -DFAISS_ENABLE_GPU=OFF \
-      -DBUILD_TESTING=OFF \
-      -DOPTI_IVFPQ=OFF \
-      -DKRL=0N \
-      -DBUILD_SHARED_LIBS=ON \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DFAISS_OPT_LEVEL=generic \
-      -DFAISS_ENABLE_PYTHON=OFF \
-      -DMKL_LIBRARIES=/opt/OpenBLAS/lib/libopenblas.so
-    make -C build -j faiss
-    make -C build install
-    ```
-    LLVM编译：
-    ```
-    cd /path/to/faiss-1.8.0/faiss
-    cmake -B build . \
-      -DFAISS_ENABLE_GPU=OFF \
-      -DBUILD_TESTING=OFF \
-      -DOPTI_IVFPQ=OFF \
-      -DKRL=0N \
-      -DBUILD_SHARED_LIBS=ON \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DFAISS_ENABLE_PYTHON=OFF \
-      -DCMAKE_INSTALL_PREFIX=/path/to/faiss/install-llvm-gomp \
-      -DMKL_LIBRARIES=/opt/OpenBLAS/lib/libopenblas.so \
-      -DOpenMP_C_FLAGS="-fopenmp=libgomp" \
-      -DOpenMP_CXX_FLAGS="-fopenmp=libgomp" \
-      -DOpenMP_C_LIB_NAMES="gomp" \
-      -DOpenMP_CXX_LIB_NAMES="gomp" \
-      -DOpenMP_gomp_LIBRARY=/usr/lib/gcc/aarch64-linux-gnu/12/libgomp.so
-    cmake --build build --parallel
-    cmake --install build
-    ```
-    >![](public_sys-resources/icon-note.gif) **说明：**
-    >-   可通过在编译时添加编译选项-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install设置/path/to/faiss/install以指定安装路径，默认安装路径为/usr/local。
-    >-   编译选项-DMKL_LIBRARIES需指定为OpenBLAS的实际安装路径。
-    >-   编译选项-DKRL和-DOPTI_IVFPQ用于指定是否开启KRL和OPTI_IVFPQ优化选项，二者不可同时开启。
-    >-   0002-faiss_1.8.0-optimize-eqv.patch不包含OPTI_IVFPQ优化选项，仅支持KRL。
-
-
-## 测试示例<a name="ZH-CN_TOPIC_0000002475969077"></a>
-
-下方使用示例以使用sift-128-euclidean.hdf5数据集，Faiss\(HNSW\)算法，线程数32为例。
-
-1.  获取测试程序。
-
-    ```
-    git clone https://gitcode.com/openeuler/sra_test.git
-    ```
-
-2.  创建data文件夹，获取测试数据。
-
-    ```
-    cd /path/to/sra_test
-    mkdir data && cd data
-    wget http://ann-benchmarks.com/sift-128-euclidean.hdf5 --no-check-certificate
-    ```
-
-    完整的目录结构应如下所示：
-
-    ```
-    ├── configs                                                   // 存放对应算法、对应数据集配置文件
-          └── hnsw
-                └── hnsw_sift-128-euclidean.config
-    ├── include                                                   // 存放测试框架对应的头文件
-    ├── src                                                       // 存放测试框架对应的源文件
-    ├── Makefile                                                  // 编译脚本文件
-    ├── scripts
-          └── build.sh                                            // 脚本文件
-    ├── test.sh                                                   // 测试脚本
-    ├── data                                                      // 存放数据集
-          └── sift-128-euclidean.hdf5
-    ├── indexes
-          └── hnsw                                                // 存放构建好的索引，需手动创建。
-                └── sift.faiss                                    // 构建好的索引，运行可执行文件hnsw_test后（对应数据集配置文件“save_or_load”为save）时生成
-    └── hnsw_test                                                 // 编译后生成的可执行文件
-    ```
-
-3.  安装相关依赖。
-
-    ```
-    yum install hdf5 hdf5-devel numactl numactl-devel
-    ```
-
-4.  编译运行程序。请根据实际安装Faiss的路径，修改Makefile中FAISSROOT项。
-
-    ```
-    make hnsw_test
-    # 目前可通过安装patch的形式对Faiss原生的HNSW、PQFS、IVFPQ、IVFPQFS、IVFFLAT等算法进行加速，测试时选择不同的编译指令：
-    # HNSW：make hnsw_test
-    # HNSW-FP16: make hnsw_fp16_test
-    # PQFS：make pqfs_test
-    # IVFPQ：make ivfpq_test
-    # IVFPQFS：make ivfpqfs_test
-	# IVFFLAT: make ivfflat_test
-    ```
-
-5.  执行测试。可根据需求调整test.sh中的数据集和绑核。
-
-    ```
-    sh test.sh hnsw
-    ```
-    >![](public_sys-resources/icon-note.gif) **说明：**
-    >-   若是第一次执行，确保hnsw_sift-128-euclidean.config文件夹中的"save_or_load"为"save"；后续执行可改为"load"，使用构件好的图索引查询。
-    >-   首次编译时，根据命令行提示交互输入对应算法动态库路径与头文件路径。
-    >-   脚本将在build文件夹下自动保存对应算法所需动态库与头文件路径，后续编译无需命令行交互输入路径，可以直接修改build文件夹下config_faiss_aarch64.sh中的对应配置，再运行make hnsw_test即可。
-
-# 贡献指南<a name="ZH-CN_TOPIC_0000002442489288"></a>
-
-如果使用过程中有任何问题，或者需要反馈特性需求和bug报告，可以提交issues联系我们，具体贡献方法可参考[这里](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md)。
-
-# 许可证书<a name="ZH-CN_TOPIC_0000002476009245"></a>
-
-采用 MIT License 许可证授权，支持修改代码和再开源。
+感谢来自社区的每一个PR，欢迎贡献Faiss！

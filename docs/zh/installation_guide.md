@@ -76,10 +76,10 @@
     git clone --branch v1.8.0 --single-branch https://github.com/facebookresearch/faiss.git
     ```
 
-2. 获取基于鲲鹏优化的补丁文件，标签为**v1.8.0-2603**。假设存放于“/path/to/faiss-patch“。
+2. 获取基于鲲鹏优化的补丁文件，标签为**v1.0.0**。假设存放于“/path/to/faiss-patch“。
 
     ```bash
-    git clone --branch v1.8.0-2603 https://gitcode.com/boostkit/faiss.git faiss-patch
+    git clone --branch v1.0.0 https://gitcode.com/boostkit/faiss.git faiss-patch
     ```
 
     >![](public_sys-resources/icon-note.gif) **说明：** 

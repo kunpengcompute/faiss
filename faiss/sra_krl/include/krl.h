@@ -128,6 +128,11 @@ KRL_API_PUBLIC int krl_L2sqr(const float *x, const float *__restrict y, const si
 KRL_API_PUBLIC int krl_L2sqr_f16f32(
     const uint16_t *x, const uint16_t *__restrict y, size_t d, float *dis);
 
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_L2sqr_f16f32_sve2(
+    const uint16_t *x, const uint16_t *__restrict y, size_t d, float *dis);
+#endif
+
 /*
  * @brief Compute L2 square distance between two 8-bit integer vectors.
  * @param x Pointer to the first vector.
@@ -400,6 +405,11 @@ KRL_API_PUBLIC int krl_fast_table_lookup_step(int nq, int nsq, const uint8_t *co
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs32(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs32_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
+#endif
+
 /*
  * @brief Perform fast IP table lookup and filtering operations for single query with batch size 32.
  * @param nsq Number of subquantizers.
@@ -416,6 +426,11 @@ KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs32(int nsq, const uint8_t *co
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs32(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs32_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
+#endif
+
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 64).
  * @param nsq Number of subquantizers.
@@ -430,6 +445,11 @@ KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs32(int nsq, const uint8_t *co
  */
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
+
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs64_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
+#endif
 
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 64, inner product).
@@ -446,6 +466,11 @@ KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs64(int nsq, const uint8_t *co
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs64_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
+#endif
+
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 96).
  * @param nsq Number of subquantizers.
@@ -461,6 +486,11 @@ KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs64(int nsq, const uint8_t *co
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs96(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dise,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs96_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
+#endif
+
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 96, inner product).
  * @param nsq Number of subquantizers.
@@ -475,6 +505,11 @@ KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs96(int nsq, const uint8_t *co
  */
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs96(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
+
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs96_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
+#endif
 
 /*
  * @brief Pack 4-bit codes into blocks.

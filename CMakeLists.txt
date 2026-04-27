@@ -23,6 +23,7 @@ cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)
 # ARM-only options (Linux only): fail fast on x86
 option(KRL "Enable sra_krl (ARM only)" OFF)
 option(OPTI_IVFPQ "Enable optimized_ivfpq (ARM only)" OFF)
+option(USE_SVE2 "Enable SVE2 fast-scan kernels (ARM only, requires KRL)" OFF)
 
 # Detect arch by uname (most reliable on Linux)
 execute_process(
@@ -43,10 +44,16 @@ if(FAISS_ARCH MATCHES "^(aarch64|arm64|armv[0-9]+l|arm)")
 endif()
 
 # Only care x86 vs arm: x86 => hard fail when enabling ARM-only options
-if((KRL OR OPTI_IVFPQ) AND FAISS_IS_X86)
+if((KRL OR OPTI_IVFPQ OR USE_SVE2) AND FAISS_IS_X86)
   message(FATAL_ERROR
-    "KRL/OPTI_IVFPQ are ARM-only, but detected arch '${FAISS_ARCH}'. "
-    "Please configure with -DKRL=OFF -DOPTI_IVFPQ=OFF on x86."
+    "KRL/OPTI_IVFPQ/USE_SVE2 are ARM-only, but detected arch '${FAISS_ARCH}'. "
+    "Please configure with -DKRL=OFF -DOPTI_IVFPQ=OFF -DUSE_SVE2=OFF on x86."
+  )
+endif()
+
+if(USE_SVE2 AND NOT KRL)
+  message(FATAL_ERROR
+    "USE_SVE2 requires KRL. Please configure with -DKRL=ON when enabling USE_SVE2."
   )
 endif()
 

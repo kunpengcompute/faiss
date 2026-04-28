@@ -317,6 +317,7 @@ if(FAISS_ENABLE_KRL)
 
   set(KRL_SVE2_SRC
     sra_krl/src/L2distance_simd_f16f32_sve2.c
+    sra_krl/src/IPdistance_simd_f16f32_sve2.c
     sra_krl/src/pq_search_with_table_4bit_sve2.c
   )
 

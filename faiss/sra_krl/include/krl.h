@@ -188,6 +188,11 @@ KRL_API_PUBLIC int krl_L2sqr_by_idx(
 KRL_API_PUBLIC int krl_L2sqr_by_idx_f16f32(
     float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
 
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_L2sqr_by_idx_f16f32_sve2(
+    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
+#endif
+
 /*
  * @brief Compute L2 square distance between 8-bit integer vectors using indices.
  * @param dis Output distance array.
@@ -236,6 +241,11 @@ KRL_API_PUBLIC int krl_inner_product_by_idx_s8f32(
 KRL_API_PUBLIC int krl_inner_product_by_idx_f16f32(
     float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
 
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_inner_product_by_idx_f16f32_sve2(
+    float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
+#endif
+
 /*
  * @brief Compute inner product distance between vectors using indices.
  * @param dis Output distance array.
@@ -270,6 +280,11 @@ KRL_API_PUBLIC int krl_L2sqr_ny(float *dis, const float *x, const float *y, size
  */
 KRL_API_PUBLIC int krl_L2sqr_ny_f16f32(
     float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
+
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_L2sqr_ny_f16f32_sve2(
+    float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
+#endif
 
 /*
  * @brief Compute L2 square distance between multiple 8-bit integer vectors.
@@ -314,6 +329,11 @@ KRL_API_PUBLIC int krl_inner_product_ny(
  */
 KRL_API_PUBLIC int krl_inner_product_ny_f16f32(
     float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
+
+#ifdef USE_SVE2
+KRL_API_PUBLIC int krl_inner_product_ny_f16f32_sve2(
+    float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
+#endif
 
 /*
  * @brief Compute inner product distance between multiple 8-bit integer vectors.

@@ -1610,7 +1610,7 @@ KRL_IMPRECISE_FUNCTION_END
          i += 2;
      }
      if (ny & 1) {
-         krl_L2sqr_f16f32_sve2(x, y + d * ids[i], d, &dis[i], 1);
+         krl_L2sqr_f16f32_sve2(x, y + d * ids[i], d, &dis[i]);
      }
      return SUCCESS;
  }
@@ -1639,7 +1639,7 @@ KRL_IMPRECISE_FUNCTION_END
          i += 2;
      }
      if (ny & 1) {
-         krl_L2sqr_f16f32_sve2(x, y + i * d, d, &dis[i], 1);
+         krl_L2sqr_f16f32_sve2(x, y + i * d, d, &dis[i]);
      }
      return SUCCESS;
  }

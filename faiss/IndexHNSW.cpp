@@ -454,19 +454,31 @@ struct FlatL2DisSQ16 : DistanceComputer {
 
     float operator()(idx_t i) override {
 		float ret;
+#ifdef USE_SVE2
+		krl_L2sqr_f16f32_sve2((const uint16_t*)q16, (const uint16_t*)b16 + i * d, d, &ret);
+#else
 		krl_L2sqr_f16f32((const uint16_t*)q16, (const uint16_t*)b16 + i * d, d, &ret);
+#endif
         return ret;
     }
 
     float symmetric_dis(idx_t i, idx_t j) override {
 		float ret;
+#ifdef USE_SVE2
+		krl_L2sqr_f16f32_sve2((const uint16_t*)b16 + i * d, (const uint16_t*)b16 + j * d, d, &ret);
+#else
 		krl_L2sqr_f16f32((const uint16_t*)b16 + i * d, (const uint16_t*)b16 + j * d, d, &ret);
+#endif
         return ret;
     }
 
     // compute with krl
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) final override {
+#ifdef USE_SVE2
+        krl_L2sqr_by_idx_f16f32_sve2(dis, (const uint16_t*)q16, (const uint16_t*)b16, idx, d, ny);
+#else
         krl_L2sqr_by_idx_f16f32(dis, (const uint16_t*)q16, (const uint16_t*)b16, idx, d, ny);
+#endif
     }
 
     virtual ~FlatL2DisSQ16() {};

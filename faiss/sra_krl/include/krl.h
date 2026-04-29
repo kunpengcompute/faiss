@@ -128,10 +128,8 @@ KRL_API_PUBLIC int krl_L2sqr(const float *x, const float *__restrict y, const si
 KRL_API_PUBLIC int krl_L2sqr_f16f32(
     const uint16_t *x, const uint16_t *__restrict y, size_t d, float *dis);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_L2sqr_f16f32_sve2(
     const uint16_t *x, const uint16_t *__restrict y, size_t d, float *dis);
-#endif
 
 /*
  * @brief Compute L2 square distance between two 8-bit integer vectors.
@@ -188,10 +186,8 @@ KRL_API_PUBLIC int krl_L2sqr_by_idx(
 KRL_API_PUBLIC int krl_L2sqr_by_idx_f16f32(
     float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_L2sqr_by_idx_f16f32_sve2(
     float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
-#endif
 
 /*
  * @brief Compute L2 square distance between 8-bit integer vectors using indices.
@@ -241,10 +237,8 @@ KRL_API_PUBLIC int krl_inner_product_by_idx_s8f32(
 KRL_API_PUBLIC int krl_inner_product_by_idx_f16f32(
     float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_inner_product_by_idx_f16f32_sve2(
     float *dis, const uint16_t *x, const uint16_t *y, const int64_t *ids, size_t d, size_t ny);
-#endif
 
 /*
  * @brief Compute inner product distance between vectors using indices.
@@ -281,10 +275,8 @@ KRL_API_PUBLIC int krl_L2sqr_ny(float *dis, const float *x, const float *y, size
 KRL_API_PUBLIC int krl_L2sqr_ny_f16f32(
     float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_L2sqr_ny_f16f32_sve2(
     float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
-#endif
 
 /*
  * @brief Compute L2 square distance between multiple 8-bit integer vectors.
@@ -330,10 +322,8 @@ KRL_API_PUBLIC int krl_inner_product_ny(
 KRL_API_PUBLIC int krl_inner_product_ny_f16f32(
     float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_inner_product_ny_f16f32_sve2(
     float *dis, const uint16_t *x, const uint16_t *y, size_t ny, size_t d);
-#endif
 
 /*
  * @brief Compute inner product distance between multiple 8-bit integer vectors.
@@ -425,10 +415,8 @@ KRL_API_PUBLIC int krl_fast_table_lookup_step(int nq, int nsq, const uint8_t *co
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs32(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs32_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
-#endif
 
 /*
  * @brief Perform fast IP table lookup and filtering operations for single query with batch size 32.
@@ -446,10 +434,8 @@ KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs32_sve2(int nsq, const uint8_
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs32(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs32_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
-#endif
 
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 64).
@@ -466,10 +452,8 @@ KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs32_sve2(int nsq, const uint8_
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs64_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
-#endif
 
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 64, inner product).
@@ -486,10 +470,8 @@ KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs64_sve2(int nsq, const uint8_
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs64(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs64_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
-#endif
 
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 96).
@@ -506,10 +488,8 @@ KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs64_sve2(int nsq, const uint8_
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs96(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dise,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs96_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
-#endif
 
 /*
  * @brief Fast table lookup function for 4-bit codes (single query, batch size 96, inner product).
@@ -526,10 +506,8 @@ KRL_API_PUBLIC int krl_L2_table_lookup_fast_scan_bs96_sve2(int nsq, const uint8_
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs96(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
 
-#ifdef USE_SVE2
 KRL_API_PUBLIC int krl_IP_table_lookup_fast_scan_bs96_sve2(int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
     uint16_t threshold, uint32_t *lt_mask, size_t codes_size, size_t LUT_size, size_t lt_mask_size);
-#endif
 
 /*
  * @brief Pack 4-bit codes into blocks.

@@ -47,9 +47,9 @@
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. 请参考[《Faiss 安装指南》](./installation_guide.md)编译安装Faiss。
+2. 请参考《[安装指南](./installation_guide.md)》编译安装Faiss。
    >**说明：** 作为全量优化后Faiss测试，需开启与鲲鹏优化相关的宏，此处以 **-DOPTI\_IVFPQ=ON**为例。
-3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开 **-DOPTI\_IVFPQ=ON** 。若步骤[2](#li1673311431218)选择开启  **-DKRL=ON**，则此处也需同步开启。
+3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据命令行提示同步开 **-DOPTI\_IVFPQ=ON** 。若步骤[2](#li1673311431218)选择开启  **-DKRL=ON**，则此处也需同步开启。
 
     ```bash
     make ivfpq_test
@@ -122,9 +122,9 @@
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. 请参考[《Faiss 安装指南》](./installation_guide.md)编译安装Faiss。
+2. 请参考《[安装指南](./installation_guide.md)》编译安装Faiss。
    > **说明：** 作为等价优化后Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
-3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开启 **-DKRL=ON**。
+3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据命令行提示同步开启 **-DKRL=ON**。
 
     ```bash
     make ivfpq_test
@@ -197,7 +197,7 @@
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. 请参考[《Faiss 安装指南》](./installation_guide.md)编译安装Faiss。
+2. 请参考《[安装指南](./installation_guide.md)》编译安装Faiss。
 3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据根据命令行提示同步开启 **-DKRL=ON -DUSE\_FP16=ON**。
 
     ```bash

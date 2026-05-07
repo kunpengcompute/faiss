@@ -24,149 +24,51 @@ faiss/
    └── zh
       ├── api_reference.md                        // API参考
       ├── feature_introduction.md                 // 特性介绍
-      ├── best_practices.md                       // 最佳实现
+      ├── best_practices.md                       // 最佳实践
       ├── installation_guide.md                   // 安装指南
-      ├── quick_start.md                          // 快速上手
+      ├── quick_start.md                          // 快速入门
       └── release_notes.md                        // 版本说明书
-```
-
-使用补丁后Faiss完整的目录结构如下所示：
-
-```text
-faiss/
-├─ benchs/                                     // 基准测试
-├─ c_api/                                      // C语言API封装
-├─ cmake/                                      // CMake配置模块
-├─ conda/                                      // Conda构建脚本
-├─ contrib/                                    // Python贡献模块
-├─ demos/                                      // 示例程序
-├─ faiss/
-│   ├─ CMakeLists.txt                          // 构建配置
-│   ├─ Index.h                                 // 抽象基类，统一接口
-│   ├─ IndexFlat.cpp                           // 暴力搜索实现
-│   ├─ IndexFlatCodes.h                        // 统一码存储基类（用于PQ、SQ 等）
-│   ├─ IndexFlatCodes.cpp                      // 统一码存储基类实现
-│   ├─ IndexFastScan.h                         // 4‑bit PQ/AQ快速扫描通用接口
-│   ├─ IndexFastScan.cpp                       // 4‑bit PQ/AQ快速扫描通用实现
-│   ├─ IndexIVF.h                              // IVF基类接口
-│   ├─ IndexIVF.cpp                            // IVF基类+具体实现
-│   ├─ IndexIVFFlat.cpp                        // IVFFlat具体实现
-│   ├─ IndexIVFPQ.cpp                          // IVFPQ实现
-│   ├─ IndexIVFFastScan.h                      // IVFPQFastScan接口
-│   ├─ IndexIVFFastScan.cpp                    // IVFPQFastScan（CPU）实现
-│   ├─ IndexHNSW.h                             // HNSW索引接口
-│   ├─ IndexHNSW.cpp                           // HNSW索引实现
-│   ├─ IndexRefine.h                           // 基准+细化组合索引接口
-│   ├─ IndexRefine.cpp                         // 基准+细化组合索引实现
-│   ├─ impl/
-│   │   ├─ DistanceComputer.h                  // 距离计算抽象接口
-│   │   ├─ ProductQuantizer.h                  // 乘积量化器接口
-│   │   ├─ ProductQuantizer.cpp                // 乘积量化器实现
-│   │   ├─ pq4_fast_scan.h                     // 4‑bit PQ快速扫描接口
-│   │   ├─ pq4_fast_scan_search_1.cpp          // 4‑bit PQ快速扫描单查询实现
-│   │   ├─ pq4_fast_scan_search_qbs.cpp        // 4‑bit PQ快速扫描批量查询实现
-│   │   ├─ HNSW.cpp                            // HNSW图结构实现
-│   │   ├─ index_read.cpp                      // 索引反序列化实现
-│   │   └─ simd_result_handlers.h              // SIMD结果处理器
-│   ├─ invlists/
-│   │   ├─ InvertedLists.h                     // 倒排列表抽象接口
-│   │   └─ InvertedLists.cpp                   // 倒排列表实现
-│   ├─ utils/
-│   │   └─ distances_simd.cpp                  // SIMD L2/IP/L1/Linf实现
-│   ├─ sra_krl/
-│   │   ├─ include/
-│   │   │   ├─ krl.h                           // 对外统一API声明
-│   │   │   ├─ krl_internal.h                  // 内部结构体、宏、SIMD辅助实现
-│   │   │   ├─ platform_macros.h               // 错误码、度量常量、平台宏
-│   │   │   └─ safe_memory.h                   // 安全内存操作
-│   │   └─ src/
-│   │       ├─ Heap_sort.c                     // Top‑K堆构建、双堆重排实现
-│   │       ├─ IPdistance_simd.c               // 单精度向量内积SIMD实现（batch 2/4/8/16）
-│   │       ├─ IPdistance_simd_f16.c           // float16 IP距离计算实现
-│   │       ├─ IPdistance_simd_f16f32.c        // float16 IP距离计算实现（float输出）
-│   │       ├─ IPdistance_simd_s8.c            // int8 IP距离计算实现（int32/float输出）
-│   │       ├─ L2distance_simd.c               // float L2距离计算实现（batch 2/4/8/16/24）
-│   │       ├─ L2distance_simd_f16.c           // float16 L2距离计算实现
-│   │       ├─ L2distance_simd_f16f32.c        // float16 L2距离计算实现（float输出）
-│   │       ├─ L2distance_simd_u8.c            // uint8 L2距离计算实现（uint32/float输出）
-│   │       ├─ matrix_block_transpose.c        // 4×4块转置kernel
-│   │       ├─ MinMax_quant.c                  // 量化（fp16/u8/s8）
-│   │       ├─ NegaIPdistance_simd_f16f32.c    // float16 IP距离计算实现（取反，float输出）
-│   │       ├─ NegaIPdistance_simd_s8.c        // int8 IP距离计算实现（取反，int32/float输出）
-│   │       ├─ handle_IO.c                     // 句柄序列化/反序列化（文件I/O）
-│   │       ├─ krl_handles.c                   // 句柄创建、初始化、清理、指针访问
-│   │       ├─ pq_search_with_table_4bit.c     // 4‑bit查表
-│   │       ├─ pq_search_with_table_8bit.c     // 8‑bit查表
-│   │       ├─ reorder_2_vectors.c             // 稀疏/连续重排
-│   │       └─ sve_search_codes.c              // 4‑bit fp16查表（sve）
-│   ├─ cppcontrib/                             // C++贡献模块
-│   ├─ gpu/                                    // GPU子系统
-│   └─ python/                                 // Python绑定
-├─ misc/                                       // 杂项测试
-├─ tests/                                      // 单元测试
-├─ tutorial/                                   // 教程示例
-├─ CMakeLists.txt                              // 顶层构建配置
-├─ CHANGELOG.md
-├─ CODE_OF_CONDUCT.md
-├─ CONTRIBUTING.md
-├─ INSTALL.md
-├─ LICENSE
-└─ README.md
 ```
 
 ## 版本说明
 
-关于Faiss的版本更新情况请参见[《Faiss 版本说明书》](./docs/zh/release_notes.md)。
+关于Faiss的版本更新情况请参见《[版本说明书](./docs/zh/release_notes.md)》。
 
 ## 学习文档
 
 <a name="table1191773710200"></a>
-<table><thead align="left"><tr id="row1291816372202"><th class="cellrowborder" valign="top" width="9.780978097809781%" id="mcps1.1.4.1.1"><p id="p291823714205"><a name="p291823714205"></a><a name="p291823714205"></a>学习资源类别</p>
-</th>
-<th class="cellrowborder" valign="top" width="17.64176417641764%" id="mcps1.1.4.1.2"><p id="p13918183762016"><a name="p13918183762016"></a><a name="p13918183762016"></a>学习资源名称</p>
+<table><thead align="left"><tr id="row1291816372202"><th class="cellrowborder" valign="top" width="17.64176417641764%" id="mcps1.1.4.1.2"><p id="p13918183762016"><a name="p13918183762016"></a><a name="p13918183762016"></a>学习资源名称</p>
 </th>
 <th class="cellrowborder" valign="top" width="72.57725772577258%" id="mcps1.1.4.1.3"><p id="p89181437152019"><a name="p89181437152019"></a><a name="p89181437152019"></a>学习资源简介</p>
 </th>
 </tr>
 </thead>
-<tbody><tr id="row2918153732020"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211217"><a name="p598512211217"></a><a name="p598512211217"></a>文档</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172023"><a name="p17918337172023"></a><a name="p17918337172023"></a><a href="./docs/zh/feature_introduction.md">特性介绍</a></p>
+<tbody><tr id="row2918153732020"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172023"><a name="p17918337172023"></a><a name="p17918337172023"></a><a href="./docs/zh/feature_introduction.md">特性介绍</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742021"><a name="p15918183742021"></a><a name="p15918183742021"></a>提供Faiss架构介绍及优化说明。</p>
 </td>
 </tr>
-<tr id="row179181137112015"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p1918123710208"><a name="p1918123710208"></a><a name="p1918123710208"></a>文档</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p2091893722011"><a name="p2091893722011"></a><a name="p2091893722011"></a><a href="./docs/zh/release_notes.md">版本说明书</a></p>
+<tr id="row179181137112015"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p2091893722011"><a name="p2091893722011"></a><a name="p2091893722011"></a><a href="./docs/zh/release_notes.md">版本说明书</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p491893752010"><a name="p491893752010"></a><a name="p491893752010"></a>提供Faiss每个发布版本的基础信息和特性更新信息。</p>
 </td>
 </tr>
-<tr id="row939116371143"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p1039163711413"><a name="p1039163711413"></a><a name="p1039163711413"></a>文档</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p03913372046"><a name="p03913372046"></a><a name="p03913372046"></a><a href="./docs/zh/quick_start.md">快速入门</a></p>
+<tr id="row939116371143"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p03913372046"><a name="p03913372046"></a><a name="p03913372046"></a><a href="./docs/zh/quick_start.md">快速入门</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p1139217371746"><a name="p1139217371746"></a><a name="p1139217371746"></a>提供Faiss快速入门指导。</p>
 </td>
 </tr>
-<tr id="row2918153732017"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211214"><a name="p598512211214"></a><a name="p598512211214"></a>文档</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172020"><a name="p17918337172020"></a><a name="p17918337172020"></a><a href="./docs/zh/installation_guide.md">安装指南</a></p>
+<tr id="row2918153732017"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172020"><a name="p17918337172020"></a><a name="p17918337172020"></a><a href="./docs/zh/installation_guide.md">安装指南</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742018"><a name="p15918183742018"></a><a name="p15918183742018"></a>提供Faiss编译安装方法指导。</p>
 </td>
 </tr>
-<tr id="row2918153732018"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211215"><a name="p598512211215"></a><a name="p598512211215"></a>文档</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172021"><a name="p17918337172021"></a><a name="p17918337172021"></a><a href="./docs/zh/api_reference.md">API参考</a></p>
+<tr id="row2918153732018"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172021"><a name="p17918337172021"></a><a name="p17918337172021"></a><a href="./docs/zh/api_reference.md">API参考</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742019"><a name="p15918183742019"></a><a name="p15918183742019"></a>提供Faiss新增API接口定义、接口说明。</p>
 </td>
 </tr>
-<tr id="row2918153732019"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211216"><a name="p598512211216"></a><a name="p598512211216"></a>文档</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172022"><a name="p17918337172022"></a><a name="p17918337172022"></a><a href="./docs/zh/best_practices.md">最佳实践</a></p>
+<tr id="row2918153732019"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172022"><a name="p17918337172022"></a><a name="p17918337172022"></a><a href="./docs/zh/best_practices.md">最佳实践</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742020"><a name="p15918183742020"></a><a name="p15918183742020"></a>提供Faiss使用的实践案例。</p>
 </td>

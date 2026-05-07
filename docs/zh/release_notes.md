@@ -153,42 +153,42 @@
 </th>
 </tr>
 </thead>
-<tbody><tr id="row179181137112015"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p1918123710208"><a name="p1918123710208"></a><a name="p1918123710208"></a><a href="./release_notes.md">《Faiss 版本说明书》</a></p>
+<tbody><tr id="row179181137112015"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p1918123710208"><a name="p1918123710208"></a><a name="p1918123710208"></a>《版本说明书》</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p491893752010"><a name="p491893752010"></a><a name="p491893752010"></a>本文档提供Faiss的版本发布信息。</p>
 </td>
 <td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p491893752011"><a name="p491893752011"></a><a name="p491893752011"></a>开源仓</p>
 </td>
 </tr>
-<tr id="row939116371143"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p1039163711413"><a name="p1039163711413"></a><a name="p1039163711413"></a><a href="./quick_start.md">《Faiss 快速入门》</a></p>
+<tr id="row939116371143"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p1039163711413"><a name="p1039163711413"></a><a name="p1039163711413"></a>《快速入门》</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p1139217371746"><a name="p1139217371746"></a><a name="p1139217371746"></a>本文档提供Faiss的快速上手指导。</p>
 </td>
 <td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p1139217371747"><a name="p1139217371747"></a><a name="p1139217371747"></a>开源仓</p>
 </td>
 </tr>
-<tr id="row2918153732017"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p598512211214"><a name="p598512211214"></a><a name="p598512211214"></a><a href="./installation_guide.md">《Faiss 安装指南》</a></p>
+<tr id="row2918153732017"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p598512211214"><a name="p598512211214"></a><a name="p598512211214"></a>《安装指南》</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p15918183742018"><a name="p15918183742018"></a><a name="p15918183742018"></a>本文档提供Faiss编译安装指导。</p>
 </td>
 <td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p15918183742028"><a name="p15918183742028"></a><a name="p15918183742028"></a>开源仓</p>
 </td>
 </tr>
-<tr id="row2918153732018"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p598512211215"><a name="p598512211215"></a><a name="p598512211215"></a><a href="./api_reference.md">《Faiss API参考》</a></p>
+<tr id="row2918153732018"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p598512211215"><a name="p598512211215"></a><a name="p598512211215"></a>《API参考》</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p15918183742019"><a name="p15918183742019"></a><a name="p15918183742019"></a>本文档提供Faiss新增API接口定义、接口说明。</p>
+<td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p15918183742019"><a name="p15918183742019"></a><a name="p15918183742019"></a>本文档提供Faiss新增接口定义、接口说明。</p>
 </td>
 <td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p15918183742029"><a name="p15918183742029"></a><a name="p15918183742029"></a>开源仓</p>
 </td>
 </tr>
-<tr id="row2918153732019"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p598512211216"><a name="p598512211216"></a><a name="p598512211216"></a><a href="./best_practices.md">《Faiss 最佳实践》</a></p>
+<tr id="row2918153732019"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p598512211216"><a name="p598512211216"></a><a name="p598512211216"></a>《最佳实践》</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p15918183742020"><a name="p15918183742020"></a><a name="p15918183742020"></a>本文档提供Faiss使用的实践案例。</p>
 </td>
 <td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p15918183742030"><a name="p15918183742030"></a><a name="p15918183742030"></a>开源仓</p>
 </td>
 </tr>
-<tr id="row2918153732020"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p598512211217"><a name="p598512211217"></a><a name="p598512211217"></a><a href="./feature_introduction.md">《Faiss 特性介绍》</a></p>
+<tr id="row2918153732020"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p598512211217"><a name="p598512211217"></a><a name="p598512211217"></a>《特性介绍》</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p15918183742021"><a name="p15918183742021"></a><a name="p15918183742021"></a>本文档提供Faiss架构介绍及优化说明。</p>
 </td>

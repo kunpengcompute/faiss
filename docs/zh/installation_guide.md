@@ -95,7 +95,7 @@
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-4. Faiss依赖数学库，从[Github仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
+4. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
@@ -118,6 +118,89 @@
     cd /path/to/faiss
     patch -p1 < /path/to/faiss-patch/0001-faiss_1.8.0-optimize-neq.patch
     # patch -p1 < /path/to/faiss-patch/0002-faiss_1.8.0-optimize-eqv.patch
+    ```
+
+    使用补丁后Faiss完整的目录结构如下所示：
+    ```text
+    faiss/
+    ├─ benchs/                                     // 基准测试
+    ├─ c_api/                                      // C语言API封装
+    ├─ cmake/                                      // CMake配置模块
+    ├─ conda/                                      // Conda构建脚本
+    ├─ contrib/                                    // Python贡献模块
+    ├─ demos/                                      // 示例程序
+    ├─ faiss/
+    │   ├─ CMakeLists.txt                          // 构建配置
+    │   ├─ Index.h                                 // 抽象基类，统一接口
+    │   ├─ IndexFlat.cpp                           // 暴力搜索实现
+    │   ├─ IndexFlatCodes.h                        // 统一码存储基类（用于PQ、SQ 等）
+    │   ├─ IndexFlatCodes.cpp                      // 统一码存储基类实现
+    │   ├─ IndexFastScan.h                         // 4‑bit PQ/AQ快速扫描通用接口
+    │   ├─ IndexFastScan.cpp                       // 4‑bit PQ/AQ快速扫描通用实现
+    │   ├─ IndexIVF.h                              // IVF基类接口
+    │   ├─ IndexIVF.cpp                            // IVF基类+具体实现
+    │   ├─ IndexIVFFlat.cpp                        // IVFFlat具体实现
+    │   ├─ IndexIVFPQ.cpp                          // IVFPQ实现
+    │   ├─ IndexIVFFastScan.h                      // IVFPQFastScan接口
+    │   ├─ IndexIVFFastScan.cpp                    // IVFPQFastScan（CPU）实现
+    │   ├─ IndexHNSW.h                             // HNSW索引接口
+    │   ├─ IndexHNSW.cpp                           // HNSW索引实现
+    │   ├─ IndexRefine.h                           // 基准+细化组合索引接口
+    │   ├─ IndexRefine.cpp                         // 基准+细化组合索引实现
+    │   ├─ impl/
+    │   │   ├─ DistanceComputer.h                  // 距离计算抽象接口
+    │   │   ├─ ProductQuantizer.h                  // 乘积量化器接口
+    │   │   ├─ ProductQuantizer.cpp                // 乘积量化器实现
+    │   │   ├─ pq4_fast_scan.h                     // 4‑bit PQ快速扫描接口
+    │   │   ├─ pq4_fast_scan_search_1.cpp          // 4‑bit PQ快速扫描单查询实现
+    │   │   ├─ pq4_fast_scan_search_qbs.cpp        // 4‑bit PQ快速扫描批量查询实现
+    │   │   ├─ HNSW.cpp                            // HNSW图结构实现
+    │   │   ├─ index_read.cpp                      // 索引反序列化实现
+    │   │   └─ simd_result_handlers.h              // SIMD结果处理器
+    │   ├─ invlists/
+    │   │   ├─ InvertedLists.h                     // 倒排列表抽象接口
+    │   │   └─ InvertedLists.cpp                   // 倒排列表实现
+    │   ├─ utils/
+    │   │   └─ distances_simd.cpp                  // SIMD L2/IP/L1/Linf实现
+    │   ├─ sra_krl/
+    │   │   ├─ include/
+    │   │   │   ├─ krl.h                           // 对外统一API声明
+    │   │   │   ├─ krl_internal.h                  // 内部结构体、宏、SIMD辅助实现
+    │   │   │   ├─ platform_macros.h               // 错误码、度量常量、平台宏
+    │   │   │   └─ safe_memory.h                   // 安全内存操作
+    │   │   └─ src/
+    │   │       ├─ Heap_sort.c                     // Top‑K堆构建、双堆重排实现
+    │   │       ├─ IPdistance_simd.c               // 单精度向量内积SIMD实现（batch 2/4/8/16）
+    │   │       ├─ IPdistance_simd_f16.c           // float16 IP距离计算实现
+    │   │       ├─ IPdistance_simd_f16f32.c        // float16 IP距离计算实现（float输出）
+    │   │       ├─ IPdistance_simd_s8.c            // int8 IP距离计算实现（int32/float输出）
+    │   │       ├─ L2distance_simd.c               // float L2距离计算实现（batch 2/4/8/16/24）
+    │   │       ├─ L2distance_simd_f16.c           // float16 L2距离计算实现
+    │   │       ├─ L2distance_simd_f16f32.c        // float16 L2距离计算实现（float输出）
+    │   │       ├─ L2distance_simd_u8.c            // uint8 L2距离计算实现（uint32/float输出）
+    │   │       ├─ matrix_block_transpose.c        // 4×4块转置kernel
+    │   │       ├─ MinMax_quant.c                  // 量化（fp16/u8/s8）
+    │   │       ├─ NegaIPdistance_simd_f16f32.c    // float16 IP距离计算实现（取反，float输出）
+    │   │       ├─ NegaIPdistance_simd_s8.c        // int8 IP距离计算实现（取反，int32/float输出）
+    │   │       ├─ handle_IO.c                     // 句柄序列化/反序列化（文件I/O）
+    │   │       ├─ krl_handles.c                   // 句柄创建、初始化、清理、指针访问
+    │   │       ├─ pq_search_with_table_4bit.c     // 4‑bit查表
+    │   │       ├─ pq_search_with_table_8bit.c     // 8‑bit查表
+    │   │       ├─ reorder_2_vectors.c             // 稀疏/连续重排
+    │   │       └─ sve_search_codes.c              // 4‑bit fp16查表（sve）
+    │   ├─ cppcontrib/                             // C++贡献模块
+    │   ├─ gpu/                                    // GPU子系统
+    │   └─ python/                                 // Python绑定
+    ├─ misc/                                       // 杂项测试
+    ├─ tests/                                      // 单元测试
+    ├─ tutorial/                                   // 教程示例
+    ├─ CMakeLists.txt                              // 顶层构建配置
+    ├─ CHANGELOG.md
+    ├─ CODE_OF_CONDUCT.md
+    ├─ CONTRIBUTING.md
+    ├─ INSTALL.md
+    ├─ LICENSE
+    └─ README.md
     ```
 
 7. 编译Faiss代码获取libfaiss.so。注意：需启用鲲鹏优化宏以获得性能提升。

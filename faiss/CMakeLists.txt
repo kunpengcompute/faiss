@@ -320,6 +320,16 @@ if(FAISS_ENABLE_KRL)
     )
   endif()
 
+  if(FAISS_ENABLE_SVE2)
+    set_source_files_properties(${KRL_SVE2_SRC} PROPERTIES LANGUAGE CXX)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+      set_source_files_properties(${KRL_SVE2_SRC} APPEND_STRING PROPERTY
+        COMPILE_FLAGS " -march=armv8.2-a+fp16+sve2+rcpc -msve-vector-bits=256"
+      )
+    endif()
+    list(APPEND FAISS_SRC ${KRL_SVE2_SRC})
+  endif()
+
   list(APPEND FAISS_SRC ${KRL_SRC})
 endif()
 

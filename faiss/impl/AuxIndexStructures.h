@@ -11,6 +11,7 @@
 #ifndef FAISS_AUX_INDEX_STRUCTURES_H
 #define FAISS_AUX_INDEX_STRUCTURES_H
 
+#include <unordered_set>
 #include <stdint.h>
 
 #include <cstring>
@@ -164,25 +165,53 @@ struct FAISS_API InterruptCallback {
 /// set implementation optimized for fast access.
 struct VisitedTable {
     std::vector<uint8_t> visited;
+    std::unordered_set<int> visited_set;
     uint8_t visno;
 
-    explicit VisitedTable(int size) : visited(size), visno(1) {}
+    // Use hashset when ntotal >= this threshold.
+    // Vector: O(1) get/set, O(ntotal) reset. Hashset: O(1) reset, slower get/set.
+    // At ntotal=10M the memset cost dominates on x86; hashset wins by ~3-4x.
+    // WARNING: On ARM this causes 10% regression due to cache miss overhead.
+    static const int hashset_threshold = 500000;
 
-    /// set flag #no to true
-    void set(int no) {
-        visited[no] = visno;
+    explicit VisitedTable(int size)
+            : visno(size >= hashset_threshold ? 0 : 1) {
+        if (visno != 0) {
+            visited.resize(size, 0);
+        } else {
+            // Pre-allocate hashset capacity to avoid rehash during queries
+            visited_set.reserve(1024);
+        }
+    }
+
+    /// set flag #no to true; returns true if this changed it (was unvisited)
+    bool set(int no) {
+        if (visno == 0) {
+            return visited_set.insert(no).second;
+        } else if (visited[no] == visno) {
+            return false;
+        } else {
+            visited[no] = visno;
+            return true;
+        }
     }
 
     /// get flag #no
     bool get(int no) const {
-        return visited[no] == visno;
+        if (visno == 0) {
+            return visited_set.count(no) != 0;
+        } else {
+            return visited[no] == visno;
+        }
     }
 
     /// reset all flags to false
     void advance() {
-        visno++;
-        if (visno == 250) {
-            // 250 rather than 255 because sometimes we use visno and visno+1
+        if (visno == 0) {
+            visited_set.clear();
+        } else if (visno < 254) {
+            ++visno;
+        } else {
             memset(visited.data(), 0, sizeof(visited[0]) * visited.size());
             visno = 1;
         }

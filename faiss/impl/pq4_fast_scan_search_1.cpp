@@ -153,7 +153,11 @@ inline void accumulate_fixed_blocks32(
     if(keep_min) {
         for (size_t j0 = 0; j0 < nb; j0 += 32) {
             const uint16_t threshold = res.get_threshold(0);
+#ifdef USE_SVE2
+            krl_L2_table_lookup_fast_scan_bs32_sve2(
+#else
             krl_L2_table_lookup_fast_scan_bs32(
+#endif
 				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 16, nsq * 16, 1);
             res.handle_generic1(j0, distance, lt_mask);
             codes += 16 * nsq;
@@ -162,7 +166,11 @@ inline void accumulate_fixed_blocks32(
     } else {
         for (size_t j0 = 0; j0 < nb; j0 += 32) {
             const uint16_t threshold = res.get_threshold(0);
+#ifdef USE_SVE2
+            krl_IP_table_lookup_fast_scan_bs32_sve2(
+#else
             krl_IP_table_lookup_fast_scan_bs32(
+#endif
 				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 16, nsq * 16, 1);
             res.handle_generic1(j0, distance, lt_mask);
             codes += 16 * nsq;
@@ -183,7 +191,11 @@ inline void accumulate_fixed_blocks64(
     if(keep_min) {
         for (size_t j0 = 0; j0 < nb; j0 += 64) {
             const uint16_t threshold = res.get_threshold(0);
+#ifdef USE_SVE2
+            krl_L2_table_lookup_fast_scan_bs64_sve2(
+#else
             krl_L2_table_lookup_fast_scan_bs64(
+#endif
 				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 32, nsq * 16, 2);
             res.handle_generic2(j0, distance, lt_mask);
             codes += 32 * nsq;
@@ -192,7 +204,11 @@ inline void accumulate_fixed_blocks64(
     } else {
         for (size_t j0 = 0; j0 < nb; j0 += 64) {
             const uint16_t threshold = res.get_threshold(0);
+#ifdef USE_SVE2
+            krl_IP_table_lookup_fast_scan_bs64_sve2(
+#else
             krl_IP_table_lookup_fast_scan_bs64(
+#endif
 				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 32, nsq * 16, 2);
             res.handle_generic2(j0, distance, lt_mask);
             codes += 32 * nsq;
@@ -213,7 +229,11 @@ inline void accumulate_fixed_blocks96(
     if(keep_min) {
         for (size_t j0 = 0; j0 < nb; j0 += 96) {
             const uint16_t threshold = res.get_threshold(0);
+#ifdef USE_SVE2
+            krl_L2_table_lookup_fast_scan_bs96_sve2(
+#else
             krl_L2_table_lookup_fast_scan_bs96(
+#endif
 				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 48, nsq * 16, 3);
             res.handle_generic3(j0, distance, lt_mask);
             codes += 48 * nsq;
@@ -221,7 +241,11 @@ inline void accumulate_fixed_blocks96(
     } else {
         for (size_t j0 = 0; j0 < nb; j0 += 96) {
             const uint16_t threshold = res.get_threshold(0);
+#ifdef USE_SVE2
+            krl_IP_table_lookup_fast_scan_bs96_sve2(
+#else
             krl_IP_table_lookup_fast_scan_bs96(
+#endif
 				nsq, codes, LUT, distance, threshold, lt_mask, nsq * 48, nsq * 16, 3);
             res.handle_generic3(j0, distance, lt_mask);
             codes += 48 * nsq;

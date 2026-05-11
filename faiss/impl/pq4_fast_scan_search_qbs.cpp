@@ -148,12 +148,20 @@ void accumulate_q_4step(
                 const uint8_t* lut = LUT0 + qi * nsq * 16;
 
                 if (keep_min) {
+#ifdef USE_SVE2
+                    krl_L2_table_lookup_fast_scan_bs32_sve2(
+#else
                     krl_L2_table_lookup_fast_scan_bs32(
+#endif
                         nsq, codes, lut,
                         distance + qi * 32, thr, &lt_mask[qi],
                         nsq * 16, nsq * 16, 1);
                 } else {
+#ifdef USE_SVE2
+                    krl_IP_table_lookup_fast_scan_bs32_sve2(
+#else
                     krl_IP_table_lookup_fast_scan_bs32(
+#endif
                         nsq, codes, lut,
                         distance + qi * 32, thr, &lt_mask[qi],
                         nsq * 16, nsq * 16, 1);

@@ -223,6 +223,7 @@ set(FAISS_HEADERS
 
 # -------------------- ARM-only options (Linux only) --------------------
 option(KRL "Enable sra_krl (ARM only)" OFF)
+option(USE_SVE2 "Enable SVE2 fast-scan kernels (ARM only, requires KRL)" OFF)
 
 execute_process(
   COMMAND uname -m
@@ -241,10 +242,10 @@ if(FAISS_ARCH MATCHES "^(aarch64|arm64|armv[0-9]+l|arm)")
   set(FAISS_IS_ARM TRUE)
 endif()
 
-if(KRL AND FAISS_IS_X86)
+if((KRL OR USE_SVE2) AND FAISS_IS_X86)
   message(FATAL_ERROR
-    "KRL are ARM-only, but detected arch '${FAISS_ARCH}'. "
-    "Please configure with -DKRL=OFF on x86."
+    "KRL/USE_SVE2 are ARM-only, but detected arch '${FAISS_ARCH}'. "
+    "Please configure with -DKRL=OFF -DUSE_SVE2=OFF on x86."
   )
 endif()
 
@@ -252,6 +253,17 @@ endif()
 set(FAISS_ENABLE_KRL OFF)
 if(KRL AND FAISS_IS_ARM)
   set(FAISS_ENABLE_KRL ON)
+endif()
+
+set(FAISS_ENABLE_SVE2 OFF)
+if(USE_SVE2 AND FAISS_IS_ARM AND FAISS_ENABLE_KRL)
+  set(FAISS_ENABLE_SVE2 ON)
+endif()
+
+if(USE_SVE2 AND NOT KRL)
+  message(FATAL_ERROR
+    "USE_SVE2 requires KRL. Please configure with -DKRL=ON when enabling USE_SVE2."
+  )
 endif()
 
 # -------------------- non-Windows sources --------------------
@@ -288,6 +300,10 @@ if(FAISS_ENABLE_KRL)
     sra_krl/src/sve_search_codes.c
   )
 
+  set(KRL_SVE2_SRC
+    sra_krl/src/pq_search_with_table_4bit_sve2.c
+  )
+
   set(KRL_HEADERS
     sra_krl/include/krl.h
     sra_krl/include/safe_memory.h
@@ -302,6 +318,16 @@ if(FAISS_ENABLE_KRL)
     set_source_files_properties(${SVE_FILE} APPEND_STRING PROPERTY
       COMPILE_FLAGS " -march=armv8.2-a+fp16+sve+rcpc -msve-vector-bits=256"
     )
+  endif()
+
+  if(FAISS_ENABLE_SVE2)
+    set_source_files_properties(${KRL_SVE2_SRC} PROPERTIES LANGUAGE CXX)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+      set_source_files_properties(${KRL_SVE2_SRC} APPEND_STRING PROPERTY
+        COMPILE_FLAGS " -march=armv8.2-a+fp16+sve2+rcpc -msve-vector-bits=256"
+      )
+    endif()
+    list(APPEND FAISS_SRC ${KRL_SVE2_SRC})
   endif()
 
   list(APPEND FAISS_SRC ${KRL_SRC})
@@ -319,6 +345,9 @@ target_include_directories(faiss PUBLIC
 
 if(FAISS_ENABLE_KRL)
   target_compile_definitions(faiss PRIVATE KRL)
+  if(FAISS_ENABLE_SVE2)
+    target_compile_definitions(faiss PRIVATE USE_SVE2)
+  endif()
 
   target_compile_options(faiss PRIVATE
     $<$<COMPILE_LANGUAGE:C,CXX>:-O3 -fpermissive>

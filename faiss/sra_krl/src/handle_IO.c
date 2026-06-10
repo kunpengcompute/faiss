@@ -67,7 +67,7 @@ static inline size_t read_element(FILE *f, size_t bytes, uint8_t *element)
  */
 static inline size_t read_list(FILE *f, size_t n, size_t bytes, uint8_t *vec)
 {
-    if (n < 1 && n >= ((uint64_t)(1) << 40)) {
+    if (n < 1 || n >= ((uint64_t)(1) << 40)) {
         return 0;
     }
     return fread(vec, bytes, n, f);

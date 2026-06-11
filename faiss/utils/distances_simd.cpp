@@ -235,7 +235,7 @@ float fvec_inner_product(const float* x, const float* y, size_t d) {
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
 
-#ifdef __aarch64__
+#ifdef KRL
 FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
 float fvec_inner_product_f16(const float16_t* x, const float16_t* y, size_t d) {
     float res = 0.F;
@@ -262,7 +262,7 @@ float fvec_norm_L2sqr(const float* x, size_t d) {
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
 
-#ifdef __aarch64__
+#ifdef KRL
 FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
 float fvec_norm_L2sqr_f16(const float16_t* x, size_t d) {
     // the double in the _ref is suspected to be a typo. Some of the manual
@@ -297,7 +297,7 @@ float fvec_L2sqr(const float* x, const float* y, size_t d) {
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
 
-#ifdef __aarch64__
+#ifdef KRL
 FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
 float fvec_L2sqr_f16(const float16_t* x, const float16_t* y, size_t d) {
     size_t i;
@@ -345,7 +345,7 @@ void fvec_inner_product_batch_4(
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
 
-#ifdef __aarch64__
+#ifdef KRL
 FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
 void fvec_inner_product_batch_4_f16(
         const float16_t* __restrict x,
@@ -415,7 +415,7 @@ void fvec_L2sqr_batch_4(
 }
 FAISS_PRAGMA_IMPRECISE_FUNCTION_END
 
-#ifdef __aarch64__
+#ifdef KRL
 FAISS_PRAGMA_IMPRECISE_FUNCTION_BEGIN
 void fvec_L2sqr_batch_4_f16(
         const float16_t* x,

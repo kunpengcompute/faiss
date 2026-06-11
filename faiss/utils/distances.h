@@ -501,7 +501,7 @@ int fvec_madd_and_argmin(
         float* c);
 
 /* added FP16 function interfaces */
-#ifdef __aarch64__
+#ifdef KRL
 float fvec_L2sqr_f16(const float16_t* x, const float16_t* y, size_t d);
 
 float fvec_inner_product_f16(const float16_t* x, const float16_t* y, size_t d);

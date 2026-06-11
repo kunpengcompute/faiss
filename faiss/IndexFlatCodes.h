@@ -54,7 +54,7 @@ struct IndexFlatCodes : Index {
 
     IndexFlatCodes(size_t code_size, idx_t d, MetricType metric = METRIC_L2);
 
-#ifdef __aarch64__
+#ifdef KRL
     IndexFlatCodes(size_t code_size, idx_t d, NumericType ntype, MetricType metric = METRIC_L2);
 #endif
 
@@ -134,9 +134,7 @@ struct IndexFlatCodes : Index {
     void dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) override;
     void quant_entries_f16(const uint8_t* entries, idx_t num_entries, float scale) override;
     void quant_entries_u8(const uint8_t* entries, idx_t num_entries, float scale) override;
-#endif
 
-#ifdef __aarch64__
     /* added FP16 function interfaces */
     void add(idx_t n, const float16_t* x) override;
 
@@ -168,7 +166,6 @@ struct IndexFlatCodes : Index {
         }
     }
 
-#ifdef KRL
     void train(idx_t n, const float16_t* x) override {
         if (ntotal > 0 && n == -1 && !kdh) {
             krl_create_reorder_handle(
@@ -176,7 +173,6 @@ struct IndexFlatCodes : Index {
         	use_handle = (kdh != nullptr);
 		}
     }
-#endif
 
     void train_ex(idx_t n, const void* x, NumericType numeric_type) override {
         if (numeric_type == NumericType::Float16) {

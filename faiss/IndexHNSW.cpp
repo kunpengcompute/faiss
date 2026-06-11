@@ -142,17 +142,14 @@ struct NegativeDistanceComputer : DistanceComputer {
         basedis->set_query(x);
     }
 
-#ifdef __aarch64__
+#ifdef KRL
     void set_query(const float16_t* x) override {
         basedis->set_query(x);
     }
-#endif
 
-#ifdef KRL
 	void set_base(const float* x) override {}
-#ifdef __aarch64__
+
 	void set_base(const float16_t* x) override {}
-#endif
 #endif
     /// compute distance of vector i to current query
     float operator()(idx_t i) override {
@@ -352,7 +349,7 @@ IndexHNSW::IndexHNSW(int d, int M, MetricType metric)
 IndexHNSW::IndexHNSW(Index* storage, int M)
         : Index(storage->d, storage->metric_type), hnsw(M), storage(storage) {}
 
-#ifdef __aarch64__
+#ifdef KRL
 IndexHNSW::IndexHNSW(int d, int M, NumericType ntype, MetricType metric)
         : Index(d, ntype, metric), hnsw(M) {}
 
@@ -1184,7 +1181,7 @@ void IndexHNSW::permute_entries(const idx_t* perm) {
 }
 
 /* added FP16 function interfaces */
-#ifdef __aarch64__
+#ifdef KRL
 void IndexHNSW::add(idx_t n, const float16_t* x) {
     FAISS_THROW_IF_NOT_MSG(
             storage,
@@ -1195,13 +1192,12 @@ void IndexHNSW::add(idx_t n, const float16_t* x) {
     ntotal = storage->ntotal;
 
     hnsw_add_vertices<float16_t>(*this, n0, n, x, verbose, hnsw.levels.size() == ntotal);
-#ifdef KRL
+
     if(quant_bits == 16) {
         storage->quant_entries_f16(storage->get_codes_pointer(), n * d, quant_scale);
     } else if(quant_bits == 8) {
         storage->quant_entries_u8(storage->get_codes_pointer(), n * d, quant_scale);
     }
-#endif
 }
 
 void IndexHNSW::train(idx_t n, const float16_t* x) {
@@ -1233,7 +1229,7 @@ void IndexHNSW::search(
             distances[i] = -distances[i];
         }
     }
-#ifdef KRL
+
     // *** add for reordering ***
     if (apply_reorder && perm != nullptr) {
         std::vector<idx_t> labels_permuted(n * k);
@@ -1242,7 +1238,6 @@ void IndexHNSW::search(
         }
         std::copy_n(labels_permuted.cbegin(), n * k, labels);
     }
-#endif
 }
 
 void IndexHNSW::range_search(
@@ -1334,7 +1329,7 @@ IndexHNSWFlat::IndexHNSWFlat(int d, int M, MetricType metric)
     is_trained = true;
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 IndexHNSWFlat::IndexHNSWFlat(int d, int M, NumericType ntype, MetricType metric)
         : IndexHNSW(
                   (metric == METRIC_L2) ? new IndexFlatL2(d, ntype)
@@ -1364,7 +1359,7 @@ void IndexHNSWPQ::train(idx_t n, const float* x) {
 }
 
 /* explicit FP32 function interface */
-#ifdef __aarch64__
+#ifdef KRL
 void IndexHNSWPQ::add(idx_t n, const float* x) {
     IndexHNSW::add(n, x);
 }
@@ -1481,7 +1476,7 @@ IndexHNSWSQ::IndexHNSWSQ(
 IndexHNSWSQ::IndexHNSWSQ() = default;
 
 /* explicit FP32 function interface */
-#ifdef __aarch64__
+#ifdef KRL
 void IndexHNSWSQ::add(idx_t n, const float* x) {
     IndexHNSW::add(n, x);
 }
@@ -1799,7 +1794,7 @@ void IndexHNSW2Level::flip_to_ivf() {
 }
 
 /* explicit FP32 function interface */
-#ifdef __aarch64__
+#ifdef KRL
 void IndexHNSW2Level::add(idx_t n, const float* x) {
     IndexHNSW::add(n, x);
 }

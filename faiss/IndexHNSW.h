@@ -28,7 +28,7 @@
 #include <faiss/IndexScalarQuantizer.h>
 #include <faiss/impl/HNSW.h>
 #include <faiss/utils/utils.h>
-#ifdef __aarch64__
+#ifdef KRL
 #include <faiss/utils/fp16-arm.h>
 #endif
 
@@ -58,13 +58,12 @@ struct IndexHNSW : Index {
     bool apply_reorder = true;
     size_t perm_size = 0;
     faiss::idx_t* perm = nullptr;
-#endif
-    explicit IndexHNSW(int d = 0, int M = 32, MetricType metric = METRIC_L2);
-    explicit IndexHNSW(Index* storage, int M = 32);
-#ifdef __aarch64__
+
     IndexHNSW(int d, int M, NumericType ntype, MetricType metric);
     IndexHNSW(Index* storage, NumericType ntype, int M = 32);
 #endif
+    explicit IndexHNSW(int d = 0, int M = 32, MetricType metric = METRIC_L2);
+    explicit IndexHNSW(Index* storage, int M = 32);
 
     ~IndexHNSW() override;
 
@@ -129,7 +128,7 @@ struct IndexHNSW : Index {
     void permute_entries(const idx_t* perm);
 
     /* added FP16 function interfaces */
-#ifdef __aarch64__
+#ifdef KRL
     void add(idx_t n, const float16_t* x) override;
 
     void add_ex(idx_t n, const void* x, NumericType numeric_type) override {
@@ -242,7 +241,7 @@ struct IndexHNSW : Index {
 struct IndexHNSWFlat : IndexHNSW {
     IndexHNSWFlat();
     IndexHNSWFlat(int d, int M, MetricType metric = METRIC_L2);
-#ifdef __aarch64__
+#ifdef KRL
     IndexHNSWFlat(int d, int M, NumericType ntype = NumericType::Float16, MetricType metric = METRIC_L2);
 #endif
 };
@@ -255,7 +254,7 @@ struct IndexHNSWPQ : IndexHNSW {
     IndexHNSWPQ(int d, int pq_m, int M, int pq_nbits = 8);
     void train(idx_t n, const float* x) override;
 
-#ifdef __aarch64__
+#ifdef KRL
     /* explicit FP32 function interface */
     void add(idx_t n, const float* x) override;
 
@@ -403,7 +402,7 @@ struct IndexHNSWSQ : IndexHNSW {
             ScalarQuantizer::QuantizerType qtype,
             int M,
             MetricType metric = METRIC_L2);
-#ifdef __aarch64__
+#ifdef KRL
     /* explicit FP32 function interface */
     void add(idx_t n, const float* x) override;
 
@@ -560,7 +559,7 @@ struct IndexHNSW2Level : IndexHNSW {
             idx_t* labels,
             const SearchParameters* params = nullptr) const override;
 
-#ifdef __aarch64__
+#ifdef KRL
     /* explicit FP32 function interface */
     void add(idx_t n, const float* x) override;
 

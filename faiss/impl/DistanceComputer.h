@@ -29,10 +29,9 @@ struct DistanceComputer {
     /// called before computing distances. Pointer x should remain valid
     /// while operator () is called
     virtual void set_query(const float* x) = 0;
-#ifdef __aarch64__
-    virtual void set_query(const float16_t* x) {}
-#endif
 #ifdef KRL
+    virtual void set_query(const float16_t* x) {}
+
     virtual void set_base(const float* x) = 0;
 
     virtual void set_base(const float16_t* x) {}

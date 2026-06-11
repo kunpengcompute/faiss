@@ -576,7 +576,7 @@ Index* read_index(IOReader* f, int io_flags) {
 #endif
         // leak!
         idx = idxf;
-#ifdef __aarch64__
+#ifdef KRL
     } else if (h == fourcc("IxFi") || h == fourcc("IxFt") || h == fourcc("IxFL")) {
         IndexFlat* idxf;
         if (h == fourcc("IxFi")) {
@@ -591,7 +591,7 @@ Index* read_index(IOReader* f, int io_flags) {
         READXBVECTOR(idxf->codes);
         FAISS_THROW_IF_NOT(
                 idxf->codes.size() == idxf->ntotal * idxf->code_size);
-#ifdef KRL
+
         if (idxf->ntotal > 0 && !idxf->codes.empty()) {
             idxf->kdh = nullptr;
             krl_create_reorder_handle(
@@ -600,7 +600,7 @@ Index* read_index(IOReader* f, int io_flags) {
                 idxf->ntotal * idxf->d * sizeof(float));
             idxf->use_handle = (idxf->kdh != nullptr);
         }
-#endif
+
         // leak!
         idx = idxf;
 #endif

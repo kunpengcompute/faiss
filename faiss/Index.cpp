@@ -198,7 +198,7 @@ void Index::check_compatible_for_merge(const Index& /* otherIndex */) const {
 }
 
 /* added FP16 function interfaces */
-#ifdef __aarch64__
+#ifdef KRL
 void Index::reconstruct(idx_t, float16_t*) const {
     FAISS_THROW_MSG("reconstruct not implemented for this type of index");
 }

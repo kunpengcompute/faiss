@@ -255,66 +255,23 @@ struct IndexHNSWPQ : IndexHNSW {
     void train(idx_t n, const float* x) override;
 
 #ifdef KRL
-    /* explicit FP32 function interface */
-    void add(idx_t n, const float* x) override;
-
-    void search(
-            idx_t n,
-            const float* x,
-            idx_t k,
-            float* distances,
-            idx_t* labels,
-            const SearchParameters* params = nullptr) const override;
-
-    void range_search(
-            idx_t n,
-            const float* x,
-            float radius,
-            RangeSearchResult* result,
-            const SearchParameters* params = nullptr) const override;
-
-    void reconstruct(idx_t key, float* recons) const override;
-
-    void search_level_0(
-            idx_t n,
-            const float* x,
-            idx_t k,
-            const storage_idx_t* nearest,
-            const float* nearest_d,
-            float* distances,
-            idx_t* labels,
-            int nprobe = 1,
-            int search_type = 1) const;
-    
     /* added FP16 function interfaces */
-    void train(idx_t n, const float16_t* x) override;
-
     void train_ex(idx_t n, const void* x, NumericType numeric_type) override {
         if (numeric_type == NumericType::Float16) {
-            train(n, static_cast<const float16_t*>(x));
+            FAISS_THROW_MSG("IndexHNSWPQ::train: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWPQ::train: unsupported numeric type");
         }
     }
 
-    void add(idx_t n, const float16_t* x) override;
-
     void add_ex(idx_t n, const void* x, NumericType numeric_type) override {
         if (numeric_type == NumericType::Float16) {
-            add(n, static_cast<const float16_t*>(x));
+            FAISS_THROW_MSG("IndexHNSWPQ::add: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWPQ::add: unsupported numeric type");
         }
     }
     
-    void search(
-            idx_t n,
-            const float16_t* x,
-            idx_t k,
-            float* distances,
-            idx_t* labels,
-            const SearchParameters* params = nullptr) const override;
-
     void search_ex(
             idx_t n,
             const void* x,
@@ -324,18 +281,11 @@ struct IndexHNSWPQ : IndexHNSW {
             NumericType numeric_type,
             const SearchParameters* params = nullptr) const override {
         if (numeric_type == NumericType::Float16) {
-            search(n, static_cast<const float16_t*>(x), k, distances, labels, params);
+            FAISS_THROW_MSG("IndexHNSWPQ::search: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWPQ::search: unsupported numeric type");
         }
     }
-
-    void range_search(
-            idx_t n,
-            const float16_t* x,
-            float radius,
-            RangeSearchResult* result,
-            const SearchParameters* params = nullptr) const override;
 
     void range_search_ex(
             idx_t n,
@@ -345,32 +295,19 @@ struct IndexHNSWPQ : IndexHNSW {
             NumericType numeric_type,
             const SearchParameters* params = nullptr) const override {
         if (numeric_type == NumericType::Float16) {
-            range_search(n, static_cast<const float16_t*>(x), radius, result, params);
+            FAISS_THROW_MSG("IndexHNSWPQ::range_search: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWPQ::range_search: unsupported numeric type");
         }
     }
 
-    void reconstruct(idx_t key, float16_t* recons) const override;
-
     void reconstruct_ex(idx_t key, void* recons, NumericType numeric_type) const override {
         if (numeric_type == NumericType::Float16) {
-            reconstruct(key, static_cast<float16_t*>(recons));
+            FAISS_THROW_MSG("IndexHNSWPQ::reconstruct: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWPQ::reconstruct: unsupported numeric type");
         }
     }
-
-    void search_level_0(
-            idx_t n,
-            const float16_t* x,
-            idx_t k,
-            const storage_idx_t* nearest,
-            const float* nearest_d,
-            float* distances,
-            idx_t* labels,
-            int nprobe = 1,
-            int search_type = 1) const;
 
     void search_level_0_ex(
             idx_t n,
@@ -384,7 +321,7 @@ struct IndexHNSWPQ : IndexHNSW {
             int nprobe = 1,
             int search_type = 1) const {
         if (numeric_type == NumericType::Float16) {
-            search_level_0(n, static_cast<const float16_t*>(x), k, nearest, nearest_d, distances, labels, nprobe, search_type);
+            FAISS_THROW_MSG("IndexHNSWPQ::search_level_0: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWPQ::search_level_0: unsupported numeric type");
         }
@@ -403,67 +340,22 @@ struct IndexHNSWSQ : IndexHNSW {
             int M,
             MetricType metric = METRIC_L2);
 #ifdef KRL
-    /* explicit FP32 function interface */
-    void add(idx_t n, const float* x) override;
-
-    void train(idx_t n, const float* x) override;
-
-    void search(
-            idx_t n,
-            const float* x,
-            idx_t k,
-            float* distances,
-            idx_t* labels,
-            const SearchParameters* params = nullptr) const override;
-
-    void range_search(
-            idx_t n,
-            const float* x,
-            float radius,
-            RangeSearchResult* result,
-            const SearchParameters* params = nullptr) const override;
-
-    void reconstruct(idx_t key, float* recons) const override;
-
-    void search_level_0(
-            idx_t n,
-            const float* x,
-            idx_t k,
-            const storage_idx_t* nearest,
-            const float* nearest_d,
-            float* distances,
-            idx_t* labels,
-            int nprobe = 1,
-            int search_type = 1) const;
-
     /* added FP16 function interfaces */
-    void add(idx_t n, const float16_t* x) override;
-
     void add_ex(idx_t n, const void* x, NumericType numeric_type) override {
         if (numeric_type == NumericType::Float16) {
-            add(n, static_cast<const float16_t*>(x));
+            FAISS_THROW_MSG("IndexHNSWSQ::add: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWSQ::add: unsupported numeric type");
         }
     }
 
-    void train(idx_t n, const float16_t* x) override;
-
     void train_ex(idx_t n, const void* x, NumericType numeric_type) override {
         if (numeric_type == NumericType::Float16) {
-            train(n, static_cast<const float16_t*>(x));
+            FAISS_THROW_MSG("IndexHNSWSQ::train: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWSQ::train: unsupported numeric type");
         }
     }
-
-    void search(
-            idx_t n,
-            const float16_t* x,
-            idx_t k,
-            float* distances,
-            idx_t* labels,
-            const SearchParameters* params = nullptr) const override;
 
     void search_ex(
             idx_t n,
@@ -474,18 +366,11 @@ struct IndexHNSWSQ : IndexHNSW {
             NumericType numeric_type,
             const SearchParameters* params = nullptr) const override {
         if (numeric_type == NumericType::Float16) {
-            search(n, static_cast<const float16_t*>(x), k, distances, labels, params);
+            FAISS_THROW_MSG("IndexHNSWSQ::search: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWSQ::search: unsupported numeric type");
         }
     }
-
-    void range_search(
-            idx_t n,
-            const float16_t* x,
-            float radius,
-            RangeSearchResult* result,
-            const SearchParameters* params = nullptr) const override;
 
     void range_search_ex(
             idx_t n,
@@ -495,32 +380,19 @@ struct IndexHNSWSQ : IndexHNSW {
             NumericType numeric_type,
             const SearchParameters* params = nullptr) const override {
         if (numeric_type == NumericType::Float16) {
-            range_search(n, static_cast<const float16_t*>(x), radius, result, params);
+            FAISS_THROW_MSG("IndexHNSWSQ::range_search: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWSQ::range_search: unsupported numeric type");
         }
     }
 
-    void reconstruct(idx_t key, float16_t* recons) const override;
-
     void reconstruct_ex(idx_t key, void* recons, NumericType numeric_type) const override {
         if (numeric_type == NumericType::Float16) {
-            reconstruct(key, static_cast<float16_t*>(recons));
+            FAISS_THROW_MSG("IndexHNSWSQ::reconstruct: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWSQ::reconstruct: unsupported numeric type");
         }
     }
-
-    void search_level_0(
-            idx_t n,
-            const float16_t* x,
-            idx_t k,
-            const storage_idx_t* nearest,
-            const float* nearest_d,
-            float* distances,
-            idx_t* labels,
-            int nprobe = 1,
-            int search_type = 1) const;
 
     void search_level_0_ex(
             idx_t n,
@@ -534,7 +406,7 @@ struct IndexHNSWSQ : IndexHNSW {
             int nprobe = 1,
             int search_type = 1) const {
         if (numeric_type == NumericType::Float16) {
-            search_level_0(n, static_cast<const float16_t*>(x), k, nearest, nearest_d, distances, labels, nprobe, search_type);
+            FAISS_THROW_MSG("IndexHNSWSQ::search_level_0: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSWSQ::search_level_0: unsupported numeric type");
         }
@@ -560,59 +432,22 @@ struct IndexHNSW2Level : IndexHNSW {
             const SearchParameters* params = nullptr) const override;
 
 #ifdef KRL
-    /* explicit FP32 function interface */
-    void add(idx_t n, const float* x) override;
-
-    void train(idx_t n, const float* x) override;
-
-    void range_search(
-            idx_t n,
-            const float* x,
-            float radius,
-            RangeSearchResult* result,
-            const SearchParameters* params = nullptr) const override;
-
-    void reconstruct(idx_t key, float* recons) const override;
-
-    void search_level_0(
-            idx_t n,
-            const float* x,
-            idx_t k,
-            const storage_idx_t* nearest,
-            const float* nearest_d,
-            float* distances,
-            idx_t* labels,
-            int nprobe = 1,
-            int search_type = 1) const;
-
     /* added FP16 function interfaces */
-    void add(idx_t n, const float16_t* x) override;
-
     void add_ex(idx_t n, const void* x, NumericType numeric_type) override {
         if (numeric_type == NumericType::Float16) {
-            add(n, static_cast<const float16_t*>(x));
+            FAISS_THROW_MSG("IndexHNSW2Level::add: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSW2Level::add: unsupported numeric type");
         }
     }
 
-    void train(idx_t n, const float16_t* x) override;
-
     void train_ex(idx_t n, const void* x, NumericType numeric_type) override {
         if (numeric_type == NumericType::Float16) {
-            train(n, static_cast<const float16_t*>(x));
+            FAISS_THROW_MSG("IndexHNSW2Level::train: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSW2Level::train: unsupported numeric type");
         }
     }
-
-    void search(
-            idx_t n,
-            const float16_t* x,
-            idx_t k,
-            float* distances,
-            idx_t* labels,
-            const SearchParameters* params = nullptr) const override;
 
     void search_ex(
             idx_t n,
@@ -623,18 +458,11 @@ struct IndexHNSW2Level : IndexHNSW {
             NumericType numeric_type,
             const SearchParameters* params = nullptr) const override {
         if (numeric_type == NumericType::Float16) {
-            search(n, static_cast<const float16_t*>(x), k, distances, labels, params);
+            FAISS_THROW_MSG("IndexHNSW2Level::search: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSW2Level::search: unsupported numeric type");
         }
     }
-
-    void range_search(
-            idx_t n,
-            const float16_t* x,
-            float radius,
-            RangeSearchResult* result,
-            const SearchParameters* params = nullptr) const override;
 
     void range_search_ex(
             idx_t n,
@@ -644,32 +472,19 @@ struct IndexHNSW2Level : IndexHNSW {
             NumericType numeric_type,
             const SearchParameters* params = nullptr) const override {
         if (numeric_type == NumericType::Float16) {
-            range_search(n, static_cast<const float16_t*>(x), radius, result, params);
+            FAISS_THROW_MSG("IndexHNSW2Level::range_search: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSW2Level::range_search: unsupported numeric type");
         }
     }
 
-    void reconstruct(idx_t key, float16_t* recons) const override;
-
     void reconstruct_ex(idx_t key, void* recons, NumericType numeric_type) const override {
         if (numeric_type == NumericType::Float16) {
-            reconstruct(key, static_cast<float16_t*>(recons));
+            FAISS_THROW_MSG("IndexHNSW2Level::reconstruct: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSW2Level::reconstruct: unsupported numeric type");
         }
     }
-
-    void search_level_0(
-            idx_t n,
-            const float16_t* x,
-            idx_t k,
-            const storage_idx_t* nearest,
-            const float* nearest_d,
-            float* distances,
-            idx_t* labels,
-            int nprobe = 1,
-            int search_type = 1) const;
 
     void search_level_0_ex(
             idx_t n,
@@ -683,7 +498,7 @@ struct IndexHNSW2Level : IndexHNSW {
             int nprobe = 1,
             int search_type = 1) const {
         if (numeric_type == NumericType::Float16) {
-            search_level_0(n, static_cast<const float16_t*>(x), k, nearest, nearest_d, distances, labels, nprobe, search_type);
+            FAISS_THROW_MSG("IndexHNSW2Level::search_level_0: does not support FP16");
         } else {
             FAISS_THROW_MSG("IndexHNSW2Level::search_level_0: unsupported numeric type");
         }

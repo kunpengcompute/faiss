@@ -26,6 +26,10 @@
  */
 static void reset_distance_handle(KRLDistanceHandle **kdh)
 {
+    if (kdh == NULL || (*kdh) != NULL) {
+        printf("Error: INVALPOINTER in reset_distance_handle\n");
+        return;
+    }
     (*kdh)->data_bits = 0;
     (*kdh)->full_data_bits = 0;
     (*kdh)->M = 0;

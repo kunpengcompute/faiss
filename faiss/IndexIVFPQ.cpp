@@ -396,6 +396,9 @@ void IndexIVFPQ::add_core_o(
                comment);
     }
     ntotal += n;
+#if defined(KRL) || defined(OPTI_IVFPQ)
+    tmp_buffer_size = invlists->initialize_tmp_buffer(64);
+#endif
 }
 
 void IndexIVFPQ::reconstruct_from_offset(

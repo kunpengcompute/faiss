@@ -30,7 +30,7 @@
 #include <faiss/utils/sorting.h>
 #include <faiss/utils/utils.h>
 #include <cstring>
-#ifdef __aarch64__
+#ifdef KRL
 #include <stdexcept>
 #endif
 #if defined(OPTI_IVFPQ)
@@ -47,7 +47,7 @@ extern "C" {
 
 namespace faiss {
 
-#ifdef __aarch64__
+#ifdef KRL
 namespace {
     size_t calculate_code_size(idx_t d, NumericType ntype) {
         switch (ntype) {
@@ -65,7 +65,7 @@ namespace {
 IndexFlat::IndexFlat(idx_t d, MetricType metric)
         : IndexFlatCodes(sizeof(float) * d, d, metric) {}
 
-#ifdef __aarch64__
+#ifdef KRL
 IndexFlat::IndexFlat(idx_t d, NumericType ntype, MetricType metric)
         : IndexFlatCodes(calculate_code_size(d, ntype), d, ntype, metric) {}
 #endif
@@ -116,7 +116,7 @@ void IndexFlat::search(
 #elif defined(KRL)
     if(use_handle && 4 * k < ntotal && !sel) {
         #pragma omp parallel for if (n > 1)
-        for (int i = 0; i < n; ++i) {
+        for (idx_t i = 0; i < n; ++i) {
             krl_reorder_2_vector_continuous(kdh, ntotal, 0, x + i * d, k, distances + i * k, labels + i * k, d);
         }
         return;
@@ -260,7 +260,7 @@ struct FlatL2Dis : FlatCodesDistanceComputer {
 #endif
 };
 
-#ifdef __aarch64__
+#ifdef KRL
 struct FlatL2DisFP16 : FlatCodesDistanceComputer {
     size_t d;
     idx_t nb;
@@ -274,12 +274,8 @@ struct FlatL2DisFP16 : FlatCodesDistanceComputer {
     }
 
     float symmetric_dis(idx_t i, idx_t j) override {
-#ifdef KRL
         return fvec_L2sqr_f16(reinterpret_cast<const float16_t*>(codes + j * code_size), 
             reinterpret_cast<const float16_t*>(codes + i * code_size), d);
-#else
-        return fvec_L2sqr_f16(b + j * d, b + i * d, d);
-#endif
     }
 
     explicit FlatL2DisFP16(const IndexFlat& storage, const float16_t* q = nullptr)
@@ -329,7 +325,6 @@ struct FlatL2DisFP16 : FlatCodesDistanceComputer {
         dis3 = dp3;
     }
 
-#ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
 #ifdef USE_SVE2
@@ -338,7 +333,6 @@ struct FlatL2DisFP16 : FlatCodesDistanceComputer {
         krl_L2sqr_by_idx_f16f32(dis, reinterpret_cast<const uint16_t*>(q), reinterpret_cast<const uint16_t*>(codes), idx, d, ny);
 #endif
     }
-#endif
 };
 #endif
 
@@ -419,7 +413,7 @@ struct FlatIPDis : FlatCodesDistanceComputer {
 #endif
 };
 
-#ifdef __aarch64__
+#ifdef KRL
 struct FlatIPDisFP16 : FlatCodesDistanceComputer {
     size_t d;
     idx_t nb;
@@ -450,11 +444,9 @@ struct FlatIPDisFP16 : FlatCodesDistanceComputer {
         q = x;
     }
 
-#ifdef KRL
     void set_base(const float16_t* x) {
         std::cerr << "TypeError, struct FlatIPDisFP16 can't use set_base func!\n" << std::endl;
     }
-#endif
 
     // compute four distances
     void distances_batch_4(
@@ -489,7 +481,6 @@ struct FlatIPDisFP16 : FlatCodesDistanceComputer {
         dis3 = dp3;
     }
 
-#ifdef KRL
     void distances_multi_codes(const int64_t* idx, float* dis, int ny) override {
         ndis += ny;
 #ifdef USE_SVE2
@@ -498,7 +489,6 @@ struct FlatIPDisFP16 : FlatCodesDistanceComputer {
         krl_inner_product_by_idx_f16f32(dis, reinterpret_cast<const uint16_t*>(q), reinterpret_cast<const uint16_t*>(codes), idx, d, ny);
 #endif
     }
-#endif
 };
 #endif
 
@@ -506,7 +496,7 @@ struct FlatIPDisFP16 : FlatCodesDistanceComputer {
 
 FlatCodesDistanceComputer* IndexFlat::get_FlatCodesDistanceComputer() const {
     if (numeric_type == NumericType::Float16) {
-#ifdef __aarch64__
+#ifdef KRL
         if (metric_type == METRIC_L2) {
             return new FlatL2DisFP16(*this);
         } else if (metric_type == METRIC_INNER_PRODUCT) {
@@ -657,7 +647,7 @@ struct FlatL2WithNormsDis : FlatCodesDistanceComputer {
     }
 };
 
-#ifdef __aarch64__
+#ifdef KRL
 struct FlatL2WithNormsDisFP16 : FlatCodesDistanceComputer {
     size_t d;
     idx_t nb;
@@ -764,7 +754,7 @@ void IndexFlatL2::sync_l2norms() {
             ntotal);
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void IndexFlatL2::sync_l2norms(NumericType ntype) {
     cached_l2norms.resize(ntotal);
     if (ntype == NumericType::Float16) {
@@ -790,7 +780,7 @@ void IndexFlatL2::clear_l2norms() {
 }
 
 FlatCodesDistanceComputer* IndexFlatL2::get_FlatCodesDistanceComputer() const {
-#ifdef __aarch64__
+#ifdef KRL
     if (numeric_type == NumericType::Float16 && metric_type == METRIC_L2) {
         if (!cached_l2norms.empty()) {
             return new FlatL2WithNormsDisFP16(*this);
@@ -945,7 +935,7 @@ void IndexFlat1D::search(
 }
 
 /* added FP16 function interfaces */
-#ifdef __aarch64__
+#ifdef KRL
 void IndexFlat::search(
             idx_t n,
             const float16_t* x,
@@ -954,7 +944,7 @@ void IndexFlat::search(
             idx_t* labels,
             const SearchParameters* params) const {
     IDSelector* sel = params ? params->sel : nullptr;
-#ifdef KRL
+
     if(use_handle && 4 * k < ntotal && !sel) {
         #pragma omp parallel for if (n > 1)
         for (int i = 0; i < n; ++i) {
@@ -962,7 +952,7 @@ void IndexFlat::search(
         }
             return;
     }
-#endif
+
     FAISS_THROW_IF_NOT(k > 0);
 
     // we see the distances and labels as heaps

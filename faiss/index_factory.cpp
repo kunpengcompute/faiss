@@ -253,7 +253,7 @@ Index* parse_coarse_quantizer(
         int hnsw_M = sm[2].length() > 0 ? std::stoi(sm[2]) : 32;
         return new IndexHNSWFlat(d, hnsw_M, mt);
     }
-#ifdef __aarch64__
+#ifdef KRL
     if (match("IVF([0-9]+)_HNSW([0-9]*)_FP16")) {
         nlist = std::stoi(sm[1].str());
         int hnsw_M = sm[2].length() > 0 ? std::stoi(sm[2]) : 32;
@@ -445,7 +445,7 @@ IndexHNSW* parse_IndexHNSW(
         return re_match(code_string, pattern, sm);
     };
 
-#ifdef __aarch64__
+#ifdef KRL
     if (match("FlatFP16|")) {
         NumericType ntype = NumericType::Float16;
         return new IndexHNSWFlat(d, hnsw_M, ntype, mt);

@@ -28,10 +28,8 @@
 #include <sstream>
 #include <string>
 #include <typeinfo>
-#ifdef __aarch64__
-#include <faiss/utils/fp16-arm.h>
-#endif
 #ifdef KRL
+#include <faiss/utils/fp16-arm.h>
 #include <iostream>
 #endif
 
@@ -160,7 +158,7 @@ struct Index {
               metric_arg(0),
               numeric_type(NumericType::Float32) {}
 
-#ifdef __aarch64__
+#ifdef KRL
     Index(idx_t d, NumericType ntype, MetricType metric)
             : d(d),
               ntotal(0),
@@ -388,9 +386,9 @@ struct Index {
     virtual void dequant_entries_f32(const uint8_t* entries, idx_t num_entries, int quant_bit) {};
     virtual void quant_entries_f16(const uint8_t* entries, idx_t num_entries, float scale) {};
     virtual void quant_entries_u8(const uint8_t* entries, idx_t num_entries, float scale) {};
-#endif
+
     /* added FP16 function interfaces */
-#ifdef __aarch64__
+
     virtual void train(idx_t n, const float16_t* x) {
         std::vector<float> x_float(n);
         convert_fp16_to_fp32(x, n, x_float.data());

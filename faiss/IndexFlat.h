@@ -25,7 +25,7 @@
 #include <vector>
 
 #include <faiss/IndexFlatCodes.h>
-#ifdef __aarch64__
+#ifdef KRL
 #include <faiss/sra_krl/include/safe_memory.h>
 #endif
 
@@ -37,7 +37,7 @@ struct IndexFlat : IndexFlatCodes {
             idx_t d, ///< dimensionality of the input vectors
             MetricType metric = METRIC_L2);
 
-#ifdef __aarch64__
+#ifdef KRL
     IndexFlat(
             idx_t d,
             NumericType ntype,
@@ -94,7 +94,7 @@ struct IndexFlat : IndexFlatCodes {
     void sa_decode(idx_t n, const uint8_t* bytes, float* x) const override;
 
     /* added FP16 function interfaces */
-#ifdef __aarch64__
+#ifdef KRL
     void search(
             idx_t n,
             const float16_t* x,
@@ -192,7 +192,7 @@ protected:
 
 struct IndexFlatIP : IndexFlat {
     explicit IndexFlatIP(idx_t d) : IndexFlat(d, METRIC_INNER_PRODUCT) {}
-#ifdef __aarch64__
+#ifdef KRL
     IndexFlatIP(idx_t d, NumericType ntype) : IndexFlat(d, ntype, METRIC_INNER_PRODUCT) {}
 #endif
     IndexFlatIP() {}
@@ -209,7 +209,7 @@ struct IndexFlatL2 : IndexFlat {
      * @param d dimensionality of the input vectors
      */
     explicit IndexFlatL2(idx_t d) : IndexFlat(d, METRIC_L2) {}
-#ifdef __aarch64__
+#ifdef KRL
     IndexFlatL2(idx_t d, NumericType ntype) : IndexFlat(d, ntype, METRIC_L2) {}
 #endif
     IndexFlatL2() {}
@@ -219,7 +219,7 @@ struct IndexFlatL2 : IndexFlat {
 
     // compute L2 norms
     void sync_l2norms();
-#ifdef __aarch64__
+#ifdef KRL
     void sync_l2norms(NumericType ntype);
 #endif
     // clear L2 norms

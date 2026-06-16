@@ -496,7 +496,7 @@ void IndexIVF::search_preassigned(
 
         if (!omp_fail)
 #elif defined(KRL)
-        if (scanner->klh != nullptr) {
+        if (scanner->klh == nullptr) {
             krl_create_LUT8b_handle(&(scanner->klh),(int)(sel != nullptr), tmp_buffer_size);
         }
 #endif

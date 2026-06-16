@@ -92,7 +92,7 @@ void fvec_norms_L2sqr(
         nr[i] = fvec_norm_L2sqr(x + i * d, d);
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void fvec_norms_L2sqr_f16(
         float* __restrict nr,
         const float16_t* __restrict x,
@@ -187,7 +187,7 @@ void exhaustive_inner_product_seq(
                 float ip = 0;
                 if constexpr (std::is_same_v<T, float>) {
                     ip = fvec_inner_product(x_i, y_j, d);
-#ifdef __aarch64__
+#ifdef KRL
                 } else if constexpr (std::is_same_v<T, float16_t>) {
                     ip = fvec_inner_product_f16(x_i, y_j, d);
 #endif
@@ -232,7 +232,7 @@ void exhaustive_L2sqr_seq(
                 float disij = 0;
                 if constexpr (std::is_same_v<T, float>) {
                     disij = fvec_L2sqr(x_i, y_j, d);
-#ifdef __aarch64__
+#ifdef KRL
                 } else if constexpr (std::is_same_v<T, float16_t>) {
                     disij = fvec_L2sqr_f16(x_i, y_j, d);
 #endif
@@ -293,7 +293,7 @@ void exhaustive_inner_product_blas(
                         &zero,
                         ip_block.get(),
                         &nyi);
-#ifdef __aarch64__
+#ifdef KRL
                 } else if constexpr (std::is_same_v<T, float16_t>) {
                     std::vector<float> x_float(nx * d);
                     std::vector<float> y_float(ny * d);
@@ -350,7 +350,7 @@ void exhaustive_L2sqr_blas_default_impl(
 
     if constexpr (std::is_same_v<T, float>){
         fvec_norms_L2sqr(x_norms.get(), x, d, nx);
-#ifdef __aarch64__
+#ifdef KRL
     } else if constexpr (std::is_same_v<T, float16_t>) {
         fvec_norms_L2sqr_f16(x_norms.get(), x, d, nx);
 #endif
@@ -363,7 +363,7 @@ void exhaustive_L2sqr_blas_default_impl(
         del2.reset(y_norms2);
         if constexpr (std::is_same_v<T, float>){
             fvec_norms_L2sqr(y_norms2, y, d, ny);
-#ifdef __aarch64__
+#ifdef KRL
         } else if constexpr (std::is_same_v<T, float16_t>) {
             fvec_norms_L2sqr_f16(y_norms2, y, d, ny);
 #endif
@@ -402,7 +402,7 @@ void exhaustive_L2sqr_blas_default_impl(
                        &zero,
                        ip_block.get(),
                        &nyi);
-#ifdef __aarch64__
+#ifdef KRL
                 } else if constexpr (std::is_same_v<T, float16_t>) {
                     std::vector<float> x_float(nx * d);
                     std::vector<float> y_float(ny * d);
@@ -815,7 +815,7 @@ void knn_inner_product(
     knn_inner_product(x, y, d, nx, ny, res->k, res->val, res->ids, sel);
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void knn_inner_product_f16(
         const float16_t* x,
         const float16_t* y,
@@ -928,7 +928,7 @@ void knn_L2sqr(
     knn_L2sqr(x, y, d, nx, ny, res->k, res->val, res->ids, y_norm2, sel);
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void knn_L2sqr_f16(
         const float16_t* x,
         const float16_t* y,
@@ -1009,7 +1009,7 @@ void range_search_L2sqr(
     }
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void range_search_L2sqr_f16(
         const float16_t* x,
         const float16_t* y,
@@ -1051,7 +1051,7 @@ void range_search_inner_product(
     }
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void range_search_inner_product_f16(
         const float16_t* x,
         const float16_t* y,
@@ -1102,7 +1102,7 @@ void fvec_inner_products_by_idx(
     }
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void fvec_inner_products_by_idx_f16(
         float* __restrict ip,
         const float16_t* x,
@@ -1152,7 +1152,7 @@ void fvec_L2sqr_by_idx(
     }
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void fvec_L2sqr_by_idx_f16(
         float* __restrict dis,
         const float16_t* x,
@@ -1254,7 +1254,7 @@ void knn_inner_products_by_idx(
     }
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void knn_inner_products_by_idx_f16(
         const float16_t* x,
         const float16_t* y,
@@ -1331,7 +1331,7 @@ void knn_L2sqr_by_idx(
     }
 }
 
-#ifdef __aarch64__
+#ifdef KRL
 void knn_L2sqr_by_idx_f16(
         const float16_t* x,
         const float16_t* y,

@@ -2,6 +2,7 @@
 
 ## 最新消息
 
+- \[2026.06.30\]：优化VisitedTable访问标记，采用类hashset的generation-based标记替代全量memset重置，将VisitedTable更新从O(N)优化至O(1)。4bit查表算子增加SVE2实现。
 - \[2026.03.30\]：Faiss提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。
 - \[2025.12.30\]：Faiss发布于Gitcode平台，实现IVFFLAT、IVFPQ、IVFPQFS、PQFS、HNSW优化。
 

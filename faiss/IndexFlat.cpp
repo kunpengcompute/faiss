@@ -42,7 +42,7 @@ void IndexFlat::search(
 #if defined(KRL)
     if(use_handle && 4 * k < ntotal && !sel) {
         #pragma omp parallel for if (n > 1)
-        for (int i = 0; i < n; ++i) {
+        for (idx_t i = 0; i < n; ++i) {
             krl_reorder_2_vector_continuous(kdh, ntotal, 0, x + i * d, k, distances + i * k, labels + i * k, d);
         }
         return;

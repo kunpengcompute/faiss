@@ -467,7 +467,7 @@ void IndexIVF::search_preassigned(
         std::unique_ptr<InvertedListScanner> scanner(
                 get_InvertedListScanner(store_pairs, sel));
 #if defined(KRL)
-        if (scanner->klh != nullptr) {
+        if (scanner->klh == nullptr) {
             krl_create_LUT8b_handle(&(scanner->klh),(int)(sel != nullptr), tmp_buffer_size);
         }
 #endif

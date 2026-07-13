@@ -2,6 +2,7 @@
 
 ## Lastest Updates
 
+- [2026.06.30]: The VisitedTable access flags are optimized by replacing the full memset reset with a generation-based flag similar to a hashset, reducing VisitedTable updates from O(N) to O(1). The 4-bit lookup operator is implemented using SVE2.
 - [2026.03.30]: Faiss provides a non-equivalence optimization patch and an equivalence optimization patch. The non-equivalence optimization patch further optimizes the IVFPQ algorithm and supports the HNSW FP16 interface.
 - [2025.12.30]: Faiss was released on the Gitcode platform, optimizing IVFFLAT, IVFPQ, IVFPQFS, PQFS, and HNSW.
 
@@ -19,6 +20,7 @@ The repository directory structure is as follows:
 faiss/
 ├─ 0001-faiss_1.8.0-optimize-neq.patch         // Non-equivalence optimization patch
 ├─ 0002-faiss_1.8.0-optimize-eqv.patch         // Equivalence optimization patch
+├─ README_en.md                                // Introduction
 └── docs
    ├── LICENSE
    └── en
@@ -37,52 +39,39 @@ For details about the version updates of Faiss, see [Release Notes](./docs/en/re
 ## Documents
 
 <a name="table1191773710200"></a>
-<table><thead align="left"><tr id="row1291816372202"><th class="cellrowborder" valign="top" width="9.780978097809781%" id="mcps1.1.4.1.1"><p id="p291823714205"><a name="p291823714205"></a><a name="p291823714205"></a>Resource Type</p>
-</th>
+<table><thead align="left"><tr id="row1291816372202">
 <th class="cellrowborder" valign="top" width="17.64176417641764%" id="mcps1.1.4.1.2"><p id="p13918183762016"><a name="p13918183762016"></a><a name="p13918183762016"></a>Resource Name</p>
 </th>
 Introduction to <th class="cellrowborder" valign="top" width="72.57725772577258%" id="mcps1.1.4.1.3"><p id="p89181437152019"><a name="p89181437152019"></a><a name="p89181437152019"></a>Resource Description</p>
 </th>
 </tr>
 </thead>
-<tbody><tr id="row2918153732020"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211217"><a name="p598512211217"></a><a name="p598512211217"></a>Document</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172023"><a name="p17918337172023"></a><a name="p17918337172023"></a><a href="./docs/en/feature_introduction.md"> Feature Introduction</a></p>
+<tbody><tr id="row2918153732020"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172023"><a name="p17918337172023"></a><a name="p17918337172023"></a><a href="./docs/en/feature_introduction.md"> Feature Introduction</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742021"><a name="p15918183742021"></a><a name="p15918183742021"></a>Describes the Faiss architecture and optimizations.</p>
 </td>
 </tr>
-<tr id="row179181137112015"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p1918123710208"><a name="p1918123710208"></a><a name="p1918123710208"></a>Document</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p2091893722011"><a name="p2091893722011"></a><a name="p2091893722011"></a><a href="./docs/en/release_notes.md">Release Notes</a></p>
+<tr id="row179181137112015"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p2091893722011"><a name="p2091893722011"></a><a name="p2091893722011"></a><a href="./docs/en/release_notes.md">Release Notes</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p491893752010"><a name="p491893752010"></a><a name="p491893752010"></a>Provides basic information and feature updates of each Faiss release.</p>
 </td>
 </tr>
-<tr id="row939116371143"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p1039163711413"><a name="p1039163711413"></a><a name="p1039163711413"></a>Document</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p03913372046"><a name="p03913372046"></a><a name="p03913372046"></a><a href="./docs/en/quick_start.md">Quick Start</a></p>
+<tr id="row939116371143"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p03913372046"><a name="p03913372046"></a><a name="p03913372046"></a><a href="./docs/en/quick_start.md">Quick Start</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p1139217371746"><a name="p1139217371746"></a><a name="p1139217371746"></a>Provides guidance for getting started with Faiss.</p>
 </td>
 </tr>
-<tr id="row2918153732017"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211214"><a name="p598512211214"></a><a name="p598512211214"></a>Document</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172020"><a name="p17918337172020"></a><a name="p17918337172020"></a><a href="./docs/en/installation_guide.md">Installation Guide</a></p>
+<tr id="row2918153732017"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172020"><a name="p17918337172020"></a><a name="p17918337172020"></a><a href="./docs/en/installation_guide.md">Installation Guide</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742018"><a name="p15918183742018"></a><a name="p15918183742018"></a>Provides guidance for compiling and installing Faiss.</p>
 </td>
 </tr>
-<tr id="row2918153732018"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211215"><a name="p598512211215"></a><a name="p598512211215"></a>Document</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172021"><a name="p17918337172021"></a><a name="p17918337172021"></a><a href="./docs/en/api_reference.md">API Reference</a></p>
+<tr id="row2918153732018"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172021"><a name="p17918337172021"></a><a name="p17918337172021"></a><a href="./docs/en/api_reference.md">API Reference</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742019"><a name="p15918183742019"></a><a name="p15918183742019"></a>Provides the definitions and descriptions of new Faiss APIs.</p>
 </td>
 </tr>
-<tr id="row2918153732019"><td class="cellrowborder" valign="top" width="9.780978097809781%" headers="mcps1.1.4.1.1 "><p id="p598512211216"><a name="p598512211216"></a><a name="p598512211216"></a>Document</p>
-</td>
-<td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172022"><a name="p17918337172022"></a><a name="p17918337172022"></a><a href="./docs/en/best_practices.md">Best Practices</a></p>
+<tr id="row2918153732019"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172022"><a name="p17918337172022"></a><a name="p17918337172022"></a><a href="./docs/en/best_practices.md">Best Practices</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742020"><a name="p15918183742020"></a><a name="p15918183742020"></a>Provides practical cases of Faiss.</p>
 </td>

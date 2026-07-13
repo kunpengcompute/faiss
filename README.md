@@ -20,6 +20,7 @@ HNSW是Faiss提供的一种近似最近邻（ANN）图检索算法，开源Faiss
 faiss/
 ├─ 0001-faiss_1.8.0-optimize-neq.patch         // 全量优化补丁
 ├─ 0002-faiss_1.8.0-optimize-eqv.patch         // 等价优化补丁
+├─ README.md                                   // 项目介绍
 └── docs
    ├── LICENSE
    └── zh

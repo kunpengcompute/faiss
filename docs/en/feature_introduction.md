@@ -18,7 +18,7 @@ The following figure shows the logical architecture and functional modules of Fa
 
 **Figure 1** Faiss logical architecture<a name="fig289735134415"></a><a id="faiss logical architecture"></a>
 
-<img src="figures/faiss-logical-architecture.jpg" alt="faiss logical architecture" width="600"/>
+<img src="figures/faiss-logical-architecture.png" alt="faiss logical architecture" width="600"/>
 
 <a name="table1440914563559"></a>
 <table><thead align="left"><tr id="row10409145645519"><th class="cellrowborder" valign="top" width="50%" id="mcps1.1.3.1.1"><p id="p1949441225612"><a name="p1949441225612"></a><a name="p1949441225612"></a>Module</p>

@@ -19,6 +19,13 @@
 #include <faiss/utils/AlignedTable.h>
 #include <faiss/utils/Heap.h>
 
+#ifdef KRL
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+    #include <faiss/sra_krl/include/krl_heap.h>
+#endif
+
 namespace faiss {
 
 // Forward declarations
@@ -220,9 +227,22 @@ IVFRaBitQHeapHandler<C, SL>::IVFRaBitQHeapHandler(
           unpack_buf((idx->d + 7) / 8) {
     current_list_no = 0;
     probe_indices.clear();
+#ifdef KRL
+    constexpr int k_asce = C::is_max ? 1 : 0;
+    constexpr float neutral = C::is_max ? HUGE_VALF : -HUGE_VALF;
+    for (int64_t q = 0; q < static_cast<int64_t>(nq); q++) {
+        float* hd = heap_distances + q * k;
+        int64_t* hi = heap_labels + q * k;
+        // KRL heapify doesn't fill neutral values — do it ourselves
+        std::fill(hd, hd + k, neutral);
+        std::fill(hi, hi + k, -1);
+        krl_2heaps_heapify<k_asce>(k, hd, hi, hd, hi);
+    }
+#else
     for (int64_t q = 0; q < static_cast<int64_t>(nq); q++) {
         heap_heapify<Cfloat>(k, heap_distances + q * k, heap_labels + q * k);
     }
+#endif
 }
 
 template <class C, SIMDLevel SL>
@@ -279,6 +299,86 @@ void IVFRaBitQHeapHandler<C, SL>::handle(
     const size_t qb = context->qb > 0 ? context->qb : index->qb;
     const size_t d = index->d;
 
+#ifdef KRL
+    constexpr int k_asce = C::is_max ? 1 : 0;
+    const float c34 = query_factors.c34;
+    const float qr_to_c = query_factors.qr_to_c_L2sqr;
+    const float qr_norm = query_factors.qr_norm_L2sqr;
+    const bool has_ip_corr = (qr_norm != 0.0f);
+
+    if (!is_multibit) {
+        // NEON 4-way: d32tab[j]*one_a+bias + compute_1bit_adjusted + heap
+        const float32x4_t one_a_v4 = vdupq_n_f32(one_a);
+        const float32x4_t bias_v4 = vdupq_n_f32(bias);
+        const float32x4_t c34_v4 = vdupq_n_f32(c34);
+        const float32x4_t qr_v4 = vdupq_n_f32(qr_to_c);
+        const float32x4_t z4 = vdupq_n_f32(0.0f);
+        const float32x4_t nh = vdupq_n_f32(-0.5f);
+        const float32x4_t qrn = vdupq_n_f32(qr_norm);
+        size_t j = 0;
+        for (; j + 3 < max_positions; j += 4) {
+            // prefetch next batch of aux data into L1
+            if (j + 20 < max_positions)
+                __builtin_prefetch(
+                        aux_base + (j + 20) * storage_size, 0, 3);
+            // norm = d32tab[j..j+3] * one_a + bias
+            uint16x4_t r16 = vld1_u16(d32tab + j);
+            uint32x4_t r32 = vmovl_u16(r16);
+            float32x4_t rf = vcvtq_f32_u32(r32);
+            float32x4_t nd = vmlaq_f32(bias_v4, rf, one_a_v4);
+
+            // db_factors for 4 elements: 2×16-byte loads → {or,dp}×4
+            float32x4_t db01 = vld1q_f32(
+                    (const float*)(aux_base + j * storage_size));
+            float32x4_t db23 = vld1q_f32(
+                    (const float*)(aux_base + (j + 2) * storage_size));
+            float32x4x2_t db = vuzpq_f32(db01, db23);
+            float32x4_t or4 = db.val[0]; // {or0, or1, or2, or3}
+            float32x4_t dp4 = db.val[1]; // {dp0, dp1, dp2, dp3}
+
+            // adj = or + qr_to_c - 2*dp*(nd - c34)
+            float32x4_t fd = vsubq_f32(nd, c34_v4);
+            float32x4_t term = vmulq_f32(dp4, fd);
+            term = vaddq_f32(term, term);
+            float32x4_t adj = vsubq_f32(or4, term);
+            adj = vaddq_f32(adj, qr_v4);
+            if (has_ip_corr) {
+                // IP correction: adj = -0.5 * (adj - qr_norm)
+                adj = vsubq_f32(adj, qrn);
+                adj = vmulq_f32(adj, nh);
+            } else {
+                adj = vmaxq_f32(adj, z4);
+            }
+
+            float adj_a[4];
+            vst1q_f32(adj_a, adj);
+            const float heap_top = heap_dis[0];
+
+            for (int jj = 0; jj < 4; jj++) {
+                int64_t r = this->adjust_id(b, j + jj);
+                if (__builtin_expect(r < 0, 0))
+                    continue;
+                if (__builtin_expect(
+                            this->sel && !this->sel->is_member(r), 0))
+                    continue;
+                this->scan_cnt++;
+                if ((k_asce == 0 && heap_top < adj_a[jj]) ||
+                    (k_asce == 1 && heap_top > adj_a[jj])) {
+                    krl_2heaps_replace_top<k_asce>(
+                            k, heap_dis, heap_ids, adj_a[jj], r);
+                    nup++;
+                }
+            }
+        }
+        // scalar tail
+        for (; j < max_positions; j++) {
+            goto scalar_elem;
+        }
+        return;
+    }
+scalar_elem: (void)0;
+#endif
+
     for (size_t j = 0; j < max_positions; j++) {
         const int64_t result_id = this->adjust_id(b, j);
         if (result_id < 0) {
@@ -315,11 +415,24 @@ void IVFRaBitQHeapHandler<C, SL>::handle(
                 size_t local_offset = idx_base + j;
                 float dist_full = compute_full_multibit_distance(
                         local_q, q, local_offset, base_ptr);
+#ifdef KRL
+                bool replace;
+                if constexpr (k_asce == 0)
+                    replace = (heap_dis[0] < dist_full);
+                else
+                    replace = (heap_dis[0] > dist_full);
+                if (replace) {
+                    krl_2heaps_replace_top<k_asce>(
+                            k, heap_dis, heap_ids, dist_full, result_id);
+                    nup++;
+                }
+#else
                 if (Cfloat::cmp(heap_dis[0], dist_full)) {
                     heap_replace_top<Cfloat>(
                             k, heap_dis, heap_ids, dist_full, result_id);
                     nup++;
                 }
+#endif
             }
         } else {
             const auto& db_factors =
@@ -332,11 +445,24 @@ void IVFRaBitQHeapHandler<C, SL>::handle(
                             centered,
                             qb,
                             d);
+#ifdef KRL
+            bool replace;
+            if constexpr (k_asce == 0)
+                replace = (heap_dis[0] < adjusted_distance);
+            else
+                replace = (heap_dis[0] > adjusted_distance);
+            if (replace) {
+                krl_2heaps_replace_top<k_asce>(
+                        k, heap_dis, heap_ids, adjusted_distance, result_id);
+                nup++;
+            }
+#else
             if (Cfloat::cmp(heap_dis[0], adjusted_distance)) {
                 heap_replace_top<Cfloat>(
                         k, heap_dis, heap_ids, adjusted_distance, result_id);
                 nup++;
             }
+#endif
         }
     }
 }
@@ -362,10 +488,19 @@ void IVFRaBitQHeapHandler<C, SL>::begin(const float* norms) {
 
 template <class C, SIMDLevel SL>
 void IVFRaBitQHeapHandler<C, SL>::end() {
+#ifdef KRL
+    constexpr int k_asce = C::is_max ? 1 : 0;
+#pragma omp parallel for
+    for (int64_t q = 0; q < static_cast<int64_t>(nq); q++) {
+        krl_2heaps_reorder<k_asce>(
+                k, heap_distances + q * k, heap_labels + q * k);
+    }
+#else
 #pragma omp parallel for
     for (int64_t q = 0; q < static_cast<int64_t>(nq); q++) {
         heap_reorder<Cfloat>(k, heap_distances + q * k, heap_labels + q * k);
     }
+#endif
 }
 
 template <class C, SIMDLevel SL>

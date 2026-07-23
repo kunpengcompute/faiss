@@ -9,6 +9,12 @@
 
 #include <faiss/Index.h>
 
+#ifdef KRL
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+#endif
+
 namespace faiss {
 
 struct IndexRefineSearchParameters : SearchParameters {
@@ -85,6 +91,16 @@ struct IndexRefineFlat : IndexRefine {
     IndexRefineFlat(Index* base_index, const float* xb);
 
     IndexRefineFlat();
+
+#ifdef KRL
+    KRLDistanceHandle* kdh = nullptr;
+    size_t full_level = 3;
+    size_t accu_level = 1;
+
+    void add(idx_t n, const float* x) override;
+    void reset() override;
+    ~IndexRefineFlat();
+#endif
 
     void search(
             idx_t n,

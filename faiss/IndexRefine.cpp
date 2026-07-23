@@ -12,7 +12,28 @@
 #include <faiss/impl/FaissAssert.h>
 #include <faiss/utils/Heap.h>
 
+#include <vector>
+
+#ifdef KRL
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+#endif
+
 namespace faiss {
+
+#ifdef KRL
+namespace {
+
+struct IndexRefineScratch {
+    std::vector<idx_t> labels;
+    std::vector<float> distances;
+};
+
+thread_local IndexRefineScratch index_refine_scratch;
+
+} // namespace
+#endif
 
 /***************************************************
  * IndexRefine
@@ -246,6 +267,54 @@ IndexRefineFlat::IndexRefineFlat() : IndexRefine() {
     own_refine_index = true;
 }
 
+#ifdef KRL
+void IndexRefineFlat::add(idx_t n, const float* x) {
+    FAISS_THROW_IF_NOT(is_trained);
+    base_index->add(n, x);
+    if (!kdh) {
+        krl_create_reorder_handle(
+                &kdh,
+                accu_level,
+                full_level,
+                n,
+                d,
+                base_index->metric_type,
+                (const uint8_t*)x,
+                n * d * 4);
+    } else {
+        krl_clean_distance_handle(&kdh);
+        krl_create_reorder_handle(
+                &kdh,
+                accu_level,
+                full_level,
+                n,
+                d,
+                base_index->metric_type,
+                (const uint8_t*)x,
+                n * d * 4);
+    }
+    refine_index->add(n, x);
+    ntotal = base_index->ntotal;
+}
+
+void IndexRefineFlat::reset() {
+    base_index->reset();
+    if (kdh) {
+        krl_clean_distance_handle(&kdh);
+        kdh = nullptr;
+    }
+    refine_index->reset();
+    ntotal = 0;
+}
+
+IndexRefineFlat::~IndexRefineFlat() {
+    if (kdh) {
+        krl_clean_distance_handle(&kdh);
+        kdh = nullptr;
+    }
+}
+#endif
+
 void IndexRefineFlat::search(
         idx_t n,
         const float* x,
@@ -276,6 +345,15 @@ void IndexRefineFlat::search(
             n <= INT64_MAX / k_base, "n * k_base would overflow int64");
     idx_t* base_labels = labels;
     float* base_distances = distances;
+#ifdef KRL
+    if (k != k_base) {
+        const size_t scratch_size = static_cast<size_t>(n) * k_base;
+        index_refine_scratch.labels.resize(scratch_size);
+        index_refine_scratch.distances.resize(scratch_size);
+        base_labels = index_refine_scratch.labels.data();
+        base_distances = index_refine_scratch.distances.data();
+    }
+#else
     std::unique_ptr<idx_t[]> del1;
     std::unique_ptr<float[]> del2;
 
@@ -285,6 +363,7 @@ void IndexRefineFlat::search(
         base_distances = new float[n * k_base];
         del2.reset(base_distances);
     }
+#endif
 
     base_index->search(
             n, x, k_base, base_distances, base_labels, base_index_params);
@@ -292,6 +371,25 @@ void IndexRefineFlat::search(
     for (idx_t i = 0; i < n * k_base; i++) {
         FAISS_THROW_IF_NOT(base_labels[i] >= -1 && base_labels[i] < ntotal);
     }
+
+#ifdef KRL
+    if (kdh) {
+#pragma omp parallel for if (n > 1)
+        for (int i = 0; i < n; i++) {
+            krl_reorder_2_vector(
+                    kdh,
+                    k_base,
+                    base_distances + i * k_base,
+                    base_labels + i * k_base,
+                    x + i * d,
+                    k,
+                    distances + i * k,
+                    labels + i * k,
+                    d);
+        }
+        return;
+    }
+#endif
 
     // compute refined distances
     auto rf = dynamic_cast<const IndexFlat*>(refine_index);

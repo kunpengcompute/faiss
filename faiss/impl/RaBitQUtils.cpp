@@ -13,6 +13,10 @@
 #include <faiss/utils/rabitq_simd.h>
 #include <algorithm>
 #include <cmath>
+
+#ifdef KRL
+#include <arm_neon.h>
+#endif
 #include <cstring>
 #include <limits>
 
@@ -199,11 +203,35 @@ QueryFactorsData compute_query_factors(
         v_min = -v_radius;
         v_max = v_radius;
     } else {
+#ifdef KRL
+        size_t i = 0;
+        float32x4_t vmin4 = vdupq_n_f32(v_min);
+        float32x4_t vmax4 = vdupq_n_f32(v_max);
+        for (; i + 3 < d; i += 4) {
+            float32x4_t v = vld1q_f32(rq + i);
+            vmin4 = vminq_f32(vmin4, v);
+            vmax4 = vmaxq_f32(vmax4, v);
+        }
+        float mns[4], mxs[4];
+        vst1q_f32(mns, vmin4);
+        vst1q_f32(mxs, vmax4);
+        v_min = mns[0]; v_max = mxs[0];
+        for (int k = 1; k < 4; k++) {
+            v_min = std::min(v_min, mns[k]);
+            v_max = std::max(v_max, mxs[k]);
+        }
+        for (; i < d; i++) {
+            const float v_q = rq[i];
+            v_min = std::min(v_min, v_q);
+            v_max = std::max(v_max, v_q);
+        }
+#else
         for (size_t i = 0; i < d; i++) {
             const float v_q = rq[i];
             v_min = std::min(v_min, v_q);
             v_max = std::max(v_max, v_q);
         }
+#endif
     }
 
     // Quantize the query
@@ -216,6 +244,41 @@ QueryFactorsData compute_query_factors(
     int64_t sum2_signed_odd_int = 0;
 
     uint8_t* rqq = rotated_qq.data();
+#ifdef KRL
+    const float32x4_t vmin4 = vdupq_n_f32(v_min);
+    const float32x4_t id4 = vdupq_n_f32(inv_delta);
+    const float32x4_t maxc4 = vdupq_n_f32((float)max_code);
+    const float32x4_t zero4 = vdupq_n_f32(0.0f);
+    size_t i = 0;
+    for (; i + 3 < d; i += 4) {
+        float32x4_t v = vld1q_f32(rq + i);
+        v = vsubq_f32(v, vmin4);
+        v = vmulq_f32(v, id4);
+        v = vmaxq_f32(v, zero4);
+        v = vminq_f32(v, maxc4);
+        uint32x4_t vi = vcvtaq_u32_f32(v);
+        uint32_t ui[4];
+        vst1q_u32(ui, vi);
+        for (int k = 0; k < 4; k++) {
+            uint8_t qq = (uint8_t)ui[k];
+            rqq[i + k] = qq;
+            sum_qq += qq;
+        }
+    }
+    for (; i < d; i++) {
+        const float v_q = rq[i];
+        const uint8_t v_qq = std::clamp<float>(
+                std::round((v_q - v_min) * inv_delta), 0, max_code);
+        rqq[i] = v_qq;
+        sum_qq += v_qq;
+    }
+    if (centered) {
+        for (size_t j = 0; j < d; j++) {
+            int64_t si = int64_t(rqq[j]) * 2 - max_code;
+            sum2_signed_odd_int += si * si;
+        }
+    }
+#else
     for (size_t i = 0; i < d; i++) {
         const float v_q = rq[i];
         const uint8_t v_qq = std::clamp<float>(
@@ -228,6 +291,7 @@ QueryFactorsData compute_query_factors(
             sum2_signed_odd_int += signed_odd_int * signed_odd_int;
         }
     }
+#endif
 
     // Compute query factors
     query_factors.c1 = 2 * delta * inv_d_sqrt;

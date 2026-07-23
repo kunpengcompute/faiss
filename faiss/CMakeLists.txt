@@ -84,6 +84,22 @@ else()
 endif()
 # =============================================================================
 
+# KRL optimization support (Huawei ARM NEON intrinsics)
+option(KRL "Enable KRL optimizations (ARM only)" OFF)
+
+if(KRL AND NOT CMAKE_SYSTEM_PROCESSOR MATCHES "(aarch64|arm64|ARM64)")
+  message(FATAL_ERROR
+    "KRL is ARM-only, but detected arch '${CMAKE_SYSTEM_PROCESSOR}'. "
+    "Please configure with -DKRL=OFF on non-ARM platforms."
+  )
+endif()
+
+set(FAISS_ENABLE_KRL OFF)
+if(KRL)
+  set(FAISS_ENABLE_KRL ON)
+endif()
+# =============================================================================
+
 set(FAISS_SRC
   AutoTune.cpp
   Clustering.cpp
@@ -421,6 +437,40 @@ if(NOT WIN32)
   list(APPEND FAISS_HEADERS invlists/OnDiskInvertedLists.h)
 endif()
 
+# -------------------- KRL (ARM only) --------------------
+if(FAISS_ENABLE_KRL)
+  message(STATUS "KRL optimizations: ENABLED")
+
+  set(KRL_SRC
+    sra_krl/src/Heap_sort.c
+    sra_krl/src/IPdistance_simd.c
+    sra_krl/src/IPdistance_simd_f16f32.c
+    sra_krl/src/IPdistance_simd_s8.c
+    sra_krl/src/L2distance_simd.c
+    sra_krl/src/L2distance_simd_f16f32.c
+    sra_krl/src/L2distance_simd_u8.c
+    sra_krl/src/MinMax_quant.c
+    sra_krl/src/krl_handles.c
+    sra_krl/src/matrix_block_transpose.c
+    sra_krl/src/pq_search_with_table_4bit.c
+    sra_krl/src/reorder_2_vectors.c
+  )
+
+  set(KRL_HEADERS
+    sra_krl/include/krl.h
+    sra_krl/include/krl_heap.h
+    sra_krl/include/krl_internal.h
+    sra_krl/include/platform_macros.h
+    sra_krl/include/safe_memory.h
+  )
+
+  # C source files use C++ templates, must compile as CXX
+  set_source_files_properties(${KRL_SRC} PROPERTIES LANGUAGE CXX)
+
+  list(APPEND FAISS_SRC ${KRL_SRC})
+  list(APPEND FAISS_HEADERS ${KRL_HEADERS})
+endif()
+
 # Export FAISS_HEADERS variable to parent scope.
 set(FAISS_HEADERS ${FAISS_HEADERS} PARENT_SCOPE)
 
@@ -663,6 +713,17 @@ if(FAISS_ENABLE_SVS)
   target_compile_definitions(faiss_avx512 PRIVATE FAISS_ENABLE_SVS FAISS_SVS_RUNTIME_VERSION=${FAISS_SVS_RUNTIME_VERSION})
   target_compile_definitions(faiss_avx512_spr PRIVATE FAISS_ENABLE_SVS FAISS_SVS_RUNTIME_VERSION=${FAISS_SVS_RUNTIME_VERSION})
   target_compile_definitions(faiss_sve PRIVATE FAISS_ENABLE_SVS FAISS_SVS_RUNTIME_VERSION=${FAISS_SVS_RUNTIME_VERSION})
+endif()
+
+if(FAISS_ENABLE_KRL)
+  target_compile_definitions(faiss PUBLIC KRL)
+  target_compile_options(faiss PUBLIC
+    $<$<COMPILE_LANGUAGE:C,CXX>:-march=armv8.2-a+fp16fml+dotprod>
+  )
+  target_include_directories(faiss PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/sra_krl/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/faiss/sra_krl/include>
+  )
 endif()
 
 if(WIN32)

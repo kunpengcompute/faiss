@@ -186,6 +186,10 @@ void accumulate_to_mem_impl(
  ***************************************************************/
 
 struct FastScanCodeScanner {
+#ifdef KRL
+    bool apply_repack = false;
+#endif
+
     virtual ~FastScanCodeScanner() = default;
 
     /// Access the underlying result handler (for begin/end/normalizer calls)

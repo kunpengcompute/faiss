@@ -143,30 +143,26 @@ void accumulate_q_4step(
             uint16_t distance[32 * SQ];
             uint32_t lt_mask[SQ];
 
+            uint16_t thresholds[SQ];
             for (int qi = 0; qi < SQ; ++qi) {
-                uint16_t thr = res.get_threshold(qi);
-                const uint8_t* lut = LUT0 + qi * nsq * 16;
-
-                if (keep_min) {
-#ifdef USE_SVE2
-                    krl_L2_table_lookup_fast_scan_bs32_sve2(
-#else
-                    krl_L2_table_lookup_fast_scan_bs32(
-#endif
-                        nsq, codes, lut,
-                        distance + qi * 32, thr, &lt_mask[qi],
-                        nsq * 16, nsq * 16, 1);
-                } else {
-#ifdef USE_SVE2
-                    krl_IP_table_lookup_fast_scan_bs32_sve2(
-#else
-                    krl_IP_table_lookup_fast_scan_bs32(
-#endif
-                        nsq, codes, lut,
-                        distance + qi * 32, thr, &lt_mask[qi],
-                        nsq * 16, nsq * 16, 1);
-                }
+                thresholds[qi] = res.get_threshold(qi);
             }
+
+#ifdef USE_SVE2
+            krl_fast_table_lookup_step_sve2(
+                SQ, nsq, codes, LUT0,
+                distance, thresholds, lt_mask,
+                keep_min ? 1 : 0,
+                nsq * 16, SQ * nsq * 16,
+                SQ * sizeof(uint16_t), SQ * sizeof(uint32_t));
+#else
+            krl_fast_table_lookup_step(
+                SQ, nsq, codes, LUT0,
+                distance, thresholds, lt_mask,
+                keep_min ? 1 : 0,
+                nsq * 16, SQ * nsq * 16,
+                SQ * sizeof(uint16_t), SQ * sizeof(uint32_t));
+#endif
 
             res.set_block_origin(0, j0);
             res.handle_generic(SQ, 0, distance, lt_mask);

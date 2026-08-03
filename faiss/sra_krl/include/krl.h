@@ -385,6 +385,27 @@ KRL_API_PUBLIC int krl_fast_table_lookup_step(int nq, int nsq, const uint8_t *co
     size_t lt_mask_size);
 
 /*
+ * @brief Perform fast table lookup and filtering operations for multiple queries using SVE2.
+ *        Codes loaded once per batch, shared across up to 4 queries. No register clobber issue
+ *        (pure SVE2 intrinsics, full 32 Z-registers available).
+ * @param nq Number of queries.
+ * @param nsq Number of subquantizers.
+ * @param codes Pointer to the codes array, layout (nsq, batch=32).
+ * @param LUT Pointer to the precomputed distances array, layout (nq, nsq, ksub=16).
+ * @param dis Pointer to the array storing computed distances.
+ * @param threshold Pointer to the filter threshold array.
+ * @param lt_mask Pointer to the array storing filter results.
+ * @param keep_min Filter comparison rule (0 for IP/keep max, 1 for L2/keep min).
+ * @param codes_size Length of codes.
+ * @param LUT_size Length of LUT.
+ * @param threshold_size Length of threshold.
+ * @param lt_mask_size Length of lt_mask.
+ */
+KRL_API_PUBLIC int krl_fast_table_lookup_step_sve2(int nq, int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
+    const uint16_t *threshold, uint32_t *lt_mask, int keep_min, size_t codes_size, size_t LUT_size, size_t threshold_size,
+    size_t lt_mask_size);
+
+/*
  * @brief Perform fast L2 table lookup and filtering operations for single query with batch size 32.
  * @param nsq Number of subquantizers.
  * @param codes Pointer to the codes array, layout (nsq, batch=32).

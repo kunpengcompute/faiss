@@ -68,6 +68,8 @@
 
 ## 编译安装
 
+### v1.8.0
+
 从GitCode获取Faiss开源代码，安装必要的依赖工具、库，以及基于鲲鹏平台优化后的Patch然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
 
 1. 获取Faiss开源代码，标签为**v1.8.0**。假设代码存放于“/path/to/faiss“。
@@ -76,10 +78,10 @@
     git clone --branch v1.8.0 --single-branch https://github.com/facebookresearch/faiss.git
     ```
 
-2. 获取基于鲲鹏优化的补丁文件，标签为**v1.0.0**。假设存放于“/path/to/faiss-patch“。
+2. 获取基于鲲鹏优化的补丁文件，标签为**v1.1.0**。假设存放于“/path/to/faiss-patch“。
 
     ```bash
-    git clone --branch v1.0.0 https://gitcode.com/boostkit/faiss.git faiss-patch
+    git clone --branch v1.1.0 https://gitcode.com/boostkit/faiss.git faiss-patch
     ```
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
@@ -121,6 +123,7 @@
     ```
 
     使用补丁后Faiss完整的目录结构如下所示：
+
     ```text
     faiss/
     ├─ benchs/                                     // 基准测试
@@ -231,13 +234,174 @@
     >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
     >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt“文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)“修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)“。
 
+### v1.14.3
+
+从GitCode获取Faiss开源代码，安装必要的依赖工具、库，以及基于鲲鹏平台优化后的Patch然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
+
+1. 获取Faiss开源代码，标签为**v1.14.3**。假设代码存放于“/path/to/faiss“。
+
+    ```bash
+    git clone --branch v1.14.3 --single-branch https://github.com/facebookresearch/faiss.git
+    ```
+
+2. 获取基于鲲鹏优化的补丁文件，标签为**v1.1.0**。假设存放于“/path/to/faiss-patch“。
+
+    ```bash
+    git clone --branch v1.1.0 https://gitcode.com/boostkit/faiss.git faiss-patch
+    ```
+
+    >![](public_sys-resources/icon-note.gif) **说明：** 
+    >鲲鹏优化补丁文件描述如下：
+    >- 0001-faiss\_1.14.3-optimize-rabitq.patch：基于v1.14.3版本的RabitQ索引优化补丁，保证精度，但不保证Top-K的值或顺序与原生完全一致。
+
+3. 安装Make、CMake、GCC。GCC 12安装步骤适用于openEuler 22.03 LTS SP3系统，openEuler 24.03 LTS SP3系统自带GCC 12，仅安装Make、CMake。
+
+    ```bash
+    yum install make cmake gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
+    export PATH=/opt/openEuler/gcc-toolset-12/root/usr/bin/:$PATH
+    export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
+    ```
+
+4. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
+
+    ```bash
+    git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
+    ```
+
+5. <a name="li880635723510"></a>编译源代码获取libopenblas.so。
+
+    ```bash
+    cd /path/to/OpenBLAS-0.3.29/OpenBLAS
+    make
+    make install
+    ```
+
+    >![](public_sys-resources/icon-note.gif) **说明：** 
+    >您可通过**make install PREFIX=/path/to/openblas/install**设置“/path/to/openblas/install“以指定安装路径，默认安装路径为“/opt/OpenBLAS“。
+
+6. 安装补丁文件0001-faiss\_1.14.3-optimize-rabitq.patch。
+
+    ```bash
+    cd /path/to/faiss
+    patch -p1 < /path/to/faiss-patch/0001-faiss_1.14.3-optimize-rabitq.patch
+    ```
+
+    使用补丁后Faiss完整的目录结构如下所示：
+
+    ```text
+    faiss/
+    ├─ benchs/                                     // 基准测试
+    ├─ c_api/                                      // C语言API封装
+    ├─ cmake/                                      // CMake配置模块
+    ├─ conda/                                      // Conda构建脚本
+    ├─ contrib/                                    // Python贡献模块
+    ├─ demos/                                      // 示例程序
+    ├─ faiss/
+    │   ├─ CMakeLists.txt                          // 构建配置
+    │   ├─ Index.h                                 // 抽象基类，统一接口
+    │   ├─ IndexFlat.cpp                           // 暴力搜索实现
+    │   ├─ IndexFlatCodes.h                        // 统一码存储基类（用于PQ、SQ 等）
+    │   ├─ IndexFlatCodes.cpp                      // 统一码存储基类实现
+    │   ├─ IndexFastScan.h                         // 4‑bit PQ/AQ快速扫描通用接口
+    │   ├─ IndexFastScan.cpp                       // 4‑bit PQ/AQ快速扫描通用实现
+    │   ├─ IndexIVF.h                              // IVF基类接口
+    │   ├─ IndexIVF.cpp                            // IVF基类+具体实现
+    │   ├─ IndexIVFFlat.cpp                        // IVFFlat具体实现
+    │   ├─ IndexIVFPQ.cpp                          // IVFPQ实现
+    │   ├─ IndexIVFFastScan.h                      // IVFPQFastScan接口
+    │   ├─ IndexIVFFastScan.cpp                    // IVFPQFastScan（CPU）实现
+    │   ├─ IndexHNSW.h                             // HNSW索引接口
+    │   ├─ IndexHNSW.cpp                           // HNSW索引实现
+    │   ├─ IndexRefine.h                           // 基准+细化组合索引接口
+    │   ├─ IndexRefine.cpp                         // 基准+细化组合索引实现
+    │   ├─ IndexRaBitQ.h                           // RaBitQ二值量化索引接口
+    │   ├─ IndexRaBitQ.cpp                         // RaBitQ二值量化索引实现
+    │   ├─ IndexRaBitQFastScan.h                   // RaBitQ FastScan接口
+    │   ├─ IndexRaBitQFastScan.cpp                 // RaBitQ FastScan实现
+    │   ├─ IndexIVFRaBitQ.h                        // IVF+RaBitQ索引接口
+    │   ├─ IndexIVFRaBitQ.cpp                      // IVF+RaBitQ索引实现
+    │   ├─ IndexIVFRaBitQFastScan.h                // IVF+RaBitQ FastScan接口
+    │   ├─ IndexIVFRaBitQFastScan.cpp              // IVF+RaBitQ FastScan实现
+    │   ├─ impl/
+    │   │   ├─ DistanceComputer.h                  // 距离计算抽象接口
+    │   │   ├─ ProductQuantizer.h                  // 乘积量化器接口
+    │   │   ├─ ProductQuantizer.cpp                // 乘积量化器实现
+    │   │   ├─ pq4_fast_scan.h                     // 4‑bit PQ快速扫描接口
+    │   │   ├─ pq4_fast_scan_search_1.cpp          // 4‑bit PQ快速扫描单查询实现
+    │   │   ├─ pq4_fast_scan_search_qbs.cpp        // 4‑bit PQ快速扫描批量查询实现
+    │   │   ├─ HNSW.cpp                            // HNSW图结构实现
+    │   │   ├─ index_read.cpp                      // 索引反序列化实现
+    │   │   └─ simd_result_handlers.h              // SIMD结果处理器
+    │   ├─ invlists/
+    │   │   ├─ InvertedLists.h                     // 倒排列表抽象接口
+    │   │   └─ InvertedLists.cpp                   // 倒排列表实现
+    │   ├─ utils/
+    │   │   └─ distances_simd.cpp                  // SIMD L2/IP/L1/Linf实现
+    │   ├─ sra_krl/
+    │   │   ├─ include/
+    │   │   │   ├─ krl.h                           // 对外统一API声明
+    │   │   │   ├─ krl_heap.h                      // 堆结构接口
+    │   │   │   ├─ krl_internal.h                  // 内部结构体、宏、SIMD辅助实现
+    │   │   │   ├─ platform_macros.h               // 错误码、度量常量、平台宏
+    │   │   │   └─ safe_memory.h                   // 安全内存操作
+    │   │   └─ src/
+    │   │       ├─ Heap_sort.c                     // Top‑K堆构建、双堆重排实现
+    │   │       ├─ IPdistance_simd.c               // 单精度向量内积SIMD实现（batch 2/4/8/16）
+    │   │       ├─ IPdistance_simd_f16f32.c        // float16 IP距离计算实现（float输出）
+    │   │       ├─ IPdistance_simd_s8.c            // int8 IP距离计算实现（int32/float输出）
+    │   │       ├─ L2distance_simd.c               // float L2距离计算实现（batch 2/4/8/16/24）
+    │   │       ├─ L2distance_simd_f16f32.c        // float16 L2距离计算实现（float输出）
+    │   │       ├─ L2distance_simd_u8.c            // uint8 L2距离计算实现（uint32/float输出）
+    │   │       ├─ MinMax_quant.c                  // 量化（fp16/u8/s8）
+    │   │       ├─ krl_handles.c                   // 句柄创建、初始化、清理、指针访问
+    │   │       ├─ matrix_block_transpose.c        // 4×4块转置kernel
+    │   │       ├─ pq_search_with_table_4bit.c     // 4‑bit查表
+    │   │       ├─ reorder_2_vectors.c             // 稀疏/连续重排
+    │   ├─ cppcontrib/                             // C++贡献模块
+    │   ├─ gpu/                                    // GPU子系统
+    │   └─ python/                                 // Python绑定
+    ├─ misc/                                       // 杂项测试
+    ├─ tests/                                      // 单元测试
+    ├─ tutorial/                                   // 教程示例
+    ├─ CMakeLists.txt                              // 顶层构建配置
+    ├─ CHANGELOG.md
+    ├─ CODE_OF_CONDUCT.md
+    ├─ CONTRIBUTING.md
+    ├─ INSTALL.md
+    ├─ LICENSE
+    └─ README.md
+    ```
+
+7. 编译Faiss代码获取libfaiss.so。注意：需启用鲲鹏优化宏以获得性能提升。
+
+    ```bash
+    cd /path/to/faiss
+    cmake -B build . \
+      -DFAISS_ENABLE_GPU=OFF \
+      -DBUILD_TESTING=OFF \
+      -DBUILD_SHARED_LIBS=ON \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DFAISS_OPT_LEVEL=generic \
+      -DFAISS_ENABLE_PYTHON=OFF \
+      -DKRL=ON \
+      -DMKL_LIBRARIES=/opt/OpenBLAS/lib/libopenblas.so
+    make -C build -j faiss
+    make -C build install
+    ```
+    >
+    >**说明：** 
+    >
+    >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
+    >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
+    >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt“文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)“修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)“。
+
 ## 兼容性验证
 
 本节介绍在鲲鹏平台进行开源Faiss兼容性验证的方法。使用示例为sift-128-euclidean.hdf5数据集，Faiss（HNSW）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
-1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.0.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示。
+1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示。
 
     ```text
     ├── configs                                                   // 存放对应算法和数据集配置文件

@@ -54,6 +54,11 @@
 #include <faiss/IndexRaBitQ.h>
 #include <faiss/IndexRaBitQFastScan.h>
 #include <faiss/IndexRefine.h>
+#ifdef KRL
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+#endif
 #include <faiss/IndexRowwiseMinMax.h>
 #ifdef FAISS_ENABLE_SVS
 #include <faiss/impl/svs_io.h>
@@ -2175,6 +2180,27 @@ std::unique_ptr<Index> read_index_up(IOReader* f, int io_flags) {
             auto idxrf_new = std::make_unique<IndexRefineFlat>();
             static_cast<IndexRefine&>(*idxrf_new) = *idxrf;
             idxrf = std::move(idxrf_new);
+#ifdef KRL
+            IndexRefineFlat* idxrft =
+                    dynamic_cast<IndexRefineFlat*>(idxrf.get());
+            idxrft->full_level = 3;
+            idxrft->accu_level = 1;
+            IndexFlat* refine_flat =
+                    dynamic_cast<IndexFlat*>(refine.get());
+            if (refine_flat && refine_flat->ntotal > 0) {
+                idxrft->kdh = nullptr;
+                krl_create_reorder_handle(
+                        &idxrft->kdh,
+                        idxrft->accu_level,
+                        idxrft->full_level,
+                        refine_flat->ntotal,
+                        refine_flat->d,
+                        idxrft->metric_type,
+                        (const uint8_t*)refine_flat->codes.data(),
+                        refine_flat->ntotal * refine_flat->d *
+                                sizeof(float));
+            }
+#endif
         }
         idxrf->base_index = base.release();
         idxrf->refine_index = refine.release();
@@ -2810,6 +2836,69 @@ std::unique_ptr<Index> read_index_up(IOReader* f, int io_flags) {
                 bil->block_size = new_block_stride;
             }
         }
+
+#ifdef KRL
+        if (ivrqfs->bbs % 32 == 0) {
+            auto* bil =
+                    dynamic_cast<BlockInvertedLists*>(ivrqfs->invlists);
+            if (bil) {
+                const size_t nsq = ivrqfs->M2;
+                const size_t half_nsq = (nsq + 1) / 2;
+                const size_t packed_block_size = half_nsq * ivrqfs->bbs;
+                const size_t full_block_size = ivrqfs->get_block_stride();
+
+                for (size_t list_no = 0; list_no < ivrqfs->nlist;
+                     list_no++) {
+                    size_t list_size = bil->list_size(list_no);
+                    if (list_size == 0) {
+                        continue;
+                    }
+
+                    size_t ntotal2 =
+                            ((list_size + ivrqfs->bbs - 1) /
+                             ivrqfs->bbs) *
+                            ivrqfs->bbs;
+                    size_t num_blocks = ntotal2 / ivrqfs->bbs;
+                    size_t total_packed_size = ntotal2 * half_nsq;
+
+                    // Extract fast-scan portion from all blocks
+                    std::vector<uint8_t> packed_input(total_packed_size);
+                    const uint8_t* list_data =
+                            bil->codes[list_no].data();
+                    for (size_t b = 0; b < num_blocks; b++) {
+                        memcpy(packed_input.data() +
+                                        b * packed_block_size,
+                               list_data + b * full_block_size,
+                               packed_block_size);
+                    }
+
+                    // Repack into KRL kernel order
+                    std::vector<uint8_t> repacked(total_packed_size);
+                    krl_repack_codes_4b(
+                            packed_input.data(),
+                            list_size,
+                            nsq,
+                            repacked.data(),
+                            ivrqfs->bbs,
+                            ivrqfs->bbs,
+                            ivrqfs->bbs,
+                            1);
+
+                    // Write back repacked codes
+                    uint8_t* list_data_mut =
+                            bil->codes[list_no].data();
+                    for (size_t b = 0; b < num_blocks; b++) {
+                        memcpy(list_data_mut +
+                                        b * full_block_size,
+                               repacked.data() +
+                                        b * packed_block_size,
+                               packed_block_size);
+                    }
+                }
+                ivrqfs->apply_repack = true;
+            }
+        }
+#endif
 
         idx = std::move(ivrqfs);
     } else {

@@ -15,6 +15,10 @@
 
 #include <cstdio>
 
+#ifdef KRL
+#include <faiss/utils/fp16-arm.h>
+#endif
+
 #define FAISS_VERSION_MAJOR 1
 #define FAISS_VERSION_MINOR 14
 #define FAISS_VERSION_PATCH 3
@@ -162,6 +166,12 @@ struct Index {
      * @param x      input matrix, size n * d
      */
     virtual void add(idx_t n, const float* x) = 0;
+
+#ifdef KRL
+    virtual uint8_t* get_codes_pointer() {
+        return nullptr;
+    }
+#endif
 
     virtual void add_ex(idx_t n, const void* x, NumericType numeric_type) {
         if (numeric_type == NumericType::Float32) {
@@ -421,6 +431,13 @@ struct Index {
      * trained in the same way and have the same
      * parameters). Otherwise throw. */
     virtual void check_compatible_for_merge(const Index& otherIndex) const;
+
+#ifdef KRL
+    virtual void dequant_entries_f32(
+            const uint8_t* entries, idx_t num_entries, int quant_bit) {}
+    virtual void quant_entries_f16(
+            const uint8_t* entries, idx_t num_entries, float scale) {}
+#endif
 
     /** Add vectors that are computed with the standalone codec
      *

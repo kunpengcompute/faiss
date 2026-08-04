@@ -27,6 +27,12 @@
 #include <faiss/utils/distances_fused/distances_fused.h>
 #include <faiss/utils/simd_impl/exhaustive_L2sqr_blas_cmax.h>
 
+#ifdef KRL
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+#endif
+
 #ifndef FINTEGER
 #define FINTEGER long
 #endif
@@ -308,7 +314,12 @@ void exhaustive_inner_product_seq(
                     if (!res.is_in_selection(j)) {
                         continue;
                     }
+#ifdef KRL
+                    float ip;
+                    krl_ipdis(x_i, y_j, d, &ip);
+#else
                     float ip = fvec_inner_product<SL>(x_i, y_j, d);
+#endif
                     resi.add_result(ip, j);
                 }
                 resi.end();
@@ -342,7 +353,12 @@ void exhaustive_L2sqr_seq(
                     if (!res.is_in_selection(j)) {
                         continue;
                     }
+#ifdef KRL
+                    float disij;
+                    krl_L2sqr(x_i, y_j, d, &disij);
+#else
                     float disij = fvec_L2sqr<SL>(x_i, y_j, d);
+#endif
                     resi.add_result(disij, j);
                 }
                 resi.end();

@@ -10,6 +10,10 @@
 #include <faiss/impl/FaissAssert.h>
 #include <faiss/impl/RaBitQUtils.h>
 #include <faiss/impl/RaBitQuantizerMultiBit.h>
+
+#ifdef KRL
+#include <arm_neon.h>
+#endif
 #include <faiss/impl/simd_dispatch.h>
 #include <faiss/utils/distances.h>
 #include <faiss/utils/rabitq_simd.h>
@@ -236,6 +240,30 @@ struct RaBitQDistanceComputerNotQ : RaBitQDistanceComputer {
 
     RaBitQDistanceComputerNotQ() = default;
 
+#ifdef KRL
+    // LUT acceleration: per-byte-position 16-entry tables for nibble lookup
+    std::vector<float> lo_lut_;
+    std::vector<float> hi_lut_;
+    static constexpr uint8_t pop_lut_[256] = {
+            0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+            1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+            1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+            1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+            3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+            4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8,
+    };
+#endif
+
     // Compute distance using only 1-bit codes (fast)
     float distance_to_code_1bit(const uint8_t* code) override {
         FAISS_ASSERT(code != nullptr);
@@ -266,6 +294,18 @@ struct RaBitQDistanceComputerNotQ : RaBitQDistanceComputer {
         //   vector.
         uint64_t sum_q = 0;
 
+#ifdef KRL
+        const size_t d_bytes = (d + 7) / 8;
+        const float* lo_tbl = lo_lut_.data();
+        const float* hi_tbl = hi_lut_.data();
+        for (size_t pos = 0; pos < d_bytes; pos++) {
+            uint8_t b = binary_data[pos];
+            dot_qo += lo_tbl[b & 0x0F] + hi_tbl[b >> 4];
+            sum_q += pop_lut_[b];
+            lo_tbl += 16;
+            hi_tbl += 16;
+        }
+#else
         for (size_t i = 0; i < d; i++) {
             // Extract i-th bit
             bool bit = rabitq_utils::extract_bit_standard(binary_data, i);
@@ -274,6 +314,7 @@ struct RaBitQDistanceComputerNotQ : RaBitQDistanceComputer {
             // accumulate sum-of-bits
             sum_q += bit ? 1 : 0;
         }
+#endif
 
         // Apply query factors
         float final_dot =
@@ -356,6 +397,34 @@ struct RaBitQDistanceComputerNotQ : RaBitQDistanceComputer {
 
         // compute some numbers — do not quantize the query
         const float inv_d = (d == 0) ? 1.0f : (1.0f / std::sqrt((float)d));
+
+#ifdef KRL
+        // Precompute per-byte nibble LUTs for distance_to_code_1bit
+        const size_t d_bytes = (d + 7) / 8;
+        lo_lut_.resize(d_bytes * 16);
+        hi_lut_.resize(d_bytes * 16);
+        for (size_t pos = 0; pos < d_bytes; pos++) {
+            size_t base = pos * 8;
+            float* lo = lo_lut_.data() + pos * 16;
+            float* hi = hi_lut_.data() + pos * 16;
+            const float* rq = rotated_q.data() + base;
+            float rq0 = rq[0], rq1 = rq[1], rq2 = rq[2], rq3 = rq[3];
+            float rq4 = rq[4], rq5 = rq[5], rq6 = rq[6], rq7 = rq[7];
+            for (int nib = 0; nib < 16; nib++) {
+                float lo_sum = 0, hi_sum = 0;
+                if (nib & 1) lo_sum += rq0;
+                if (nib & 2) lo_sum += rq1;
+                if (nib & 4) lo_sum += rq2;
+                if (nib & 8) lo_sum += rq3;
+                if (nib & 1) hi_sum += rq4;
+                if (nib & 2) hi_sum += rq5;
+                if (nib & 4) hi_sum += rq6;
+                if (nib & 8) hi_sum += rq7;
+                lo[nib] = lo_sum;
+                hi[nib] = hi_sum;
+            }
+        }
+#endif
 
         float sum_q = 0;
         for (size_t i = 0; i < d; i++) {

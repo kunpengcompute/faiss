@@ -548,12 +548,22 @@ void IndexIVFFastScan::search_dispatch_implem(
              params->ensure_topk_full);
 
     if (impl == 0) {
+#ifdef KRL
+        // Under KRL, impl 12 pays extra regroup/pack overhead that rarely
+        // amortizes for tiny query batches.
+        if (bbs == 32 && !any_early_term_knob && n > 1) {
+            impl = 12;
+        } else {
+            impl = 10;
+        }
+#else
         // Auto-select the per-query path when early-stop budgets are used.
         if (bbs == 32 && !any_early_term_knob) {
             impl = 12;
         } else {
             impl = 10;
         }
+#endif
         if (k > 20) { // use reservoir rather than heap
             impl++;
         }
@@ -1059,8 +1069,12 @@ void IndexIVFFastScan::search_implem_10(
             (is_range_search && params) ? params->max_empty_result_buckets : 0;
 
     // Allocate probe_map once and reuse it
+#ifdef KRL
+    std::vector<int> probe_map(1);
+#else
     std::vector<int> probe_map;
     probe_map.reserve(1);
+#endif
 
     for (idx_t i = 0; i < n; i++) {
         const uint8_t* LUT = nullptr;
@@ -1123,7 +1137,9 @@ void IndexIVFFastScan::search_implem_10(
             handler.id_map = ids.get();
 
             // Set context information for handlers that need additional data
+#ifndef KRL
             probe_map.resize(1);
+#endif
             probe_map[0] = static_cast<int>(j);
             handler.set_list_context(list_no, probe_map);
 
@@ -1197,6 +1213,9 @@ void IndexIVFFastScan::search_implem_12(
     size_t cur_nprobe = cq.nprobe;
 
     std::vector<QC> qcs;
+#ifdef KRL
+    qcs.reserve(static_cast<size_t>(n) * cur_nprobe);
+#endif
     {
         size_t ij = 0;
         for (idx_t i = 0; i < n; i++) {
@@ -1227,6 +1246,12 @@ void IndexIVFFastScan::search_implem_12(
     // Allocate vectors once and reuse them
     std::vector<int> probe_map;
     probe_map.reserve(actual_qbs2);
+#ifdef KRL
+    std::vector<uint16_t> tmp_bias_storage(actual_qbs2);
+    std::vector<int> q_map(actual_qbs2);
+    std::vector<int> lut_entries(actual_qbs2);
+    AlignedTable<uint8_t> packed_lut(actual_qbs2 * dim12);
+#endif
 
     size_t i0 = 0;
     uint64_t t_copy_pack = 0, t_scan = 0;
@@ -1253,9 +1278,13 @@ void IndexIVFFastScan::search_implem_12(
         // re-organize LUTs and biases into the right order
         int nc = static_cast<int>(i1 - i0);
 
+#ifdef KRL
+        memset(packed_lut.get(), -1, static_cast<size_t>(nc) * dim12);
+#else
         std::vector<int> q_map(nc), lut_entries(nc);
         AlignedTable<uint8_t> LUT(nc * dim12);
         memset(LUT.get(), -1, nc * dim12);
+#endif
         int qbs_for_list = pq4_preferred_qbs(nc);
 
         for (size_t i = i0; i < i1; i++) {
@@ -1264,7 +1293,11 @@ void IndexIVFFastScan::search_implem_12(
             int ij = static_cast<int>(qc.qno * cur_nprobe + qc.rank);
             lut_entries[i - i0] = single_LUT ? qc.qno : ij;
             if (biases.get()) {
+#ifdef KRL
+                tmp_bias_storage[i - i0] = biases[ij];
+#else
                 tmp_bias[i - i0] = biases[ij];
+#endif
             }
         }
         pq4_pack_LUT_qbs_q_map(
@@ -1272,7 +1305,11 @@ void IndexIVFFastScan::search_implem_12(
                 static_cast<int>(M2),
                 dis_tables.get(),
                 lut_entries.data(),
+#ifdef KRL
+                packed_lut.get());
+#else
                 LUT.get());
+#endif
 
         // access the inverted list
 
@@ -1286,6 +1323,13 @@ void IndexIVFFastScan::search_implem_12(
         handler.ntotal = list_size;
         handler.q_map = q_map.data();
         handler.id_map = ids.get();
+        if (biases.get()) {
+#ifdef KRL
+            handler.dbias = tmp_bias_storage.data();
+#else
+            handler.dbias = tmp_bias.data();
+#endif
+        }
 
         // Set context information for handlers that need additional data
         // All queries in this batch access the same list_no, but each
@@ -1302,7 +1346,11 @@ void IndexIVFFastScan::search_implem_12(
                 list_size,
                 static_cast<int>(M2),
                 codes.get(),
+#ifdef KRL
+                packed_lut.get(),
+#else
                 LUT.get(),
+#endif
                 context.pq2x4_scale,
                 get_block_stride());
         // prepare for next loop
@@ -1352,6 +1400,9 @@ void IndexIVFFastScan::search_implem_14(
     size_t cur_nprobe = cq.nprobe;
 
     std::vector<QC> qcs;
+#ifdef KRL
+    qcs.reserve(static_cast<size_t>(n) * cur_nprobe);
+#endif
     {
         size_t ij = 0;
         for (idx_t i = 0; i < n; i++) {
@@ -1462,6 +1513,11 @@ void IndexIVFFastScan::search_implem_14(
         // Allocate probe_map once per thread and reuse it
         std::vector<int> probe_map;
         probe_map.reserve(actual_qbs2);
+#ifdef KRL
+        std::vector<int> q_map(actual_qbs2);
+        std::vector<int> lut_entries(actual_qbs2);
+        AlignedTable<uint8_t> LUT(actual_qbs2 * dim12);
+#endif
 
 #pragma omp for schedule(dynamic)
         for (idx_t cluster = 0; cluster < static_cast<idx_t>(ses.size());
@@ -1475,9 +1531,13 @@ void IndexIVFFastScan::search_implem_14(
             // re-organize LUTs and biases into the right order
             int nc = static_cast<int>(i1 - i0);
 
+#ifdef KRL
+            memset(LUT.get(), -1, static_cast<size_t>(nc) * dim12);
+#else
             std::vector<int> q_map(nc), lut_entries(nc);
             AlignedTable<uint8_t> LUT(nc * dim12);
             memset(LUT.get(), -1, nc * dim12);
+#endif
             int qbs_for_list = pq4_preferred_qbs(nc);
 
             for (size_t i = i0; i < i1; i++) {

@@ -38,6 +38,12 @@
 #include <faiss/impl/fast_scan/accumulate_loops_512.h>
 #endif
 
+#ifdef KRL
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+#endif
+
 namespace faiss {
 
 using namespace simd_result_handlers;
@@ -71,6 +77,53 @@ struct ScannerMixIn : FastScanCodeScanner {
             const uint8_t* LUT,
             int pq2x4_scale,
             size_t block_stride) override {
+#ifdef KRL
+        if (this->apply_repack) {
+            bool keep_min = !handler_.is_CMax;
+            int BB = bbs / 32;
+            for (size_t j0 = 0; j0 < nb;
+                 j0 += bbs, codes += block_stride) {
+                handler_.set_block_origin(0, j0);
+                for (int b = 0; b < BB; b++) {
+                    uint16_t distance[32 * 4];
+                    uint32_t lt_mask[4];
+                    uint16_t threshold_val =
+                            keep_min ? (uint16_t)0xFFFF : (uint16_t)0;
+                    uint16_t threshold[4];
+                    for (int qi = 0; qi < 4; qi++) {
+                        threshold[qi] = threshold_val;
+                    }
+                    const uint8_t* block_codes =
+                            codes + b * 16 * nsq;
+                    const uint8_t* lut = LUT;
+                    for (int q = 0; q < nq; q++) {
+                        krl_fast_table_lookup_step(
+                                1,
+                                nsq,
+                                block_codes,
+                                lut,
+                                distance + q * 32,
+                                threshold + q,
+                                lt_mask + q,
+                                keep_min ? 1 : 0,
+                                16 * nsq,
+                                16 * nsq,
+                                2,
+                                4);
+                        lut += nsq * 16;
+                    }
+                    for (int q = 0; q < nq; q++) {
+                        simd16uint16_tpl<THE_LEVEL_TO_DISPATCH> d0(
+                                distance + q * 32);
+                        simd16uint16_tpl<THE_LEVEL_TO_DISPATCH> d1(
+                                distance + q * 32 + 16);
+                        handler_.handle(q, b, d0, d1);
+                    }
+                }
+            }
+            return;
+        }
+#endif
         if (pq2x4_scale) {
             NormTableScaler<THE_LEVEL_TO_DISPATCH> scaler(pq2x4_scale);
             pq4_accumulate_loop_fixed_scaler<THE_LEVEL_TO_DISPATCH>(
@@ -106,6 +159,55 @@ struct ScannerMixIn : FastScanCodeScanner {
             const uint8_t* LUT,
             int pq2x4_scale,
             size_t block_stride) override {
+#ifdef KRL
+        if (this->apply_repack) {
+            bool keep_min = !handler_.is_CMax;
+            for (size_t j0 = 0; j0 < nb;
+                 j0 += 32, codes += block_stride) {
+                handler_.set_block_origin(0, j0);
+                uint16_t distance[32 * 4]; // max 4 queries per block
+                uint32_t lt_mask[4];
+                uint16_t threshold_val =
+                        keep_min ? (uint16_t)0xFFFF : (uint16_t)0;
+                uint16_t threshold[4];
+                for (int qi = 0; qi < 4; qi++) {
+                    threshold[qi] = threshold_val;
+                }
+                int qi = qbs;
+                int i0 = 0;
+                while (qi) {
+                    int nq = qi & 15;
+                    qi >>= 4;
+                    const uint8_t* lut = LUT + i0 * nsq * 16;
+                    for (int q = 0; q < nq; q++) {
+                        krl_fast_table_lookup_step(
+                                1,
+                                nsq,
+                                codes,
+                                lut,
+                                distance + q * 32,
+                                threshold + q,
+                                lt_mask + q,
+                                keep_min ? 1 : 0,
+                                16 * nsq,
+                                16 * nsq,
+                                2,
+                                4);
+                        lut += nsq * 16;
+                    }
+                    for (int q = 0; q < nq; q++) {
+                        simd16uint16_tpl<THE_LEVEL_TO_DISPATCH> d0(
+                                distance + q * 32);
+                        simd16uint16_tpl<THE_LEVEL_TO_DISPATCH> d1(
+                                distance + q * 32 + 16);
+                        handler_.handle(i0 + q, 0, d0, d1);
+                    }
+                    i0 += nq;
+                }
+            }
+            return;
+        }
+#endif
 #if defined(COMPILE_SIMD_AVX512) && defined(__AVX512F__)
         constexpr bool use_avx512_qbs =
                 (THE_LEVEL_TO_DISPATCH == SIMDLevel::AVX512 ||

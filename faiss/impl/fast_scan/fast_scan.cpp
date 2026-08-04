@@ -512,8 +512,15 @@ std::unique_ptr<FastScanCodeScanner> rabitq_ivf_make_knn_scanner(
         const FastScanDistancePostProcessing* context,
         bool multi_bit) {
     return with_simd_level([&]<SIMDLevel SL>() {
+#ifdef KRL
+        auto scanner = rabitq_ivf_make_knn_scanner_impl<SL>(
+                is_max, index, nq, k, distances, ids, sel, context, multi_bit);
+        scanner->apply_repack = index->apply_repack;
+        return scanner;
+#else
         return rabitq_ivf_make_knn_scanner_impl<SL>(
                 is_max, index, nq, k, distances, ids, sel, context, multi_bit);
+#endif
     });
 }
 

@@ -23,6 +23,13 @@
 #include <faiss/utils/distances.h>
 #include <faiss/utils/utils.h>
 
+#ifdef KRL
+#include <arm_neon.h>
+extern "C" {
+#include <faiss/sra_krl/include/krl.h>
+}
+#endif
+
 namespace faiss {
 
 // Import shared utilities from RaBitQUtils
@@ -273,6 +280,36 @@ bool IndexIVFRaBitQFastScan::lookup_table_is_3d() const {
 }
 
 // out[code] = base + sum of v_i for each set bit in code.
+#ifdef KRL
+inline void write_subset_sum_lut(
+        float* out,
+        float base,
+        float v0,
+        float v1,
+        float v2,
+        float v3) {
+    // NEON vectorized: 4 stores instead of 16 scalar writes.
+    // Low 2 bits combinations: {0, v0, v1, v0+v1}
+    const float lo2[4] = {0.0f, v0, v1, v0 + v1};
+    float32x4_t b = vdupq_n_f32(base);
+    float32x4_t g0 = vld1q_f32(lo2);
+    float32x4_t vv2 = vdupq_n_f32(v2);
+    float32x4_t vv3 = vdupq_n_f32(v3);
+
+    float32x4_t g1 = vaddq_f32(g0, vv2); // bit2=1
+    float32x4_t g2 = vaddq_f32(g0, vv3); // bit3=1
+    float32x4_t g3 = vaddq_f32(g1, vv3); // bit2=bit3=1
+    g0 = vaddq_f32(g0, b);
+    g1 = vaddq_f32(g1, b);
+    g2 = vaddq_f32(g2, b);
+    g3 = vaddq_f32(g3, b);
+
+    vst1q_f32(out, g0);
+    vst1q_f32(out + 4, g1);
+    vst1q_f32(out + 8, g2);
+    vst1q_f32(out + 12, g3);
+}
+#else
 inline void write_subset_sum_lut(
         float* out,
         float base,
@@ -297,6 +334,7 @@ inline void write_subset_sum_lut(
     out[14] = base + v1 + v2 + v3;
     out[15] = base + v0 + v1 + v2 + v3;
 }
+#endif
 
 // Computes lookup table for residual vectors in RaBitQ FastScan format
 void IndexIVFRaBitQFastScan::compute_residual_LUT(
@@ -380,6 +418,35 @@ void IndexIVFRaBitQFastScan::compute_residual_LUT(
         const float c1 = query_factors.c1;
         const float c2 = query_factors.c2;
 
+#ifdef KRL
+        const float32x4_t c1v = vdupq_n_f32(c1);
+        const float32x4_t c2v = vdupq_n_f32(c2);
+        for (size_t m = 0; m < M; m++) {
+            const size_t ds = m * 4;
+            float* out = lut_out + m * 16;
+            float v[4] = {0, 0, 0, 0};
+            // NEON: load 4 uint8, convert to float, c1*q + c2
+            if (ds + 7 < d_sz) {
+                uint8x8_t qq8 = vld1_u8(&rotated_qq[ds]);
+                uint16x8_t qq16 = vmovl_u8(qq8);
+                uint32x4_t qq32 = vmovl_u16(vget_low_u16(qq16));
+                float32x4_t qqf = vcvtq_f32_u32(qq32);
+                float32x4_t r =
+                        vmlaq_f32(c2v, qqf, c1v); // c2 + c1 * qq
+                vst1q_f32(v, r);
+            } else {
+                if (ds + 0 < d_sz)
+                    v[0] = c1 * rotated_qq[ds + 0] + c2;
+                if (ds + 1 < d_sz)
+                    v[1] = c1 * rotated_qq[ds + 1] + c2;
+                if (ds + 2 < d_sz)
+                    v[2] = c1 * rotated_qq[ds + 2] + c2;
+                if (ds + 3 < d_sz)
+                    v[3] = c1 * rotated_qq[ds + 3] + c2;
+            }
+            write_subset_sum_lut(out, 0.0f, v[0], v[1], v[2], v[3]);
+        }
+#else
         for (size_t m = 0; m < M; m++) {
             const size_t ds = m * 4;
             float* out = lut_out + m * 16;
@@ -400,6 +467,7 @@ void IndexIVFRaBitQFastScan::compute_residual_LUT(
 
             write_subset_sum_lut(out, 0.0f, v0, v1, v2, v3);
         }
+#endif
     }
 }
 
@@ -577,11 +645,29 @@ void IndexIVFRaBitQFastScan::compute_LUT_uint8(
                 float span_j = 0;
                 for (size_t m = 0; m < M; m++) {
                     const float* tab = lut_float.get() + j2 * dim12 + m * ksub;
+#ifdef KRL
+                    float mn, mx;
+                    // NEON 4-way min/max for ksub=16
+                    float32x4_t vmin = vld1q_f32(tab);
+                    float32x4_t vmax = vmin;
+                    for (size_t s = 4; s < ksub; s += 4) {
+                        float32x4_t v = vld1q_f32(tab + s);
+                        vmin = vminq_f32(vmin, v);
+                        vmax = vmaxq_f32(vmax, v);
+                    }
+                    // Horizontal reduce: find min/max of 4 lanes
+                    float mns[4], mxs[4];
+                    vst1q_f32(mns, vmin);
+                    vst1q_f32(mxs, vmax);
+                    mn = std::min({mns[0], mns[1], mns[2], mns[3]});
+                    mx = std::max({mxs[0], mxs[1], mxs[2], mxs[3]});
+#else
                     float mn = tab[0], mx = tab[0];
                     for (size_t s = 1; s < ksub; s++) {
                         mn = std::min(mn, tab[s]);
                         mx = std::max(mx, tab[s]);
                     }
+#endif
                     all_mins[j2 * M + m] = mn;
                     float span = mx - mn;
                     glob_max_span = std::max(glob_max_span, span);
@@ -602,10 +688,28 @@ void IndexIVFRaBitQFastScan::compute_LUT_uint8(
                     const float* tab = lut_float.get() + j2 * dim12 + m * ksub;
                     float mn = all_mins[j2 * M + m];
                     uint8_t* out = out_base + j2 * dim12_2 + m * ksub;
+#ifdef KRL
+                    // NEON 4-way float→uint8 quantization
+                    const float32x4_t a4 = vdupq_n_f32(a);
+                    const float32x4_t mn4 = vdupq_n_f32(mn);
+                    for (size_t s = 0; s < ksub; s += 4) {
+                        float32x4_t v = vld1q_f32(tab + s);
+                        v = vsubq_f32(v, mn4);
+                        v = vmulq_f32(v, a4);
+                        uint32x4_t vi = vcvtaq_u32_f32(v);
+                        uint32_t ui[4];
+                        vst1q_u32(ui, vi);
+                        out[s + 0] = static_cast<uint8_t>(ui[0]);
+                        out[s + 1] = static_cast<uint8_t>(ui[1]);
+                        out[s + 2] = static_cast<uint8_t>(ui[2]);
+                        out[s + 3] = static_cast<uint8_t>(ui[3]);
+                    }
+#else
                     for (size_t s = 0; s < ksub; s++) {
                         out[s] = static_cast<uint8_t>(
                                 std::roundf(a * (tab[s] - mn)));
                     }
+#endif
                 }
                 memset(out_base + j2 * dim12_2 + M * ksub, 0, (M2 - M) * ksub);
                 bq[j2] = static_cast<uint16_t>(

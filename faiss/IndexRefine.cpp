@@ -271,30 +271,25 @@ IndexRefineFlat::IndexRefineFlat() : IndexRefine() {
 void IndexRefineFlat::add(idx_t n, const float* x) {
     FAISS_THROW_IF_NOT(is_trained);
     base_index->add(n, x);
-    if (!kdh) {
-        krl_create_reorder_handle(
-                &kdh,
-                accu_level,
-                full_level,
-                n,
-                d,
-                base_index->metric_type,
-                (const uint8_t*)x,
-                n * d * 4);
-    } else {
-        krl_clean_distance_handle(&kdh);
-        krl_create_reorder_handle(
-                &kdh,
-                accu_level,
-                full_level,
-                n,
-                d,
-                base_index->metric_type,
-                (const uint8_t*)x,
-                n * d * 4);
-    }
     refine_index->add(n, x);
     ntotal = base_index->ntotal;
+    auto refine_flat = dynamic_cast<IndexFlat*>(refine_index);
+    FAISS_THROW_IF_NOT(refine_flat);
+    if (kdh) {
+        krl_clean_distance_handle(&kdh);
+        kdh = nullptr;
+    }
+    if (refine_flat->ntotal > 0) {
+        krl_create_reorder_handle(
+                &kdh,
+                accu_level,
+                full_level,
+                refine_flat->ntotal,
+                d,
+                base_index->metric_type,
+                refine_flat->codes.data(),
+                refine_flat->ntotal * d * sizeof(float));
+    }
 }
 
 void IndexRefineFlat::reset() {

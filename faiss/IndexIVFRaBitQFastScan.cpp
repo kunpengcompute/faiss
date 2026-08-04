@@ -426,7 +426,7 @@ void IndexIVFRaBitQFastScan::compute_residual_LUT(
             float* out = lut_out + m * 16;
             float v[4] = {0, 0, 0, 0};
             // NEON: load 4 uint8, convert to float, c1*q + c2
-            if (ds + 3 < d_sz) {
+            if (ds + 7 < d_sz) {
                 uint8x8_t qq8 = vld1_u8(&rotated_qq[ds]);
                 uint16x8_t qq16 = vmovl_u8(qq8);
                 uint32x4_t qq32 = vmovl_u16(vget_low_u16(qq16));

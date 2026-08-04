@@ -352,7 +352,6 @@ void IVFRaBitQHeapHandler<C, SL>::handle(
 
             float adj_a[4];
             vst1q_f32(adj_a, adj);
-            const float heap_top = heap_dis[0];
 
             for (int jj = 0; jj < 4; jj++) {
                 int64_t r = this->adjust_id(b, j + jj);
@@ -362,8 +361,8 @@ void IVFRaBitQHeapHandler<C, SL>::handle(
                             this->sel && !this->sel->is_member(r), 0))
                     continue;
                 this->scan_cnt++;
-                if ((k_asce == 0 && heap_top < adj_a[jj]) ||
-                    (k_asce == 1 && heap_top > adj_a[jj])) {
+                if ((k_asce == 0 && heap_dis[0] < adj_a[jj]) ||
+                    (k_asce == 1 && heap_dis[0] > adj_a[jj])) {
                     krl_2heaps_replace_top<k_asce>(
                             k, heap_dis, heap_ids, adj_a[jj], r);
                     nup++;
@@ -372,11 +371,37 @@ void IVFRaBitQHeapHandler<C, SL>::handle(
         }
         // scalar tail
         for (; j < max_positions; j++) {
-            goto scalar_elem;
+            const int64_t result_id = this->adjust_id(b, j);
+            if (result_id < 0) {
+                continue;
+            }
+            if (this->sel != nullptr && !this->sel->is_member(result_id)) {
+                continue;
+            }
+
+            this->scan_cnt++;
+
+            const float normalized_distance = d32tab[j] * one_a + bias;
+            const uint8_t* base_ptr = aux_base + j * storage_size;
+            const auto& db_factors =
+                    *reinterpret_cast<const SignBitFactors*>(base_ptr);
+            float adjusted_distance =
+                    rabitq_utils::compute_1bit_adjusted_distance(
+                            normalized_distance,
+                            db_factors,
+                            query_factors,
+                            centered,
+                            qb,
+                            d);
+            if ((k_asce == 0 && heap_dis[0] < adjusted_distance) ||
+                (k_asce == 1 && heap_dis[0] > adjusted_distance)) {
+                krl_2heaps_replace_top<k_asce>(
+                        k, heap_dis, heap_ids, adjusted_distance, result_id);
+                nup++;
+            }
         }
         return;
     }
-scalar_elem: (void)0;
 #endif
 
     for (size_t j = 0; j < max_positions; j++) {

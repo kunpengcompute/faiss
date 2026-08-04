@@ -2,11 +2,14 @@
 set -uo pipefail
 # KRL incremental coverage test suite: build → run → capture → report.
 # Usage:  sh capture_krl_coverage.sh [--compile true|false]
+# Optional: KRL_DEPS_DIR=/path/to/deps KRL_FETCH_DEPS=true|false
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 BUILD_DIR="${ROOT_DIR}/build_cov"
 FAISS_LIBDIR="${BUILD_DIR}/faiss"
+DEPS_DIR="${KRL_DEPS_DIR:-${BUILD_DIR}/_deps}"
+FETCH_DEPS="${KRL_FETCH_DEPS:-true}"
 
 INFO_COV="${ROOT_DIR}/coverage_krl.info"
 INFO_FILTERED="${ROOT_DIR}/coverage_krl_filtered.info"
@@ -24,17 +27,28 @@ fi
 if [ "$DO_COMPILE" = "true" ]; then
 
     # ensure offline dependencies exist
-    DEPS_DIR="${BUILD_DIR}/_deps"
     GTEST_SRC="${DEPS_DIR}/googletest-src"
     BENCH_SRC="${DEPS_DIR}/googlebenchmark-src"
 
-    if [ ! -d "${GTEST_SRC}" ]; then
+    mkdir -p "${DEPS_DIR}" || exit 1
+
+    if [ ! -f "${GTEST_SRC}/CMakeLists.txt" ]; then
+        if [ "${FETCH_DEPS}" != "true" ]; then
+            echo "missing googletest source: ${GTEST_SRC}"
+            echo "run once with network and KRL_FETCH_DEPS=true, or pre-populate KRL_DEPS_DIR"
+            exit 1
+        fi
         echo "=== Cloning googletest (one-time) ==="
         git clone --depth 1 https://github.com/google/googletest.git "${GTEST_SRC}" || exit 1
         (cd "${GTEST_SRC}" && git fetch --depth 1 origin 58d77fa8070e8cec2dc1ed015d66b454c8d78850 && git checkout 58d77fa8070e8cec2dc1ed015d66b454c8d78850) || exit 1
     fi
 
-    if [ ! -d "${BENCH_SRC}" ]; then
+    if [ ! -f "${BENCH_SRC}/CMakeLists.txt" ]; then
+        if [ "${FETCH_DEPS}" != "true" ]; then
+            echo "missing googlebenchmark source: ${BENCH_SRC}"
+            echo "run once with network and KRL_FETCH_DEPS=true, or pre-populate KRL_DEPS_DIR"
+            exit 1
+        fi
         echo "=== Cloning googlebenchmark (one-time) ==="
         git clone --depth 1 https://github.com/google/benchmark.git "${BENCH_SRC}" || exit 1
     fi
@@ -48,9 +62,10 @@ if [ "$DO_COMPILE" = "true" ]; then
         -DCMAKE_C_FLAGS="--coverage -O0 -g -fno-omit-frame-pointer" \
         -DCMAKE_CXX_FLAGS="--coverage -O0 -g -fno-omit-frame-pointer" \
         -DCMAKE_EXE_LINKER_FLAGS="--coverage" \
-        -DCMAKE_SHARED_LINKER_FLAGS="--coverage" || exit 1 \
+        -DCMAKE_SHARED_LINKER_FLAGS="--coverage" \
+        -DFETCHCONTENT_FULLY_DISCONNECTED=ON \
         -DFETCHCONTENT_SOURCE_DIR_GOOGLETEST="${GTEST_SRC}" \
-        -DFETCHCONTENT_SOURCE_DIR_GOOGLEBENCHMARK="${BENCH_SRC}"
+        -DFETCHCONTENT_SOURCE_DIR_GOOGLEBENCHMARK="${BENCH_SRC}" || exit 1
 
     echo "=== Building faiss_test ==="
     cmake --build "${BUILD_DIR}" --target faiss_test -j"$(nproc)" || exit 1

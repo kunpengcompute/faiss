@@ -4,7 +4,7 @@
 
 ### 全量优化
 
-本节介绍在鲲鹏平台测试全量优化后Faiss的方法。依赖鲲鹏的全量优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
+本节介绍在鲲鹏平台测试基于Faiss v1.8.0全量优化后的Faiss的方法。依赖鲲鹏的全量优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
@@ -79,7 +79,7 @@
 
 ### 等价优化
 
-本节介绍在鲲鹏平台测试等价优化后Faiss的方法。依赖鲲鹏的等价优化补丁文件0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
+本节介绍在鲲鹏平台测试基于Faiss v1.8.0等价优化后的Faiss的方法。依赖鲲鹏的等价优化补丁文件0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
@@ -155,7 +155,7 @@
 
 ### HNSW FP16支持
 
-本节介绍在鲲鹏平台测试HNSW支持FP16接口后Faiss的方法，依赖鲲鹏的优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（HNSW）算法，线程数32。
+本节介绍在鲲鹏平台测试基于Faiss v1.8.0HNSW支持FP16接口后的Faiss的方法，依赖鲲鹏的优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（HNSW）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
@@ -229,7 +229,7 @@
 
 ## v1.14.3
 
-本节介绍在鲲鹏平台测试基于v1.14.3优化后Faiss的方法，依赖鲲鹏的RabitQ索引优化补丁文件0001-faiss\_1.14.3-optimize-rabitq.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFRabitQFS）算法，线程数32。
+本节介绍在鲲鹏平台测试基于Faiss v1.14.3优化后的Faiss的方法，依赖鲲鹏的RabitQ索引优化补丁文件0001-faiss\_1.14.3-optimize-rabitq.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFRabitQFS）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
@@ -266,7 +266,7 @@
     wget http://ann-benchmarks.com/sift-128-euclidean.hdf5 --no-check-certificate
     ```
 
-**全量优化后Faiss测试<a name="section41250624115"></a>**
+**RabitQ索引优化后Faiss测试<a name="section41250624115"></a>**
 
 1. 安装相关依赖。
 

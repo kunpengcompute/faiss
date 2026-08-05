@@ -70,15 +70,15 @@
 
 ### v1.8.0
 
-从GitCode获取Faiss开源代码，安装必要的依赖工具、库以及基于鲲鹏平台优化后的补丁。然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
+从Github获取Faiss开源代码，安装必要的依赖工具、库，从GitCode获取基于鲲鹏平台优化后的补丁，然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
 
-1. 获取Faiss开源代码，标签为**v1.8.0**。假设代码存放于“/path/to/faiss“。
+1. 获取Faiss开源代码，标签为**v1.8.0**。假设代码存放于“/path/to/faiss”。
 
     ```bash
     git clone --branch v1.8.0 --single-branch https://github.com/facebookresearch/faiss.git
     ```
 
-2. 获取基于鲲鹏优化的补丁文件，标签为**v1.1.0**。假设存放于“/path/to/faiss-patch“。
+2. 获取基于鲲鹏优化的补丁文件，标签为**v1.1.0**。假设存放于“/path/to/faiss-patch”。
 
     ```bash
     git clone --branch v1.1.0 https://gitcode.com/boostkit/faiss.git faiss-patch
@@ -97,8 +97,7 @@
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-4. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
-
+4. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29”。
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
     ```
@@ -112,7 +111,7 @@
     ```
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
-    >您可通过**make install PREFIX=/path/to/openblas/install**设置“/path/to/openblas/install“以指定安装路径，默认安装路径为“/opt/OpenBLAS“。
+    >您可通过**make install PREFIX=/path/to/openblas/install**设置“/path/to/openblas/install”以指定安装路径，默认安装路径为“/opt/OpenBLAS”。
 
 6. 安装补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。
 
@@ -236,7 +235,7 @@
 
 ### v1.14.3
 
-从GitCode获取Faiss开源代码，安装必要的依赖工具、库以及基于鲲鹏平台优化后的补丁。然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
+从Github获取Faiss开源代码，安装必要的依赖工具、库，从GitCode获取基于鲲鹏平台优化后的补丁，然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
 
 1. 获取Faiss开源代码，标签为**v1.14.3**。假设代码存放于“/path/to/faiss“。
 
@@ -277,7 +276,7 @@
     ```
 
     >![](public_sys-resources/icon-note.gif) **说明：** 
-    >您可通过**make install PREFIX=/path/to/openblas/install**设置“/path/to/openblas/install“以指定安装路径，默认安装路径为“/opt/OpenBLAS“。
+    >您可通过**make install PREFIX=/path/to/openblas/install**设置“/path/to/openblas/install“以指定安装路径，默认安装路径为“/opt/OpenBLAS”。
 
 6. 安装补丁文件0001-faiss\_1.14.3-optimize-rabitq.patch。
 
@@ -391,9 +390,9 @@
     >
     >**说明：** 
     >
-    >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
+    >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install”以指定安装路径，默认安装路径为“/usr/local”。
     >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
-    >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt“文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)“修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)“。
+    >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt”文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)”修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)”。
 
 ## 兼容性验证
 
@@ -401,7 +400,7 @@
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
-1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示。
+1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test”，完整的目录结构应如下所示。
 
     ```text
     ├── configs                                                   // 存放对应算法和数据集配置文件
@@ -427,7 +426,7 @@
     └── hnsw_test                                                 // 编译后生成的可执行文件
     ```
 
-2. 获取数据集，存放于“/path/to/sra\_test/data“。
+2. 获取数据集，存放于“/path/to/sra\_test/data”。
 
     ```bash
     cd /path/to/sra_test/data
@@ -457,7 +456,7 @@
     >- IVFPQFS算法：**make ivfpqfs\_test**
     >- IVFFLAT算法：**make ivfflat\_test**
 
-4. 若是第一次执行，确保hnsw\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
+4. 若是第一次执行，确保hnsw\_sift-128-euclidean.config文件中的“save\_or\_load”为“save”；后续执行时可改为“load”，使用构建好的图索引或检索器查询。
 5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
 
     ```bash

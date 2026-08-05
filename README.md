@@ -3,15 +3,15 @@
 ## 最新消息
 
 - \[2026.09.30\]：Faiss提供基于v1.14.3版本的RabitQ索引优化补丁。
-- \[2026.06.30\]：优化VisitedTable访问标记，采用类hashset的generation-based标记替代全量memset重置，将VisitedTable更新从O(N)优化至O(1)。4bit查表算子增加SVE2实现。
+- \[2026.06.30\]：优化访问表访问标记，采用类hashset的generation-based标记替代全量memset重置，将访问表更新从O(N)优化至O(1)。4bit查表算子增加SVE2实现。
 - \[2026.03.30\]：Faiss提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。
 - \[2025.12.30\]：Faiss发布于Gitcode平台，实现IVFFLAT、IVFPQ、IVFPQFS、PQFS、HNSW优化。
 
 ## 项目介绍
 
-Faiss是由facebook开发的用于高效相似搜索和密集向量聚类的算法库，其核心采用C++编写，并为Python/numpy提供完整封装接口。Faiss提供IVFFlat、IVFPQ、HNSW、IVFPQFS、PQFS等索引方式。鲲鹏优化基于开源Faiss代码做侵入式修改，保持原有接口。
+Faiss是由Facebook开发的用于高效相似搜索和密集向量聚类的算法库，其核心采用C++编写，并为Python/numpy提供完整封装接口。Faiss提供IVFFlat、IVFPQ、HNSW、IVFPQFS、PQFS等索引方式。鲲鹏优化基于开源Faiss代码做侵入式修改，保持原有接口。
 
-HNSW是Faiss提供的一种近似最近邻（ANN）图检索算法，开源Faiss\(HNSW\)接口支持FP32数据类型。为优化计算效率与内存占用，对原生faiss进行适配改造，增加FP16接口，使其在鲲鹏ARM架构下同样支持基于FP16的高效召回计算。
+HNSW是Faiss提供的一种近似最近邻（ANN）图检索算法，开源Faiss\(HNSW\)接口支持FP32数据类型。为优化计算效率与内存占用，对原生Faiss进行适配改造，增加FP16接口，使其在鲲鹏ARM架构下同样支持基于FP16的高效召回计算。
 
 ## 目录结构
 
@@ -74,7 +74,7 @@ faiss/
 </tr>
 <tr id="row2918153732019"><td class="cellrowborder" valign="top" width="17.64176417641764%" headers="mcps1.1.4.1.2 "><p id="p17918337172022"><a name="p17918337172022"></a><a name="p17918337172022"></a><a href="./docs/zh/best_practices.md">最佳实践</a></p>
 </td>
-<td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742020"><a name="p15918183742020"></a><a name="p15918183742020"></a>提供Faiss使用的实践案例。</p>
+<td class="cellrowborder" valign="top" width="72.57725772577258%" headers="mcps1.1.4.1.3 "><p id="p15918183742020"><a name="p15918183742020"></a><a name="p15918183742020"></a>提供使用Faiss的实践案例。</p>
 </td>
 </tr>
 </tbody>

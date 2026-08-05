@@ -2,9 +2,9 @@
 
 ## 接口列表
 
-本文档提供Faiss支持FP16的接口说明。目前仅提供C++的FP16接口，不对开源Python接口做修改/新增。在完全保持1.8.0版本开源C++接口兼容性的前提下，基于1.13.2版本扩展接口的形式，通过扩展接口增加对FP16数据类型的支持。
+本文档提供Faiss支持FP16的接口说明。目前仅提供C++的FP16接口，不对开源Python接口做修改或新增。在完全保持1.8.0版本开源C++接口兼容性的前提下，利用1.13.2版本扩展接口增加对FP16数据类型的支持。
 
-- 扩展接口的命名：在原生接口命名基础添加`_ex`后缀。
+- 扩展接口的命名：在原生接口名称的基础上添加`_ex`后缀。
 - 扩展接口的调用：能够根据传入参数的数据类型，自动调用对应的功能实现。
 - 扩展接口支持的数据类型：目前仅支持FP16数据类型，后续如果有其他数据类型的实现需求，均可通过扩展接口进行调用。
 
@@ -188,9 +188,9 @@ IndexHNSWFlat新增的构造函数。
 </th>
 <th class="cellrowborder" valign="top" width="17.97%" id="mcps1.1.5.1.2"><p id="p3787454133320"><a name="p3787454133320"></a><a name="p3787454133320"></a>参数类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p7787165415336"><a name="p7787165415336"></a><a name="p7787165415336"></a>描述</p>
+<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p7787165415336"><a name="p7787165415336"></a><a name="p7787165415336"></a>参数描述</p>
 </th>
-<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p078717549335"><a name="p078717549335"></a><a name="p078717549335"></a>取值范围</p>
+<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p078717549335"><a name="p078717549335"></a><a name="p078717549335"></a>参数取值范围</p>
 </th>
 </tr>
 </thead>
@@ -257,9 +257,9 @@ void train\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\);
 </th>
 <th class="cellrowborder" valign="top" width="17.97%" id="mcps1.1.5.1.2"><p id="p10449123783510"><a name="p10449123783510"></a><a name="p10449123783510"></a>参数类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p4449837143514"><a name="p4449837143514"></a><a name="p4449837143514"></a>描述</p>
+<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p4449837143514"><a name="p4449837143514"></a><a name="p4449837143514"></a>参数描述</p>
 </th>
-<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p544913375359"><a name="p544913375359"></a><a name="p544913375359"></a>取值范围</p>
+<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p544913375359"><a name="p544913375359"></a><a name="p544913375359"></a>参数取值范围</p>
 </th>
 </tr>
 </thead>
@@ -327,9 +327,9 @@ void add\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\);
 </th>
 <th class="cellrowborder" valign="top" width="17.97%" id="mcps1.1.5.1.2"><p id="p97978517363"><a name="p97978517363"></a><a name="p97978517363"></a>参数类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p12797659369"><a name="p12797659369"></a><a name="p12797659369"></a>描述</p>
+<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p12797659369"><a name="p12797659369"></a><a name="p12797659369"></a>参数描述</p>
 </th>
-<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p12797050368"><a name="p12797050368"></a><a name="p12797050368"></a>取值范围</p>
+<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p12797050368"><a name="p12797050368"></a><a name="p12797050368"></a>参数取值范围</p>
 </th>
 </tr>
 </thead>
@@ -397,9 +397,9 @@ void search\_ex\(idx\_t n, const void\* x, idx\_t k, float\* distances, idx\_t\*
 </th>
 <th class="cellrowborder" valign="top" width="17.97%" id="mcps1.1.5.1.2"><p id="p623811430361"><a name="p623811430361"></a><a name="p623811430361"></a>参数类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p32381743173613"><a name="p32381743173613"></a><a name="p32381743173613"></a>描述</p>
+<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p32381743173613"><a name="p32381743173613"></a><a name="p32381743173613"></a>参数描述</p>
 </th>
-<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p1423834353618"><a name="p1423834353618"></a><a name="p1423834353618"></a>取值范围</p>
+<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p1423834353618"><a name="p1423834353618"></a><a name="p1423834353618"></a>参数取值范围</p>
 </th>
 </tr>
 </thead>
@@ -518,9 +518,9 @@ void range\_search\_ex\(idx\_t n, const void\* x, float radius, RangeSearchResul
 </th>
 <th class="cellrowborder" valign="top" width="17.97%" id="mcps1.1.5.1.2"><p id="p0874921153718"><a name="p0874921153718"></a><a name="p0874921153718"></a>参数类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p19874021173713"><a name="p19874021173713"></a><a name="p19874021173713"></a>描述</p>
+<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p19874021173713"><a name="p19874021173713"></a><a name="p19874021173713"></a>参数描述</p>
 </th>
-<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p19874021153717"><a name="p19874021153717"></a><a name="p19874021153717"></a>取值范围</p>
+<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p19874021153717"><a name="p19874021153717"></a><a name="p19874021153717"></a>参数取值范围</p>
 </th>
 </tr>
 </thead>
@@ -633,9 +633,9 @@ void reconstruct\_ex\(idx\_t key, void\* recons, NumericType numeric\_type\);
 </th>
 <th class="cellrowborder" valign="top" width="17.97%" id="mcps1.1.5.1.2"><p id="p23338489376"><a name="p23338489376"></a><a name="p23338489376"></a>参数类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="28.34%" id="mcps1.1.5.1.3"><p id="p1333317481377"><a name="p1333317481377"></a><a name="p1333317481377"></a>描述</p>
+<th class="cellrowborder" valign="top" width="28.34%" id="mcps1.1.5.1.3"><p id="p1333317481377"><a name="p1333317481377"></a><a name="p1333317481377"></a>参数描述</p>
 </th>
-<th class="cellrowborder" valign="top" width="38.769999999999996%" id="mcps1.1.5.1.4"><p id="p10333114813714"><a name="p10333114813714"></a><a name="p10333114813714"></a>取值范围</p>
+<th class="cellrowborder" valign="top" width="38.769999999999996%" id="mcps1.1.5.1.4"><p id="p10333114813714"><a name="p10333114813714"></a><a name="p10333114813714"></a>参数取值范围</p>
 </th>
 </tr>
 </thead>
@@ -712,9 +712,9 @@ HNSW索引在第0层执行批量近似最近邻搜索。
 </th>
 <th class="cellrowborder" valign="top" width="17.97%" id="mcps1.1.5.1.2"><p id="p20220104833815"><a name="p20220104833815"></a><a name="p20220104833815"></a>参数类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p6220154893814"><a name="p6220154893814"></a><a name="p6220154893814"></a>描述</p>
+<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p6220154893814"><a name="p6220154893814"></a><a name="p6220154893814"></a>参数描述</p>
 </th>
-<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p322012486383"><a name="p322012486383"></a><a name="p322012486383"></a>取值范围</p>
+<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p322012486383"><a name="p322012486383"></a><a name="p322012486383"></a>参数取值范围</p>
 </th>
 </tr>
 </thead>

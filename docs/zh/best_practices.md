@@ -4,7 +4,7 @@
 
 ### 全量优化
 
-本节介绍在鲲鹏平台测试全量优化后Faiss的方法，依赖鲲鹏的全量优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
+本节介绍在鲲鹏平台测试全量优化后Faiss的方法。依赖鲲鹏的全量优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
@@ -79,7 +79,7 @@
 
 ### 等价优化
 
-本节介绍在鲲鹏平台测试等价优化后Faiss的方法，依赖鲲鹏的等价优化补丁文件0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
+本节介绍在鲲鹏平台测试等价优化后Faiss的方法。依赖鲲鹏的等价优化补丁文件0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（IVFPQ）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
@@ -90,7 +90,8 @@
           └── ivfpq
                 └── ivfpq_sift-128-euclidean.config 
     ├── include                                                   // 存放测试框架对应的头文件
-          └── algo                                                // 各算法Index定义
+          └── algo                                                // 各算法Index
+          定义
           └── core                                                // 数据处理、测试结果处理等头文件
           └── framework                                           // 测试框架相关头文件
     ├── src                                                       // 存放测试框架对应的源文件
@@ -124,9 +125,9 @@
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. 请参考《[安装指南](./installation_guide.md)》编译安装Faiss。
+2. 请参考《[安装指南](./installation_guide.md)》安装Faiss。
    > **说明：** 作为等价优化后Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
-3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据命令行提示同步开启 **-DKRL=ON**。
+3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在的路径。注意，请根据命令行提示同步开启 **-DKRL=ON**。
 
     ```bash
     make ivfpq_test
@@ -275,7 +276,7 @@
 
 2. 请参考《[安装指南](./installation_guide.md)》编译安装Faiss。
    >**说明：** 作为基于v1.14.3优化后的Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
-3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据命令行提示同步开 **-DKRL=ON** 。若提示缺少头文件，则需键入 **-I/path/to/faiss**。
+3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在的路径。注意，请根据命令行提示同步开启 **-DKRL=ON** 。若提示缺少头文件，则需键入 **-I/path/to/faiss**。
 
     ```bash
     make ivfrabitqfs_test

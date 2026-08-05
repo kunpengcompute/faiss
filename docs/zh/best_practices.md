@@ -155,7 +155,7 @@
 
 ### HNSW FP16支持
 
-本节介绍在鲲鹏平台测试基于Faiss v1.8.0HNSW支持FP16接口后的Faiss的方法，依赖鲲鹏的优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（HNSW）算法，线程数32。
+本节介绍在鲲鹏平台测试基于Faiss v1.8.0 HNSW支持FP16接口后的Faiss的方法，依赖鲲鹏的优化补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。使用示例为sift-128-euclidean.hdf5数据集，Faiss（HNSW）算法，线程数32。
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 

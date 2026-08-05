@@ -11,11 +11,10 @@
 
 Faiss是由Facebook开发的用于高效相似搜索和密集向量聚类的算法库，其核心采用C++编写，并为Python/numpy提供完整封装接口。Faiss提供IVFFlat、IVFPQ、HNSW、IVFPQFS、PQFS等索引方式。鲲鹏优化基于开源Faiss代码做侵入式修改，保持原有接口。
 
-<<<<<<< HEAD
 HNSW是Faiss提供的一种近似最近邻（ANN）图检索算法，开源Faiss（HNSW）接口支持FP32数据类型。为优化计算效率与内存占用，对原生Faiss进行适配改造，增加FP16接口，使其在鲲鹏ARM架构下同样支持基于FP16的高效召回计算。
-=======
+
 HNSW是Faiss提供的一种近似最近邻（ANN）图检索算法，开源Faiss （HNSW）接口支持FP32数据类型。为优化计算效率与内存占用，对原生Faiss进行适配改造，增加FP16接口，使其在鲲鹏ARM架构下同样支持基于FP16的高效召回计算。
->>>>>>> 785bd573f46c89673b1d78ef6e49395db94b4e66
+
 
 ## 目录结构
 

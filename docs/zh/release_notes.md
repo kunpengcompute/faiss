@@ -12,7 +12,7 @@
 </tr>
 <tr id="row24726251"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.2.1"><p id="p56669300"><a name="p56669300"></a><a name="p56669300"></a>产品版本</p>
 </th>
-<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.2.1 "><p id="p11923034"><a name="p11923034"></a><a name="p11923034"></a><span id="text189831542174711"><a name="text189831542174711"></a><a name="text189831542174711"></a>26.1.RC1</span></p>
+<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.2.1 "><p id="p11923034"><a name="p11923034"></a><a name="p11923034"></a><span id="text189831542174711"><a name="text189831542174711"></a><a name="text189831542174711"></a>26.2.RC1</span></p>
 </td>
 </tr>
 <tr id="row1930811171892"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.3.1"><p id="p2030912172097"><a name="p2030912172097"></a><a name="p2030912172097"></a>软件名称</p>
@@ -22,26 +22,26 @@
 </tr>
 <tr id="row24726251"><th class="firstcol" valign="top" width="42.17%" id="mcps1.1.3.2.1"><p id="p56669300"><a name="p56669300"></a><a name="p56669300"></a>软件版本</p>
 </th>
-<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.2.1 "><p id="p11923034"><a name="p11923034"></a><a name="p11923034"></a><span id="text189831542174711"><a name="text189831542174711"></a><a name="text189831542174711"></a>v1.0.0</span></p>
+<td class="cellrowborder" valign="top" width="57.830000000000005%" headers="mcps1.1.3.2.1 "><p id="p11923034"><a name="p11923034"></a><a name="p11923034"></a><span id="text189831542174711"><a name="text189831542174711"></a><a name="text189831542174711"></a>v1.1.0</span></p>
 </td>
 </tr>
 </tbody>
 </table>
 
-### 与操作系统、编译器和CPU配套说明
+### 与操作系统、编译器和处理器配套说明
 
 **表 1** Faiss已验证环境<a id="Faiss已验证环境"></a>
 
 <a name="table4692134313211"></a>
 <table><thead align="left"><tr id="row1169294312212"><th class="cellrowborder" valign="top" width="21.8%" id="mcps1.2.6.1.1"><p id="p12692144313211"><a name="p12692144313211"></a><a name="p12692144313211"></a>操作系统</p>
 </th>
-<th class="cellrowborder" valign="top" width="19.91%" id="mcps1.2.6.1.2"><p id="p06926438214"><a name="p06926438214"></a><a name="p06926438214"></a>CPU类型</p>
+<th class="cellrowborder" valign="top" width="19.91%" id="mcps1.2.6.1.2"><p id="p06926438214"><a name="p06926438214"></a><a name="p06926438214"></a>处理器类型</p>
 </th>
 <th class="cellrowborder" valign="top" width="13.700000000000001%" id="mcps1.2.6.1.3"><p id="p269284310216"><a name="p269284310216"></a><a name="p269284310216"></a>内存</p>
 </th>
 <th class="cellrowborder" valign="top" width="17.34%" id="mcps1.2.6.1.4"><p id="p196922434215"><a name="p196922434215"></a><a name="p196922434215"></a>编译器</p>
 </th>
-<th class="cellrowborder" valign="top" width="27.250000000000004%" id="mcps1.2.6.1.5"><p id="p1769219435210"><a name="p1769219435210"></a><a name="p1769219435210"></a>其他</p>
+<th class="cellrowborder" valign="top" width="27.250000000000004%" id="mcps1.2.6.1.5"><p id="p1769219435210"><a name="p1769219435210"></a><a name="p1769219435210"></a>CMake版本号</p>
 </th>
 </tr>
 </thead>
@@ -97,13 +97,13 @@
 
 请参见《[安装指南](./installation_guide.md)》。
 
-## v1.0.0
+## v1.1.0
 
 ### 更新说明
 
 **新增特性<a name="section11862975"></a>**
 
-提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。补丁发布至Gitcode上，代码分支版本号为**v1.0.0**。
+提供基于Faiss v1.14.3版本的RabitQ索引优化补丁，
 
 **修改特性<a name="section16450949161512"></a>**
 
@@ -121,13 +121,37 @@
 
 无
 
-## V25.3.0
+## v1.0.0
 
 ### 更新说明
 
 **新增特性<a name="section11862975"></a>**
 
-新增Faiss子库，代码开源发布，需要通过源代码编译后使用。补丁发布至Gitcode上，代码分支版本号为**v1.8.0-2512**。
+提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。补丁发布至Gitcode平台，代码分支版本号为**v1.0.0**。
+
+**修改特性<a name="section16450949161512"></a>**
+
+无
+
+**删除特性<a name="section9218125814159"></a>**
+
+无
+
+### 已解决的问题
+
+无
+
+### 遗留问题
+
+无
+
+## v25.3.0
+
+### 更新说明
+
+**新增特性<a name="section11862975"></a>**
+
+新增Faiss子库，代码开源发布。Faiss需要通过源代码编译后使用。补丁发布至Gitcode平台，代码分支版本号为**v1.8.0-2512**。
 
 **修改特性<a name="section16450949161512"></a>**
 
@@ -147,7 +171,7 @@
 
 ## 版本配套文档
 
-### v1.0.0版本配套文档
+### v1.1.0版本配套文档
 
 <a name="table1191773710200"></a>
 <table><thead align="left"><tr id="row1291816372202"><th class="cellrowborder" valign="top" width="45.019999999999996%" id="mcps1.1.4.1.1"><p id="p291823714205"><a name="p291823714205"></a><a name="p291823714205"></a>文档名称</p>
@@ -167,7 +191,7 @@
 </tr>
 <tr id="row939116371143"><td class="cellrowborder" valign="top" width="45.019999999999996%" headers="mcps1.1.4.1.1 "><p id="p1039163711413"><a name="p1039163711413"></a><a name="p1039163711413"></a>《快速入门》</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p1139217371746"><a name="p1139217371746"></a><a name="p1139217371746"></a>本文档提供Faiss的快速上手指导。</p>
+<td class="cellrowborder" valign="top" width="38.019999999999996%" headers="mcps1.1.4.1.2 "><p id="p1139217371746"><a name="p1139217371746"></a><a name="p1139217371746"></a>本文档提供Faiss的快速入门指导。</p>
 </td>
 <td class="cellrowborder" valign="top" width="16.96%" headers="mcps1.1.4.1.3 "><p id="p1139217371747"><a name="p1139217371747"></a><a name="p1139217371747"></a>开源仓</p>
 </td>

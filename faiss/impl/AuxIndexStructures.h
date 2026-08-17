@@ -187,12 +187,21 @@ inline size_t get_l3_cache_size() {
 /// Divisor of 8 accounts for: multiple threads sharing L3, other data
 /// competing for cache, and safety margin.
 /// Falls back to 3M if L3 detection fails.
+///
+/// The L3 size never changes over the process lifetime, and reading it
+/// involves file I/O + string parsing that must NOT be paid on every
+/// VisitedTable construction (which happens on the search hot path).
+/// So we compute it exactly once and cache it in a function-local static.
+/// C++11 guarantees this initialization is thread-safe.
 inline int compute_hashset_threshold() {
-    size_t l3 = get_l3_cache_size();
-    if (l3 == 0)
-        return 3000000; // fallback for unknown L3
-    // threshold = L3_cache_size / 8 bytes -> ntotal nodes
-    return static_cast<int>(l3 / 8);
+    static const int threshold = [] {
+        size_t l3 = get_l3_cache_size();
+        if (l3 == 0)
+            return 3000000; // fallback for unknown L3
+        // threshold = L3_cache_size / 8 bytes -> ntotal nodes
+        return static_cast<int>(l3 / 8);
+    }();
+    return threshold;
 }
 
 /// set implementation optimized for fast access.

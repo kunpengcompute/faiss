@@ -531,7 +531,7 @@ for (int i = 0; i < std::min(5, d); i++) {
 
 **API Definition<a name="section55611644173112"></a>**
 
-void search_level_0_ex(idx_t n, const void* x, idx_t k, const storage_idx_t* nearest, const float* nearest_d, float* distances, idx_t* labels, NumericType numeric_type, int nprobe = 1, int search_type = 1);
+void search_level_0_ex(idx_t n, const void*x, idx_t k, const storage_idx_t* nearest, const float*nearest_d, float*distances, idx_t*labels, NumericType numeric_type, int nprobe = 1, int search_type = 1);
 
 **Function<a name="section14731398326"></a>**
 

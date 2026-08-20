@@ -1,13 +1,17 @@
 # Quick Start
 
-This section provides a brief guide to getting started with the core functions of Faiss.
+<!-- md-trans-meta sourceCommit=3e2fefee58f1611dbf13ddb8e6d17fcf6073b661 translatedAt=2026-08-06T08:57:24.240Z pushedAt=2026-08-07T01:07:09.478Z -->
+
+This document provides straightforward guidance for quickly getting started with Faiss core features.
 
 ## Core Concepts
 
 The core of Faiss is the index, a structure specifically designed to store vectors and efficiently perform similarity searches.
 
 - Vectors: Open-source Faiss supports float32 vectors.
+
 - Index types: For beginners, IndexFlatL2 (an exhaustive search index that yields exact results with no approximation, making it ideal for learning) is recommended. You can try IndexIVFFlat (an approximate search index for faster speed) later.
+
 - Core workflow: Create an index → Add vectors to the index → Execute similarity search.
 
 ## Example

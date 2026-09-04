@@ -87,8 +87,4 @@ We welcome your contributions to the community. If you have any questions/sugges
 
 ## Acknowledgments
 
-Faiss is jointly developed by the following Huawei department:
-
-- Kunpeng Computing BoostKit Development Dept
-
 Thank you to everyone in the community for your PRs. We warmly welcome contributions to Faiss!

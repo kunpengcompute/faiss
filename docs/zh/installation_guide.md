@@ -89,21 +89,27 @@
     >- 0001-faiss\_1.8.0-optimize-neq.patch：全量优化补丁，性能最优，保证精度，但不保证Top-K的值或顺序与原生完全一致。
     >- 0002-faiss\_1.8.0-optimize-eqv.patch：等价优化补丁，保证Top-K的值与顺序与原生保持完全一致。
 
-3. 安装Make、CMake、GCC。GCC 12安装步骤适用于openEuler 22.03 LTS SP3系统，openEuler 24.03 LTS SP3系统自带GCC 12，仅安装Make、CMake。
+3. 安装Make、CMake、GCC。
 
     ```bash
-    yum install make cmake gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
+    yum install make cmake
+    ```
+
+4. GCC 12安装步骤适用于openEuler 22.03 LTS SP3系统，openEuler 24.03 LTS SP3系统自带GCC 12。
+
+    ```bash
+    yum install gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
     export PATH=/opt/openEuler/gcc-toolset-12/root/usr/bin/:$PATH
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
     
-4. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29”。
+5. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29”。
     
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
     ```
 
-5. <a name="li880635723510"></a>编译源代码获取libopenblas.so。
+6. <a name="li880635723510"></a>编译源代码获取libopenblas.so。
 
     ```bash
     cd /path/to/OpenBLAS-0.3.29/OpenBLAS
@@ -114,7 +120,7 @@
     >![](public_sys-resources/icon-note.gif) **说明：** 
     >您可通过**make install PREFIX=/path/to/openblas/install**设置“/path/to/openblas/install”以指定安装路径，默认安装路径为“/opt/OpenBLAS”。
 
-6. 安装补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。
+7. 安装补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。
 
     ```bash
     cd /path/to/faiss
@@ -165,7 +171,7 @@
     │   │   └─ InvertedLists.cpp                   // 倒排列表实现
     │   ├─ utils/
     │   │   └─ distances_simd.cpp                  // SIMD L2/IP/L1/Linf实现
-    │   ├─ sra_krl/
+    │   ├─ sra_krl/                                // krl检索算子（新增）
     │   │   ├─ include/
     │   │   │   ├─ krl.h                           // 对外统一API声明
     │   │   │   ├─ krl_internal.h                  // 内部结构体、宏、SIMD辅助实现
@@ -206,7 +212,7 @@
     └─ README.md
     ```
 
-7. 编译Faiss代码获取libfaiss.so。注意：需启用鲲鹏优化宏以获得性能提升。
+8. 编译Faiss代码获取libfaiss.so。注意：需启用鲲鹏优化宏以获得性能提升。
 
     ```bash
     cd /path/to/faiss
@@ -254,21 +260,27 @@
     >鲲鹏优化补丁文件描述如下：
     >- 0001-faiss\_1.14.3-optimize-rabitq.patch：基于v1.14.3版本的RabitQ索引优化补丁，保证精度，但不保证Top-K的值或顺序与原生完全一致。
 
-3. 安装Make、CMake、GCC。GCC 12安装步骤适用于openEuler 22.03 LTS SP3系统，openEuler 24.03 LTS SP3系统自带GCC 12，仅安装Make、CMake。
+3. 安装Make、CMake、GCC。
 
     ```bash
-    yum install make cmake gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
+    yum install make cmake
+    ```
+
+4. GCC 12安装步骤适用于openEuler 22.03 LTS SP3系统，openEuler 24.03 LTS SP3系统自带GCC 12。
+
+    ```bash
+    yum install gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
     export PATH=/opt/openEuler/gcc-toolset-12/root/usr/bin/:$PATH
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-4. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
+5. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
     ```
 
-5. <a name="li880635723510"></a>编译源代码获取libopenblas.so。
+6. <a name="li880635723510"></a>编译源代码获取libopenblas.so。
 
     ```bash
     cd /path/to/OpenBLAS-0.3.29/OpenBLAS
@@ -279,7 +291,7 @@
     >![](public_sys-resources/icon-note.gif) **说明：** 
     >您可通过**make install PREFIX=/path/to/openblas/install**设置“/path/to/openblas/install“以指定安装路径，默认安装路径为“/opt/OpenBLAS”。
 
-6. 安装补丁文件0001-faiss\_1.14.3-optimize-rabitq.patch。
+7. 安装补丁文件0001-faiss\_1.14.3-optimize-rabitq.patch。
 
     ```bash
     cd /path/to/faiss
@@ -337,7 +349,7 @@
     │   │   └─ InvertedLists.cpp                   // 倒排列表实现
     │   ├─ utils/
     │   │   └─ distances_simd.cpp                  // SIMD L2/IP/L1/Linf实现
-    │   ├─ sra_krl/
+    │   ├─ sra_krl/                                // krl检索算子（新增）
     │   │   ├─ include/
     │   │   │   ├─ krl.h                           // 对外统一API声明
     │   │   │   ├─ krl_heap.h                      // 堆结构接口
@@ -372,7 +384,7 @@
     └─ README.md
     ```
 
-7. 编译Faiss代码获取libfaiss.so。注意：需启用鲲鹏优化宏以获得性能提升。
+8. 编译Faiss代码获取libfaiss.so。注意：需启用鲲鹏优化宏以获得性能提升。
 
     ```bash
     cd /path/to/faiss

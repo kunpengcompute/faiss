@@ -721,7 +721,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/.github/workflows/update-d
 -          fi
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/.gitignore faiss-patch/.gitignore
 --- faiss/.gitignore	2026-06-10 15:21:27.641235500 +0800
-+++ faiss-patch/.gitignore	2026-06-16 10:36:25.168399500 +0800
++++ faiss-patch/.gitignore	2026-08-17 19:31:58.104099000 +0800
 @@ -1,20 +1,32 @@
 -*.swp
 -*.swo
@@ -774,7 +774,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/.gitignore faiss-patch/.gi
 +*.app
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/CMakeLists.txt faiss-patch/CMakeLists.txt
 --- faiss/CMakeLists.txt	2026-06-10 15:21:27.641235500 +0800
-+++ faiss-patch/CMakeLists.txt	2026-06-16 10:36:25.169401600 +0800
++++ faiss-patch/CMakeLists.txt	2026-08-17 19:31:58.104099000 +0800
 @@ -20,6 +20,41 @@
  
  cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)
@@ -819,7 +819,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/CMakeLists.txt faiss-patch
  if(FAISS_ENABLE_GPU)
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/README.en.md faiss-patch/README.en.md
 --- faiss/README.en.md	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/README.en.md	2026-06-16 10:36:25.170553100 +0800
++++ faiss-patch/README.en.md	2026-08-17 19:31:58.105603300 +0800
 @@ -0,0 +1,36 @@
 +# faiss
 +
@@ -859,7 +859,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/README.en.md faiss-patch/R
 +6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/CMakeLists.txt faiss-patch/faiss/CMakeLists.txt
 --- faiss/faiss/CMakeLists.txt	2026-06-10 15:21:27.670472900 +0800
-+++ faiss-patch/faiss/CMakeLists.txt	2026-06-16 10:36:25.198116800 +0800
++++ faiss-patch/faiss/CMakeLists.txt	2026-08-17 19:31:58.131510400 +0800
 @@ -221,16 +221,145 @@
    utils/hamming_distance/avx2-inl.h
  )
@@ -1008,7 +1008,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/CMakeLists.txt faiss
    set_target_properties(faiss_avx2 PROPERTIES EXCLUDE_FROM_ALL TRUE)
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index.cpp faiss-patch/faiss/Index.cpp
 --- faiss/faiss/Index.cpp	2026-06-10 15:21:27.670472900 +0800
-+++ faiss-patch/faiss/Index.cpp	2026-06-16 10:36:25.199140400 +0800
++++ faiss-patch/faiss/Index.cpp	2026-08-17 19:31:58.133071300 +0800
 @@ -162,6 +162,9 @@
      void set_query(const float* x) override {
          q = x;
@@ -1021,7 +1021,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index.cpp faiss-patc
  } // namespace
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index.h faiss-patch/faiss/Index.h
 --- faiss/faiss/Index.h	2026-06-10 15:21:27.670472900 +0800
-+++ faiss-patch/faiss/Index.h	2026-06-16 10:36:25.199140400 +0800
++++ faiss-patch/faiss/Index.h	2026-08-17 19:31:58.133584400 +0800
 @@ -11,10 +11,14 @@
  #define FAISS_INDEX_H
  
@@ -1111,7 +1111,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index.h faiss-patch/
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index2Layer.cpp faiss-patch/faiss/Index2Layer.cpp
 --- faiss/faiss/Index2Layer.cpp	2026-06-10 15:21:27.670472900 +0800
-+++ faiss-patch/faiss/Index2Layer.cpp	2026-06-16 10:36:25.199140400 +0800
++++ faiss-patch/faiss/Index2Layer.cpp	2026-08-17 19:31:58.133584400 +0800
 @@ -160,6 +160,10 @@
      void set_query(const float* x) override {
          q = x;
@@ -1125,7 +1125,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/Index2Layer.cpp fais
  // well optimized for xNN+PQNN
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexBinaryHNSW.cpp faiss-patch/faiss/IndexBinaryHNSW.cpp
 --- faiss/faiss/IndexBinaryHNSW.cpp	2026-06-10 15:21:27.672990600 +0800
-+++ faiss-patch/faiss/IndexBinaryHNSW.cpp	2026-06-16 10:36:25.200649600 +0800
++++ faiss-patch/faiss/IndexBinaryHNSW.cpp	2026-08-17 19:31:58.135611100 +0800
 @@ -278,6 +278,10 @@
          hc.set((uint8_t*)x, code_size);
      }
@@ -1139,7 +1139,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexBinaryHNSW.cpp 
          { hnsw_stats.ndis += ndis; }
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFastScan.cpp faiss-patch/faiss/IndexFastScan.cpp
 --- faiss/faiss/IndexFastScan.cpp	2026-06-10 15:21:27.674001000 +0800
-+++ faiss-patch/faiss/IndexFastScan.cpp	2026-06-16 10:36:25.202161700 +0800
++++ faiss-patch/faiss/IndexFastScan.cpp	2026-08-17 19:31:58.136655500 +0800
 @@ -471,7 +471,11 @@
                  codes.get(),
                  LUT.get(),
@@ -1155,7 +1155,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFastScan.cpp fa
          handler->end();
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFastScan.h faiss-patch/faiss/IndexFastScan.h
 --- faiss/faiss/IndexFastScan.h	2026-06-10 15:21:27.674505300 +0800
-+++ faiss-patch/faiss/IndexFastScan.h	2026-06-16 10:36:25.202161700 +0800
++++ faiss-patch/faiss/IndexFastScan.h	2026-08-17 19:31:58.136655500 +0800
 @@ -50,6 +50,10 @@
  
      AlignedTable<uint8_t> codes;
@@ -1169,7 +1169,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFastScan.h fais
      const uint8_t* orig_codes = nullptr;
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlat.cpp faiss-patch/faiss/IndexFlat.cpp
 --- faiss/faiss/IndexFlat.cpp	2026-06-10 15:21:27.674505300 +0800
-+++ faiss-patch/faiss/IndexFlat.cpp	2026-06-16 10:36:25.202161700 +0800
++++ faiss-patch/faiss/IndexFlat.cpp	2026-08-17 19:31:58.136655500 +0800
 @@ -18,6 +18,13 @@
  #include <faiss/utils/sorting.h>
  #include <faiss/utils/utils.h>
@@ -1282,7 +1282,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlat.cpp faiss-
  
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlat.h faiss-patch/faiss/IndexFlat.h
 --- faiss/faiss/IndexFlat.h	2026-06-10 15:21:27.674505300 +0800
-+++ faiss-patch/faiss/IndexFlat.h	2026-06-16 10:36:25.202161700 +0800
++++ faiss-patch/faiss/IndexFlat.h	2026-08-17 19:31:58.136655500 +0800
 @@ -74,6 +74,7 @@
  
  struct IndexFlatIP : IndexFlat {
@@ -1309,7 +1309,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlat.h faiss-pa
  };
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlatCodes.cpp faiss-patch/faiss/IndexFlatCodes.cpp
 --- faiss/faiss/IndexFlatCodes.cpp	2026-06-10 15:21:27.674505300 +0800
-+++ faiss-patch/faiss/IndexFlatCodes.cpp	2026-06-16 10:36:25.202161700 +0800
++++ faiss-patch/faiss/IndexFlatCodes.cpp	2026-08-17 19:31:58.136655500 +0800
 @@ -12,12 +12,20 @@
  #include <faiss/impl/DistanceComputer.h>
  #include <faiss/impl/FaissAssert.h>
@@ -1391,7 +1391,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlatCodes.cpp f
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlatCodes.h faiss-patch/faiss/IndexFlatCodes.h
 --- faiss/faiss/IndexFlatCodes.h	2026-06-10 15:21:27.674505300 +0800
-+++ faiss-patch/faiss/IndexFlatCodes.h	2026-06-16 10:36:25.202161700 +0800
++++ faiss-patch/faiss/IndexFlatCodes.h	2026-08-17 19:31:58.136655500 +0800
 @@ -12,6 +12,9 @@
  #include <faiss/Index.h>
  #include <faiss/impl/DistanceComputer.h>
@@ -1470,7 +1470,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexFlatCodes.h fai
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexHNSW.cpp faiss-patch/faiss/IndexHNSW.cpp
 --- faiss/faiss/IndexHNSW.cpp	2026-06-10 15:21:27.674505300 +0800
-+++ faiss-patch/faiss/IndexHNSW.cpp	2026-06-16 10:36:25.202161700 +0800
++++ faiss-patch/faiss/IndexHNSW.cpp	2026-08-17 19:31:58.136655500 +0800
 @@ -35,6 +35,10 @@
  #include <faiss/utils/sorting.h>
  
@@ -1889,7 +1889,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexHNSW.cpp faiss-
  void IndexHNSW::reset() {
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexHNSW.h faiss-patch/faiss/IndexHNSW.h
 --- faiss/faiss/IndexHNSW.h	2026-06-10 15:21:27.675514700 +0800
-+++ faiss-patch/faiss/IndexHNSW.h	2026-06-16 10:36:25.202161700 +0800
++++ faiss-patch/faiss/IndexHNSW.h	2026-08-17 19:31:58.138160400 +0800
 @@ -33,7 +33,17 @@
      // the sequential storage
      bool own_fields = false;
@@ -1920,7 +1920,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexHNSW.h faiss-pa
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVF.cpp faiss-patch/faiss/IndexIVF.cpp
 --- faiss/faiss/IndexIVF.cpp	2026-06-10 15:21:27.676034100 +0800
-+++ faiss-patch/faiss/IndexIVF.cpp	2026-06-16 10:36:25.203679600 +0800
++++ faiss-patch/faiss/IndexIVF.cpp	2026-08-17 19:31:58.138160400 +0800
 @@ -29,6 +29,12 @@
  #include <faiss/impl/FaissAssert.h>
  #include <faiss/impl/IDSelector.h>
@@ -1969,7 +1969,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVF.cpp faiss-p
      if (interrupt) {
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVF.h faiss-patch/faiss/IndexIVF.h
 --- faiss/faiss/IndexIVF.h	2026-06-10 15:21:27.676034100 +0800
-+++ faiss-patch/faiss/IndexIVF.h	2026-06-16 10:36:25.203679600 +0800
++++ faiss-patch/faiss/IndexIVF.h	2026-08-17 19:31:58.138160400 +0800
 @@ -22,6 +22,12 @@
  #include <faiss/invlists/DirectMap.h>
  #include <faiss/invlists/InvertedLists.h>
@@ -2014,7 +2014,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVF.h faiss-pat
  // whether to check that coarse quantizers are the same
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.cpp faiss-patch/faiss/IndexIVFFastScan.cpp
 --- faiss/faiss/IndexIVFFastScan.cpp	2026-06-10 15:21:27.676542700 +0800
-+++ faiss-patch/faiss/IndexIVFFastScan.cpp	2026-06-16 10:36:25.204684300 +0800
++++ faiss-patch/faiss/IndexIVFFastScan.cpp	2026-08-17 19:31:58.139672000 +0800
 @@ -94,6 +94,7 @@
          const idx_t* xids) {
      FAISS_THROW_IF_NOT(is_trained);
@@ -2031,7 +2031,27 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.cpp
      InterruptCallback::check();
  
      direct_map.check_can_add(xids);
-@@ -1025,7 +1027,11 @@
+@@ -970,6 +972,10 @@
+ 
+     size_t ndis = 0;
+ 
++    const int max_nc = qbs2;
++    AlignedTable<uint8_t> LUT(max_nc * dim12);
++    std::vector<int> q_map(max_nc), lut_entries(max_nc);
++
+     size_t i0 = 0;
+     uint64_t t_copy_pack = 0, t_scan = 0;
+     while (i0 < qcs.size()) {
+@@ -994,8 +1000,6 @@
+         // re-organize LUTs and biases into the right order
+         int nc = i1 - i0;
+ 
+-        std::vector<int> q_map(nc), lut_entries(nc);
+-        AlignedTable<uint8_t> LUT(nc * dim12);
+         memset(LUT.get(), -1, nc * dim12);
+         int qbs = pq4_preferred_qbs(nc);
+ 
+@@ -1025,7 +1029,11 @@
          handler.id_map = ids.get();
  
          pq4_accumulate_loop_qbs(
@@ -2039,12 +2059,31 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.cpp
 +                qbs, list_size, M2, codes.get(), LUT.get(), handler, scaler
 +#ifdef KRL
 +                , this->apply_repack
-+#endif   
++#endif
 +        );
          // prepare for next loop
          i0 = i1;
      }
-@@ -1218,7 +1224,11 @@
+@@ -1167,6 +1175,9 @@
+             tmp_bias.resize(qbs2);
+             handler->dbias = tmp_bias.data();
+         }
++        const int max_nc = qbs2;
++        AlignedTable<uint8_t> LUT(max_nc * dim12);
++        std::vector<int> q_map(max_nc), lut_entries(max_nc);
+         std::set<int> q_set;
+         uint64_t t_copy_pack = 0, t_scan = 0;
+ #pragma omp for schedule(dynamic)
+@@ -1180,8 +1191,6 @@
+             // re-organize LUTs and biases into the right order
+             int nc = i1 - i0;
+ 
+-            std::vector<int> q_map(nc), lut_entries(nc);
+-            AlignedTable<uint8_t> LUT(nc * dim12);
+             memset(LUT.get(), -1, nc * dim12);
+             int qbs = pq4_preferred_qbs(nc);
+ 
+@@ -1218,7 +1227,11 @@
                      codes.get(),
                      LUT.get(),
                      *handler.get(),
@@ -2059,7 +2098,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.cpp
          // labels is in-place for HeapHC
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.h faiss-patch/faiss/IndexIVFFastScan.h
 --- faiss/faiss/IndexIVFFastScan.h	2026-06-10 15:21:27.676542700 +0800
-+++ faiss-patch/faiss/IndexIVFFastScan.h	2026-06-16 10:36:25.204684300 +0800
++++ faiss-patch/faiss/IndexIVFFastScan.h	2026-08-17 19:31:58.139672000 +0800
 @@ -59,6 +59,10 @@
      int qbs = 0;
      size_t qbs2 = 0;
@@ -2073,7 +2112,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFastScan.h f
              size_t d,
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFlat.cpp faiss-patch/faiss/IndexIVFFlat.cpp
 --- faiss/faiss/IndexIVFFlat.cpp	2026-06-10 15:21:27.676542700 +0800
-+++ faiss-patch/faiss/IndexIVFFlat.cpp	2026-06-16 10:36:25.205187900 +0800
++++ faiss-patch/faiss/IndexIVFFlat.cpp	2026-08-17 19:31:58.139672000 +0800
 @@ -88,6 +88,9 @@
                 n);
      }
@@ -2086,7 +2125,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFFlat.cpp fai
  void IndexIVFFlat::encode_vectors(
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFPQ.cpp faiss-patch/faiss/IndexIVFPQ.cpp
 --- faiss/faiss/IndexIVFPQ.cpp	2026-06-10 15:21:27.678050700 +0800
-+++ faiss-patch/faiss/IndexIVFPQ.cpp	2026-06-16 10:36:25.206190800 +0800
++++ faiss-patch/faiss/IndexIVFPQ.cpp	2026-08-17 19:31:58.139672000 +0800
 @@ -35,6 +35,11 @@
  
  #include <faiss/impl/code_distance/code_distance.h>
@@ -2163,7 +2202,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexIVFPQ.cpp faiss
          } else if (precompute_mode == 0) {
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexNNDescent.cpp faiss-patch/faiss/IndexNNDescent.cpp
 --- faiss/faiss/IndexNNDescent.cpp	2026-06-10 15:21:27.679608400 +0800
-+++ faiss-patch/faiss/IndexNNDescent.cpp	2026-06-16 10:36:25.209208500 +0800
++++ faiss-patch/faiss/IndexNNDescent.cpp	2026-08-17 19:31:58.142237400 +0800
 @@ -71,7 +71,9 @@
      void set_query(const float* x) override {
          basedis->set_query(x);
@@ -2177,7 +2216,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexNNDescent.cpp f
          return -(*basedis)(i);
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexPreTransform.cpp faiss-patch/faiss/IndexPreTransform.cpp
 --- faiss/faiss/IndexPreTransform.cpp	2026-06-10 15:21:27.681135600 +0800
-+++ faiss-patch/faiss/IndexPreTransform.cpp	2026-06-16 10:36:25.209208500 +0800
++++ faiss-patch/faiss/IndexPreTransform.cpp	2026-08-17 19:31:58.142237400 +0800
 @@ -314,7 +314,9 @@
              sub_dc->set_query(xt);
          }
@@ -2191,7 +2230,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexPreTransform.cp
      }
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexRefine.cpp faiss-patch/faiss/IndexRefine.cpp
 --- faiss/faiss/IndexRefine.cpp	2026-06-10 15:21:27.682150200 +0800
-+++ faiss-patch/faiss/IndexRefine.cpp	2026-06-16 10:36:25.210716000 +0800
++++ faiss-patch/faiss/IndexRefine.cpp	2026-08-17 19:31:58.143748800 +0800
 @@ -234,6 +234,39 @@
      own_refine_index = true;
  }
@@ -2251,7 +2290,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexRefine.cpp fais
  
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexRefine.h faiss-patch/faiss/IndexRefine.h
 --- faiss/faiss/IndexRefine.h	2026-06-10 15:21:27.682150200 +0800
-+++ faiss-patch/faiss/IndexRefine.h	2026-06-16 10:36:25.210716000 +0800
++++ faiss-patch/faiss/IndexRefine.h	2026-08-17 19:31:58.143748800 +0800
 @@ -9,6 +9,13 @@
  
  #include <faiss/Index.h>
@@ -2287,7 +2326,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/IndexRefine.h faiss-
              const float* x,
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/AuxIndexStructures.h faiss-patch/faiss/impl/AuxIndexStructures.h
 --- faiss/faiss/impl/AuxIndexStructures.h	2026-06-10 15:21:27.715412100 +0800
-+++ faiss-patch/faiss/impl/AuxIndexStructures.h	2026-06-16 10:36:25.242348700 +0800
++++ faiss-patch/faiss/impl/AuxIndexStructures.h	2026-08-17 19:31:58.174314000 +0800
 @@ -11,6 +11,7 @@
  #ifndef FAISS_AUX_INDEX_STRUCTURES_H
  #define FAISS_AUX_INDEX_STRUCTURES_H
@@ -2296,7 +2335,59 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/AuxIndexStructu
  #include <stdint.h>
  
  #include <cstring>
-@@ -164,25 +165,53 @@
+@@ -18,6 +19,9 @@
+ #include <mutex>
+ #include <vector>
+ 
++#include <fstream>
++#include <string>
++
+ #include <faiss/MetricType.h>
+ #include <faiss/impl/platform_macros.h>
+ 
+@@ -161,28 +165,89 @@
+     static size_t get_period_hint(size_t flops);
+ };
+ 
++/// Detect L3 cache size at runtime from sysfs. Returns 0 if detection fails.
++inline size_t get_l3_cache_size() {
++    std::ifstream f("/sys/devices/system/cpu/cpu0/cache/index3/size");
++    if (!f.is_open())
++        return 0;
++    std::string s;
++    f >> s;
++    if (s.empty())
++        return 0;
++    size_t val = std::stoull(s);
++    char unit = s.back();
++    if (unit == 'K' || unit == 'k')
++        val *= 1024;
++    else if (unit == 'M' || unit == 'm')
++        val *= 1024 * 1024;
++    return val;
++}
++
++/// Compute hashset threshold from L3 cache size at runtime.
++/// Divisor of 8 accounts for: multiple threads sharing L3, other data
++/// competing for cache, and safety margin.
++/// Falls back to 3M if L3 detection fails.
++///
++/// The L3 size never changes over the process lifetime, and reading it
++/// involves file I/O + string parsing that must NOT be paid on every
++/// VisitedTable construction (which happens on the search hot path).
++/// So we compute it exactly once and cache it in a function-local static.
++/// C++11 guarantees this initialization is thread-safe.
++inline int compute_hashset_threshold() {
++    static const int threshold = [] {
++        size_t l3 = get_l3_cache_size();
++        if (l3 == 0)
++            return 3000000; // fallback for unknown L3
++        // threshold = L3_cache_size / 8 bytes -> ntotal nodes
++        return static_cast<int>(l3 / 8);
++    }();
++    return threshold;
++}
++
  /// set implementation optimized for fast access.
  struct VisitedTable {
      std::vector<uint8_t> visited;
@@ -2304,14 +2395,8 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/AuxIndexStructu
      uint8_t visno;
  
 -    explicit VisitedTable(int size) : visited(size), visno(1) {}
-+    // Use hashset when ntotal >= this threshold.
-+    // Vector: O(1) get/set, O(ntotal) reset. Hashset: O(1) reset, slower get/set.
-+    // At ntotal=10M the memset cost dominates on x86; hashset wins by ~3-4x.
-+    // WARNING: On ARM this causes 10% regression due to cache miss overhead.
-+    static const int hashset_threshold = 500000;
-+
 +    explicit VisitedTable(int size)
-+            : visno(size >= hashset_threshold ? 0 : 1) {
++            : visno(size >= compute_hashset_threshold() ? 0 : 1) {
 +        if (visno != 0) {
 +            visited.resize(size, 0);
 +        } else {
@@ -2358,9 +2443,16 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/AuxIndexStructu
              memset(visited.data(), 0, sizeof(visited[0]) * visited.size());
              visno = 1;
          }
+@@ -191,4 +256,4 @@
+ 
+ } // namespace faiss
+ 
+-#endif
++#endif
+\ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/DistanceComputer.h faiss-patch/faiss/impl/DistanceComputer.h
 --- faiss/faiss/impl/DistanceComputer.h	2026-06-10 15:21:27.715925000 +0800
-+++ faiss-patch/faiss/impl/DistanceComputer.h	2026-06-16 10:36:25.242348700 +0800
++++ faiss-patch/faiss/impl/DistanceComputer.h	2026-08-17 19:31:58.174816900 +0800
 @@ -8,6 +8,9 @@
  #pragma once
  
@@ -2412,7 +2504,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/DistanceCompute
  
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/HNSW.cpp faiss-patch/faiss/impl/HNSW.cpp
 --- faiss/faiss/impl/HNSW.cpp	2026-06-10 15:21:27.716447500 +0800
-+++ faiss-patch/faiss/impl/HNSW.cpp	2026-06-16 10:36:25.242348700 +0800
++++ faiss-patch/faiss/impl/HNSW.cpp	2026-08-17 19:31:58.175324300 +0800
 @@ -397,11 +397,38 @@
          int level,
          storage_idx_t& nearest,
@@ -2525,7 +2617,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/HNSW.cpp faiss-
          if (!do_dis_check && nstep > efSearch) {
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/NSG.cpp faiss-patch/faiss/impl/NSG.cpp
 --- faiss/faiss/impl/NSG.cpp	2026-06-10 15:21:27.717960700 +0800
-+++ faiss-patch/faiss/impl/NSG.cpp	2026-06-16 10:36:25.244321800 +0800
++++ faiss-patch/faiss/impl/NSG.cpp	2026-08-17 19:31:58.176840800 +0800
 @@ -38,7 +38,9 @@
      void set_query(const float* x) override {
          basedis->set_query(x);
@@ -2539,7 +2631,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/NSG.cpp faiss-p
          return -(*basedis)(i);
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/ProductQuantizer.cpp faiss-patch/faiss/impl/ProductQuantizer.cpp
 --- faiss/faiss/impl/ProductQuantizer.cpp	2026-06-10 15:21:27.717960700 +0800
-+++ faiss-patch/faiss/impl/ProductQuantizer.cpp	2026-06-16 10:36:25.245831100 +0800
++++ faiss-patch/faiss/impl/ProductQuantizer.cpp	2026-08-17 19:31:58.177923700 +0800
 @@ -24,6 +24,9 @@
  extern "C" {
  
@@ -2610,7 +2702,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/ProductQuantize
          compute_PQ_dis_tables_dsub2(
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/ProductQuantizer.h faiss-patch/faiss/impl/ProductQuantizer.h
 --- faiss/faiss/impl/ProductQuantizer.h	2026-06-10 15:21:27.719505400 +0800
-+++ faiss-patch/faiss/impl/ProductQuantizer.h	2026-06-16 10:36:25.245831100 +0800
++++ faiss-patch/faiss/impl/ProductQuantizer.h	2026-08-17 19:31:58.177923700 +0800
 @@ -18,6 +18,11 @@
  #include <faiss/impl/Quantizer.h>
  #include <faiss/impl/platform_macros.h>
@@ -2692,7 +2784,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/ProductQuantize
      /// Layout: (M, ksub, dsub)
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/index_read.cpp faiss-patch/faiss/impl/index_read.cpp
 --- faiss/faiss/impl/index_read.cpp	2026-06-10 15:21:27.721020200 +0800
-+++ faiss-patch/faiss/impl/index_read.cpp	2026-06-16 10:36:25.248367600 +0800
++++ faiss-patch/faiss/impl/index_read.cpp	2026-08-17 19:31:58.180958900 +0800
 @@ -57,6 +57,14 @@
  #include <faiss/IndexBinaryHash.h>
  #include <faiss/IndexBinaryIVF.h>
@@ -2893,7 +2985,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/index_read.cpp 
          IndexRowwiseMinMax* imm = new IndexRowwiseMinMax();
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan.cpp faiss-patch/faiss/impl/pq4_fast_scan.cpp
 --- faiss/faiss/impl/pq4_fast_scan.cpp	2026-06-10 15:21:27.722556600 +0800
-+++ faiss-patch/faiss/impl/pq4_fast_scan.cpp	2026-06-16 10:36:25.248367600 +0800
++++ faiss-patch/faiss/impl/pq4_fast_scan.cpp	2026-08-17 19:31:58.182494700 +0800
 @@ -245,10 +245,7 @@
          for (int sq = 0; sq < nsq; sq += 2) {
              memcpy(dest + (sq / 2 * nq + q) * 32,
@@ -2908,7 +3000,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan.c
  }
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan.h faiss-patch/faiss/impl/pq4_fast_scan.h
 --- faiss/faiss/impl/pq4_fast_scan.h	2026-06-10 15:21:27.722556600 +0800
-+++ faiss-patch/faiss/impl/pq4_fast_scan.h	2026-06-16 10:36:25.248367600 +0800
++++ faiss-patch/faiss/impl/pq4_fast_scan.h	2026-08-17 19:31:58.182494700 +0800
 @@ -187,6 +187,10 @@
          const uint8_t* codes,
          const uint8_t* LUT,
@@ -2923,7 +3015,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan.h
  } // namespace faiss
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_search_1.cpp faiss-patch/faiss/impl/pq4_fast_scan_search_1.cpp
 --- faiss/faiss/impl/pq4_fast_scan_search_1.cpp	2026-06-10 15:21:27.722556600 +0800
-+++ faiss-patch/faiss/impl/pq4_fast_scan_search_1.cpp	2026-06-16 10:36:25.249877300 +0800
++++ faiss-patch/faiss/impl/pq4_fast_scan_search_1.cpp	2026-08-17 19:31:58.182494700 +0800
 @@ -10,6 +10,11 @@
  #include <faiss/impl/FaissAssert.h>
  #include <faiss/impl/LookupTableScaler.h>
@@ -3082,7 +3174,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
          accumulate_fixed_blocks<NQ, BB>(nb, nsq, codes, LUT, res, scaler); \
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_search_qbs.cpp faiss-patch/faiss/impl/pq4_fast_scan_search_qbs.cpp
 --- faiss/faiss/impl/pq4_fast_scan_search_qbs.cpp	2026-06-10 15:21:27.722556600 +0800
-+++ faiss-patch/faiss/impl/pq4_fast_scan_search_qbs.cpp	2026-06-16 10:36:25.249877300 +0800
++++ faiss-patch/faiss/impl/pq4_fast_scan_search_qbs.cpp	2026-08-17 19:31:58.182494700 +0800
 @@ -11,6 +11,11 @@
  #include <faiss/impl/LookupTableScaler.h>
  #include <faiss/impl/simd_result_handlers.h>
@@ -3095,7 +3187,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
  
  namespace faiss {
  
-@@ -119,13 +124,59 @@
+@@ -119,13 +124,55 @@
          const uint8_t* codes,
          const uint8_t* LUT0,
          ResultHandler& res,
@@ -3119,30 +3211,26 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
 +            uint16_t distance[32 * SQ];
 +            uint32_t lt_mask[SQ];
 +
++            uint16_t thresholds[SQ];
 +            for (int qi = 0; qi < SQ; ++qi) {
-+                uint16_t thr = res.get_threshold(qi);
-+                const uint8_t* lut = LUT0 + qi * nsq * 16;
-+
-+                if (keep_min) {
-+#ifdef USE_SVE2
-+                    krl_L2_table_lookup_fast_scan_bs32_sve2(
-+#else
-+                    krl_L2_table_lookup_fast_scan_bs32(
-+#endif
-+                        nsq, codes, lut,
-+                        distance + qi * 32, thr, &lt_mask[qi],
-+                        nsq * 16, nsq * 16, 1);
-+                } else {
-+#ifdef USE_SVE2
-+                    krl_IP_table_lookup_fast_scan_bs32_sve2(
-+#else
-+                    krl_IP_table_lookup_fast_scan_bs32(
-+#endif
-+                        nsq, codes, lut,
-+                        distance + qi * 32, thr, &lt_mask[qi],
-+                        nsq * 16, nsq * 16, 1);
-+                }
++                thresholds[qi] = res.get_threshold(qi);
 +            }
++
++#ifdef USE_SVE2
++            krl_fast_table_lookup_step_sve2(
++                SQ, nsq, codes, LUT0,
++                distance, thresholds, lt_mask,
++                keep_min ? 1 : 0,
++                nsq * 16, SQ * nsq * 16,
++                SQ * sizeof(uint16_t), SQ * sizeof(uint32_t));
++#else
++            krl_fast_table_lookup_step(
++                SQ, nsq, codes, LUT0,
++                distance, thresholds, lt_mask,
++                keep_min ? 1 : 0,
++                nsq * 16, SQ * nsq * 16,
++                SQ * sizeof(uint16_t), SQ * sizeof(uint32_t));
++#endif
 +
 +            res.set_block_origin(0, j0);
 +            res.handle_generic(SQ, 0, distance, lt_mask);
@@ -3156,7 +3244,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
      for (size_t j0 = 0; j0 < ntotal2; j0 += 32) {
          FixedStorageHandler<SQ, 2> res2;
          const uint8_t* LUT = LUT0;
-@@ -205,17 +256,28 @@
+@@ -205,17 +252,28 @@
          const uint8_t* codes,
          const uint8_t* LUT0,
          ResultHandler& res,
@@ -3186,7 +3274,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
          DISPATCH(0x3333); // 12
          DISPATCH(0x2333); // 11
          DISPATCH(0x2233); // 10
-@@ -274,6 +336,10 @@
+@@ -274,6 +332,10 @@
  }
  
  struct Run_pq4_accumulate_loop_qbs {
@@ -3197,7 +3285,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
      template <class ResultHandler>
      void f(ResultHandler& res,
             int qbs,
-@@ -284,11 +350,19 @@
+@@ -284,11 +346,19 @@
             const NormTableScaler* scaler) {
          if (scaler) {
              pq4_accumulate_loop_qbs_fixed_scaler(
@@ -3219,7 +3307,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
          }
      }
  };
-@@ -302,8 +376,16 @@
+@@ -302,8 +372,16 @@
          const uint8_t* codes,
          const uint8_t* LUT,
          SIMDResultHandler& res,
@@ -3239,7 +3327,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/pq4_fast_scan_s
  
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/simd_result_handlers.h faiss-patch/faiss/impl/simd_result_handlers.h
 --- faiss/faiss/impl/simd_result_handlers.h	2026-06-10 15:21:27.724137100 +0800
-+++ faiss-patch/faiss/impl/simd_result_handlers.h	2026-06-16 10:36:25.250389600 +0800
++++ faiss-patch/faiss/impl/simd_result_handlers.h	2026-08-17 19:31:58.182494700 +0800
 @@ -38,7 +38,14 @@
              size_t b,
              simd16uint16 d0,
@@ -3395,7 +3483,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/impl/simd_result_han
                  C::is_max,
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/invlists/InvertedLists.cpp faiss-patch/faiss/invlists/InvertedLists.cpp
 --- faiss/faiss/invlists/InvertedLists.cpp	2026-06-10 15:21:27.725656500 +0800
-+++ faiss-patch/faiss/invlists/InvertedLists.cpp	2026-06-16 10:36:25.250899400 +0800
++++ faiss-patch/faiss/invlists/InvertedLists.cpp	2026-08-17 19:31:58.184545800 +0800
 @@ -78,6 +78,12 @@
      }
  }
@@ -3430,7 +3518,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/invlists/InvertedLis
  /*****************************************************************
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/invlists/InvertedLists.h faiss-patch/faiss/invlists/InvertedLists.h
 --- faiss/faiss/invlists/InvertedLists.h	2026-06-10 15:21:27.725656500 +0800
-+++ faiss-patch/faiss/invlists/InvertedLists.h	2026-06-16 10:36:25.250899400 +0800
++++ faiss-patch/faiss/invlists/InvertedLists.h	2026-08-17 19:31:58.184545800 +0800
 @@ -124,6 +124,9 @@
      virtual void resize(size_t list_no, size_t new_size) = 0;
  
@@ -3453,8 +3541,8 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/invlists/InvertedLis
  /*****************************************************************
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/krl.h faiss-patch/faiss/sra_krl/include/krl.h
 --- faiss/faiss/sra_krl/include/krl.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/include/krl.h	2026-06-16 10:36:25.253966700 +0800
-@@ -0,0 +1,587 @@
++++ faiss-patch/faiss/sra_krl/include/krl.h	2026-08-17 19:31:58.187640000 +0800
+@@ -0,0 +1,608 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
 +
@@ -3842,6 +3930,27 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/krl.
 +    size_t lt_mask_size);
 +
 +/*
++ * @brief Perform fast table lookup and filtering operations for multiple queries using SVE2.
++ *        Codes loaded once per batch, shared across up to 4 queries. No register clobber issue
++ *        (pure SVE2 intrinsics, full 32 Z-registers available).
++ * @param nq Number of queries.
++ * @param nsq Number of subquantizers.
++ * @param codes Pointer to the codes array, layout (nsq, batch=32).
++ * @param LUT Pointer to the precomputed distances array, layout (nq, nsq, ksub=16).
++ * @param dis Pointer to the array storing computed distances.
++ * @param threshold Pointer to the filter threshold array.
++ * @param lt_mask Pointer to the array storing filter results.
++ * @param keep_min Filter comparison rule (0 for IP/keep max, 1 for L2/keep min).
++ * @param codes_size Length of codes.
++ * @param LUT_size Length of LUT.
++ * @param threshold_size Length of threshold.
++ * @param lt_mask_size Length of lt_mask.
++ */
++KRL_API_PUBLIC int krl_fast_table_lookup_step_sve2(int nq, int nsq, const uint8_t *codes, const uint8_t *LUT, uint16_t *dis,
++    const uint16_t *threshold, uint32_t *lt_mask, int keep_min, size_t codes_size, size_t LUT_size, size_t threshold_size,
++    size_t lt_mask_size);
++
++/*
 + * @brief Perform fast L2 table lookup and filtering operations for single query with batch size 32.
 + * @param nsq Number of subquantizers.
 + * @param codes Pointer to the codes array, layout (nsq, batch=32).
@@ -4045,7 +4154,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/krl.
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/krl_internal.h faiss-patch/faiss/sra_krl/include/krl_internal.h
 --- faiss/faiss/sra_krl/include/krl_internal.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/include/krl_internal.h	2026-06-16 10:36:25.253966700 +0800
++++ faiss-patch/faiss/sra_krl/include/krl_internal.h	2026-08-17 19:31:58.187640000 +0800
 @@ -0,0 +1,309 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -4359,7 +4468,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/krl_
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/platform_macros.h faiss-patch/faiss/sra_krl/include/platform_macros.h
 --- faiss/faiss/sra_krl/include/platform_macros.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/include/platform_macros.h	2026-06-16 10:36:25.253966700 +0800
++++ faiss-patch/faiss/sra_krl/include/platform_macros.h	2026-08-17 19:31:58.187640000 +0800
 @@ -0,0 +1,61 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -4425,7 +4534,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/plat
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/safe_memory.h faiss-patch/faiss/sra_krl/include/safe_memory.h
 --- faiss/faiss/sra_krl/include/safe_memory.h	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/include/safe_memory.h	2026-06-16 10:36:25.253966700 +0800
++++ faiss-patch/faiss/sra_krl/include/safe_memory.h	2026-08-17 19:31:58.188157000 +0800
 @@ -0,0 +1,56 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -4486,7 +4595,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/include/safe
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/Heap_sort.c faiss-patch/faiss/sra_krl/src/Heap_sort.c
 --- faiss/faiss/sra_krl/src/Heap_sort.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/Heap_sort.c	2026-06-16 10:36:25.253966700 +0800
++++ faiss-patch/faiss/sra_krl/src/Heap_sort.c	2026-08-17 19:31:58.188157000 +0800
 @@ -0,0 +1,437 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -4928,7 +5037,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/Heap_sor
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistance_simd.c faiss-patch/faiss/sra_krl/src/IPdistance_simd.c
 --- faiss/faiss/sra_krl/src/IPdistance_simd.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/IPdistance_simd.c	2026-06-16 10:36:25.255476400 +0800
++++ faiss-patch/faiss/sra_krl/src/IPdistance_simd.c	2026-08-17 19:31:58.188157000 +0800
 @@ -0,0 +1,1563 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -4985,19 +5094,19 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +        for (i = single_round; i <= d - single_round; i += single_round) {
 +            x8_0 = vld1q_f32(x + i);
 +            y8_0 = vld1q_f32(y + i);
-+            d8_0 = vmlaq_f32(d8_0, x8_0, y8_0);
++            d8_0 = vfmaq_f32(d8_0, x8_0, y8_0);
 +
 +            x8_1 = vld1q_f32(x + i + 4);
 +            y8_1 = vld1q_f32(y + i + 4);
-+            d8_1 = vmlaq_f32(d8_1, x8_1, y8_1);
++            d8_1 = vfmaq_f32(d8_1, x8_1, y8_1);
 +
 +            x8_2 = vld1q_f32(x + i + 8);
 +            y8_2 = vld1q_f32(y + i + 8);
-+            d8_2 = vmlaq_f32(d8_2, x8_2, y8_2);
++            d8_2 = vfmaq_f32(d8_2, x8_2, y8_2);
 +
 +            x8_3 = vld1q_f32(x + i + 12);
 +            y8_3 = vld1q_f32(y + i + 12);
-+            d8_3 = vmlaq_f32(d8_3, x8_3, y8_3);
++            d8_3 = vfmaq_f32(d8_3, x8_3, y8_3);
 +        }
 +
 +        d8_0 = vaddq_f32(d8_0, d8_1);
@@ -5049,14 +5158,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            x_0 = vld1q_f32(x + i);
 +            y0_0 = vld1q_f32(y + i);
 +            y1_0 = vld1q_f32(y + d + i);
-+            d0_0 = vmlaq_f32(d0_0, x_0, y0_0);
-+            d1_0 = vmlaq_f32(d1_0, x_0, y1_0);
++            d0_0 = vfmaq_f32(d0_0, x_0, y0_0);
++            d1_0 = vfmaq_f32(d1_0, x_0, y1_0);
 +
 +            x_1 = vld1q_f32(x + i + 4);
 +            y0_1 = vld1q_f32(y + i + 4);
 +            y1_1 = vld1q_f32(y + d + i + 4);
-+            d0_1 = vmlaq_f32(d0_1, x_1, y0_1);
-+            d1_1 = vmlaq_f32(d1_1, x_1, y1_1);
++            d0_1 = vfmaq_f32(d0_1, x_1, y0_1);
++            d1_1 = vfmaq_f32(d1_1, x_1, y1_1);
 +        }
 +
 +        d0_0 = vaddq_f32(d0_0, d0_1);
@@ -5110,10 +5219,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base3 = vld1q_f32(y + 2 * d + i);
 +            neon_base4 = vld1q_f32(y + 3 * d + i);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -5190,14 +5299,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base7 = vld1q_f32(y + 6 * d + i);
 +            neon_base8 = vld1q_f32(y + 7 * d + i);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 +        }
 +
 +        dis[0] = vaddvq_f32(neon_res1);
@@ -5315,14 +5424,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base8 = vld1q_f32(y + 7 * d + i);
 +
 +            /* Update inner products for first 8 vectors */
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 +
 +            /* Update database vectors for additional 8 vectors */
 +            neon_base1 = vld1q_f32(y + 8 * d + i);
@@ -5335,14 +5444,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base8 = vld1q_f32(y + 15 * d + i);
 +
 +            /* Update inner products for additional 8 vectors */
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
 +        }
 +
 +        /* Store results for all 16 vectors */
@@ -5460,14 +5569,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            x_0 = vld1q_f32(x + i);
 +            y0_0 = vld1q_f32(y0 + i);
 +            y1_0 = vld1q_f32(y1 + i);
-+            d0_0 = vmlaq_f32(d0_0, x_0, y0_0);
-+            d1_0 = vmlaq_f32(d1_0, x_0, y1_0);
++            d0_0 = vfmaq_f32(d0_0, x_0, y0_0);
++            d1_0 = vfmaq_f32(d1_0, x_0, y1_0);
 +
 +            x_1 = vld1q_f32(x + i + 4);
 +            y0_1 = vld1q_f32(y0 + i + 4);
 +            y1_1 = vld1q_f32(y1 + i + 4);
-+            d0_1 = vmlaq_f32(d0_1, x_1, y0_1);
-+            d1_1 = vmlaq_f32(d1_1, x_1, y1_1);
++            d0_1 = vfmaq_f32(d0_1, x_1, y0_1);
++            d1_1 = vfmaq_f32(d1_1, x_1, y1_1);
 +        }
 +
 +        d0_0 = vaddq_f32(d0_0, d0_1);
@@ -5520,10 +5629,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base3 = vld1q_f32(y[2] + i);
 +            neon_base4 = vld1q_f32(y[3] + i);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -5598,14 +5707,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base7 = vld1q_f32(y[6] + i);
 +            neon_base8 = vld1q_f32(y[7] + i);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -5737,14 +5846,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            float32x4_t neon_base7 = vld1q_f32(y[6] + i);
 +            float32x4_t neon_base8 = vld1q_f32(y[7] + i);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 +
 +            neon_base1 = vld1q_f32(y[8] + i);
 +            neon_base2 = vld1q_f32(y[9] + i);
@@ -5755,14 +5864,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base7 = vld1q_f32(y[14] + i);
 +            neon_base8 = vld1q_f32(y[15] + i);
 +
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
 +        }
 +        for (; i < d - multi_round; i += multi_round) {
 +            prefetch_L1(x + multi_round + i);
@@ -5793,14 +5902,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +                float32x4_t neon_base7 = vld1q_f32(y[6] + i + j);
 +                float32x4_t neon_base8 = vld1q_f32(y[7] + i + j);
 +
-+                neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-+                neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-+                neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-+                neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-+                neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-+                neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-+                neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-+                neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
++                neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
++                neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
++                neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
++                neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
++                neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
++                neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
++                neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
++                neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 +
 +                neon_base1 = vld1q_f32(y[8] + i + j);
 +                neon_base2 = vld1q_f32(y[9] + i + j);
@@ -5811,14 +5920,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +                neon_base7 = vld1q_f32(y[14] + i + j);
 +                neon_base8 = vld1q_f32(y[15] + i + j);
 +
-+                neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-+                neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-+                neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-+                neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-+                neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-+                neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-+                neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-+                neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
++                neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
++                neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
++                neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
++                neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
++                neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
++                neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
++                neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
++                neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
 +            }
 +        }
 +        for (; i <= d - single_round; i += single_round) {
@@ -5832,14 +5941,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            float32x4_t neon_base7 = vld1q_f32(y[6] + i);
 +            float32x4_t neon_base8 = vld1q_f32(y[7] + i);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 +
 +            neon_base1 = vld1q_f32(y[8] + i);
 +            neon_base2 = vld1q_f32(y[9] + i);
@@ -5850,14 +5959,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base7 = vld1q_f32(y[14] + i);
 +            neon_base8 = vld1q_f32(y[15] + i);
 +
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -5923,14 +6032,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base7 = vld1q_f32(y[6] + i);
 +            neon_base8 = vld1q_f32(y[7] + i);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 +
 +            neon_base1 = vld1q_f32(y[8] + i);
 +            neon_base2 = vld1q_f32(y[9] + i);
@@ -5941,14 +6050,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +            neon_base7 = vld1q_f32(y[14] + i);
 +            neon_base8 = vld1q_f32(y[15] + i);
 +
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -6089,14 +6198,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +        neon_base7 = vld1q_f32(y + 64 * i + 24);
 +        neon_base8 = vld1q_f32(y + 64 * i + 28);
 +
-+        neon_res[0] = vmlaq_f32(neon_res[0], neon_base1, single_query);
-+        neon_res[1] = vmlaq_f32(neon_res[1], neon_base2, single_query);
-+        neon_res[2] = vmlaq_f32(neon_res[2], neon_base3, single_query);
-+        neon_res[3] = vmlaq_f32(neon_res[3], neon_base4, single_query);
-+        neon_res[4] = vmlaq_f32(neon_res[4], neon_base5, single_query);
-+        neon_res[5] = vmlaq_f32(neon_res[5], neon_base6, single_query);
-+        neon_res[6] = vmlaq_f32(neon_res[6], neon_base7, single_query);
-+        neon_res[7] = vmlaq_f32(neon_res[7], neon_base8, single_query);
++        neon_res[0] = vfmaq_f32(neon_res[0], neon_base1, single_query);
++        neon_res[1] = vfmaq_f32(neon_res[1], neon_base2, single_query);
++        neon_res[2] = vfmaq_f32(neon_res[2], neon_base3, single_query);
++        neon_res[3] = vfmaq_f32(neon_res[3], neon_base4, single_query);
++        neon_res[4] = vfmaq_f32(neon_res[4], neon_base5, single_query);
++        neon_res[5] = vfmaq_f32(neon_res[5], neon_base6, single_query);
++        neon_res[6] = vfmaq_f32(neon_res[6], neon_base7, single_query);
++        neon_res[7] = vfmaq_f32(neon_res[7], neon_base8, single_query);
 +
 +        neon_base1 = vld1q_f32(y + 64 * i + 32);
 +        neon_base2 = vld1q_f32(y + 64 * i + 36);
@@ -6107,14 +6216,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +        neon_base7 = vld1q_f32(y + 64 * i + 56);
 +        neon_base8 = vld1q_f32(y + 64 * i + 60);
 +
-+        neon_res[8] = vmlaq_f32(neon_res[8], neon_base1, single_query);
-+        neon_res[9] = vmlaq_f32(neon_res[9], neon_base2, single_query);
-+        neon_res[10] = vmlaq_f32(neon_res[10], neon_base3, single_query);
-+        neon_res[11] = vmlaq_f32(neon_res[11], neon_base4, single_query);
-+        neon_res[12] = vmlaq_f32(neon_res[12], neon_base5, single_query);
-+        neon_res[13] = vmlaq_f32(neon_res[13], neon_base6, single_query);
-+        neon_res[14] = vmlaq_f32(neon_res[14], neon_base7, single_query);
-+        neon_res[15] = vmlaq_f32(neon_res[15], neon_base8, single_query);
++        neon_res[8] = vfmaq_f32(neon_res[8], neon_base1, single_query);
++        neon_res[9] = vfmaq_f32(neon_res[9], neon_base2, single_query);
++        neon_res[10] = vfmaq_f32(neon_res[10], neon_base3, single_query);
++        neon_res[11] = vfmaq_f32(neon_res[11], neon_base4, single_query);
++        neon_res[12] = vfmaq_f32(neon_res[12], neon_base5, single_query);
++        neon_res[13] = vfmaq_f32(neon_res[13], neon_base6, single_query);
++        neon_res[14] = vfmaq_f32(neon_res[14], neon_base7, single_query);
++        neon_res[15] = vfmaq_f32(neon_res[15], neon_base8, single_query);
 +    }
 +    {
 +        vst1q_f32(dis, neon_res[0]);
@@ -6180,14 +6289,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +        neon_base7 = vld1q_f32(y + 32 * i + 24);
 +        neon_base8 = vld1q_f32(y + 32 * i + 28);
 +
-+        neon_res[0] = vmlaq_f32(neon_res[0], neon_base1, single_query);
-+        neon_res[1] = vmlaq_f32(neon_res[1], neon_base2, single_query);
-+        neon_res[2] = vmlaq_f32(neon_res[2], neon_base3, single_query);
-+        neon_res[3] = vmlaq_f32(neon_res[3], neon_base4, single_query);
-+        neon_res[4] = vmlaq_f32(neon_res[4], neon_base5, single_query);
-+        neon_res[5] = vmlaq_f32(neon_res[5], neon_base6, single_query);
-+        neon_res[6] = vmlaq_f32(neon_res[6], neon_base7, single_query);
-+        neon_res[7] = vmlaq_f32(neon_res[7], neon_base8, single_query);
++        neon_res[0] = vfmaq_f32(neon_res[0], neon_base1, single_query);
++        neon_res[1] = vfmaq_f32(neon_res[1], neon_base2, single_query);
++        neon_res[2] = vfmaq_f32(neon_res[2], neon_base3, single_query);
++        neon_res[3] = vfmaq_f32(neon_res[3], neon_base4, single_query);
++        neon_res[4] = vfmaq_f32(neon_res[4], neon_base5, single_query);
++        neon_res[5] = vfmaq_f32(neon_res[5], neon_base6, single_query);
++        neon_res[6] = vfmaq_f32(neon_res[6], neon_base7, single_query);
++        neon_res[7] = vfmaq_f32(neon_res[7], neon_base8, single_query);
 +    }
 +    {
 +        vst1q_f32(dis, neon_res[0]);
@@ -6233,10 +6342,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 +        neon_base3 = vld1q_f32(y + 16 * i + 8);
 +        neon_base4 = vld1q_f32(y + 16 * i + 12);
 +
-+        neon_res[0] = vmlaq_f32(neon_res[0], neon_base1, single_query);
-+        neon_res[1] = vmlaq_f32(neon_res[1], neon_base2, single_query);
-+        neon_res[2] = vmlaq_f32(neon_res[2], neon_base3, single_query);
-+        neon_res[3] = vmlaq_f32(neon_res[3], neon_base4, single_query);
++        neon_res[0] = vfmaq_f32(neon_res[0], neon_base1, single_query);
++        neon_res[1] = vfmaq_f32(neon_res[1], neon_base2, single_query);
++        neon_res[2] = vfmaq_f32(neon_res[2], neon_base3, single_query);
++        neon_res[3] = vfmaq_f32(neon_res[3], neon_base4, single_query);
 +    }
 +
 +    vst1q_f32(dis, neon_res[0]);
@@ -6496,7 +6605,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistance_simd_f16.c faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16.c
 --- faiss/faiss/sra_krl/src/IPdistance_simd_f16.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16.c	2026-06-16 10:36:25.255476400 +0800
++++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16.c	2026-08-17 19:31:58.188157000 +0800
 @@ -0,0 +1,1565 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -8066,7 +8175,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistance_simd_f16f32.c faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16f32.c
 --- faiss/faiss/sra_krl/src/IPdistance_simd_f16f32.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16f32.c	2026-06-16 10:36:25.256481500 +0800
++++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_f16f32.c	2026-08-17 19:31:58.188157000 +0800
 @@ -0,0 +1,2219 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -10290,7 +10399,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistance_simd_s8.c faiss-patch/faiss/sra_krl/src/IPdistance_simd_s8.c
 --- faiss/faiss/sra_krl/src/IPdistance_simd_s8.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_s8.c	2026-06-16 10:36:25.256481500 +0800
++++ faiss-patch/faiss/sra_krl/src/IPdistance_simd_s8.c	2026-08-17 19:31:58.189667800 +0800
 @@ -0,0 +1,2044 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -12339,7 +12448,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/IPdistan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distance_simd.c faiss-patch/faiss/sra_krl/src/L2distance_simd.c
 --- faiss/faiss/sra_krl/src/L2distance_simd.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/L2distance_simd.c	2026-06-16 10:36:25.256481500 +0800
++++ faiss-patch/faiss/sra_krl/src/L2distance_simd.c	2026-08-17 19:31:58.189667800 +0800
 @@ -0,0 +1,3155 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -12407,29 +12516,29 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            x8_0 = vld1q_f32(x + i);
 +            y8_0 = vld1q_f32(y + i);
 +            const float32x4_t q8_0 = vsubq_f32(x8_0, y8_0);
-+            d8_0 = vmlaq_f32(d8_0, q8_0, q8_0);
++            d8_0 = vfmaq_f32(d8_0, q8_0, q8_0);
 +
 +            x8_1 = vld1q_f32(x + i + 4);
 +            y8_1 = vld1q_f32(y + i + 4);
 +            const float32x4_t q8_1 = vsubq_f32(x8_1, y8_1);
-+            d8_1 = vmlaq_f32(d8_1, q8_1, q8_1);
++            d8_1 = vfmaq_f32(d8_1, q8_1, q8_1);
 +
 +            x8_2 = vld1q_f32(x + i + 8);
 +            y8_2 = vld1q_f32(y + i + 8);
 +            const float32x4_t q8_2 = vsubq_f32(x8_2, y8_2);
-+            d8_2 = vmlaq_f32(d8_2, q8_2, q8_2);
++            d8_2 = vfmaq_f32(d8_2, q8_2, q8_2);
 +
 +            x8_3 = vld1q_f32(x + i + 12);
 +            y8_3 = vld1q_f32(y + i + 12);
 +            const float32x4_t q8_3 = vsubq_f32(x8_3, y8_3);
-+            d8_3 = vmlaq_f32(d8_3, q8_3, q8_3);
++            d8_3 = vfmaq_f32(d8_3, q8_3, q8_3);
 +        }
 +
 +        for (; i <= d - single_round; i += single_round) {
 +            x8_0 = vld1q_f32(x + i);
 +            y8_0 = vld1q_f32(y + i);
 +            const float32x4_t q8_0 = vsubq_f32(x8_0, y8_0);
-+            d8_0 = vmlaq_f32(d8_0, q8_0, q8_0);
++            d8_0 = vfmaq_f32(d8_0, q8_0, q8_0);
 +        }
 +
 +        d8_0 = vaddq_f32(d8_0, d8_1);
@@ -12446,7 +12555,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            x8_0 = vld1q_f32(x + i);
 +            y8_0 = vld1q_f32(y + i);
 +            const float32x4_t q8_0 = vsubq_f32(x8_0, y8_0);
-+            d8_0 = vmlaq_f32(d8_0, q8_0, q8_0);
++            d8_0 = vfmaq_f32(d8_0, q8_0, q8_0);
 +        }
 +        res = vaddvq_f32(d8_0);
 +    } else {
@@ -12502,16 +12611,16 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            y1_0 = vld1q_f32(y1 + i);
 +            const float32x4_t q0_0 = vsubq_f32(x_0, y0_0);
 +            const float32x4_t q1_0 = vsubq_f32(x_0, y1_0);
-+            d0_0 = vmlaq_f32(d0_0, q0_0, q0_0);
-+            d1_0 = vmlaq_f32(d1_0, q1_0, q1_0);
++            d0_0 = vfmaq_f32(d0_0, q0_0, q0_0);
++            d1_0 = vfmaq_f32(d1_0, q1_0, q1_0);
 +
 +            x_1 = vld1q_f32(x + i + 4);
 +            y0_1 = vld1q_f32(y0 + i + 4);
 +            y1_1 = vld1q_f32(y1 + i + 4);
 +            const float32x4_t q0_1 = vsubq_f32(x_1, y0_1);
 +            const float32x4_t q1_1 = vsubq_f32(x_1, y1_1);
-+            d0_1 = vmlaq_f32(d0_1, q0_1, q0_1);
-+            d1_1 = vmlaq_f32(d1_1, q1_1, q1_1);
++            d0_1 = vfmaq_f32(d0_1, q0_1, q0_1);
++            d1_1 = vfmaq_f32(d1_1, q1_1, q1_1);
 +        }
 +
 +        for (; i <= d - single_round; i += single_round) {
@@ -12520,8 +12629,8 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            y1_0 = vld1q_f32(y1 + i);
 +            const float32x4_t q0_0 = vsubq_f32(x_0, y0_0);
 +            const float32x4_t q1_0 = vsubq_f32(x_0, y1_0);
-+            d0_0 = vmlaq_f32(d0_0, q0_0, q0_0);
-+            d1_0 = vmlaq_f32(d1_0, q1_0, q1_0);
++            d0_0 = vfmaq_f32(d0_0, q0_0, q0_0);
++            d1_0 = vfmaq_f32(d1_0, q1_0, q1_0);
 +        }
 +
 +        d0_0 = vaddq_f32(d0_0, d0_1);
@@ -12543,9 +12652,9 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            y8_1 = vld1q_f32(y1);
 +
 +            float32x4_t q0 = vsubq_f32(x8_0, y8_0);
-+            d8_0 = vmlaq_f32(d8_0, q0, q0);
++            d8_0 = vfmaq_f32(d8_0, q0, q0);
 +            float32x4_t q1 = vsubq_f32(x8_0, y8_1);
-+            d8_1 = vmlaq_f32(d8_1, q1, q1);
++            d8_1 = vfmaq_f32(d8_1, q1, q1);
 +        }
 +        dis[0] = vaddvq_f32(d8_0);
 +        dis[1] = vaddvq_f32(d8_1);
@@ -12607,10 +12716,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            q2 = vsubq_f32(q2, b);
 +            q3 = vsubq_f32(q3, b);
 +
-+            res0 = vmlaq_f32(res0, q0, q0);
-+            res1 = vmlaq_f32(res1, q1, q1);
-+            res2 = vmlaq_f32(res2, q2, q2);
-+            res3 = vmlaq_f32(res3, q3, q3);
++            res0 = vfmaq_f32(res0, q0, q0);
++            res1 = vfmaq_f32(res1, q1, q1);
++            res2 = vfmaq_f32(res2, q2, q2);
++            res3 = vfmaq_f32(res3, q3, q3);
 +        }
 +        dis[0] = vaddvq_f32(res0);
 +        dis[1] = vaddvq_f32(res1);
@@ -12701,14 +12810,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +                neon_base7 = vsubq_f32(neon_base7, neon_query);
 +                neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+                neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+                neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+                neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+                neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
-+                neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_base5);
-+                neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_base6);
-+                neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_base7);
-+                neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_base8);
++                neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++                neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++                neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++                neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
++                neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_base5);
++                neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_base6);
++                neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_base7);
++                neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_base8);
 +            }
 +        }
 +        for (; i <= d - single_round; i += single_round) {
@@ -12731,14 +12840,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base7 = vsubq_f32(neon_base7, neon_query);
 +            neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_base5);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_base6);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_base7);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_base8);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_base5);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_base6);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_base7);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_base8);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -12797,14 +12906,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base7 = vsubq_f32(neon_base7, neon_query);
 +            neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_base5);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_base6);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_base7);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_base8);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_base5);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_base6);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_base7);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_base8);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -12935,14 +13044,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +                neon_base7 = vsubq_f32(neon_base7, neon_query);
 +                neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+                neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+                neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+                neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+                neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
-+                neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_base5);
-+                neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_base6);
-+                neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_base7);
-+                neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_base8);
++                neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++                neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++                neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++                neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
++                neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_base5);
++                neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_base6);
++                neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_base7);
++                neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_base8);
 +
 +                neon_base1 = vld1q_f32(y[8] + i + j);
 +                neon_base2 = vld1q_f32(y[9] + i + j);
@@ -12962,14 +13071,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +                neon_base7 = vsubq_f32(neon_base7, neon_query);
 +                neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+                neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_base1);
-+                neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_base2);
-+                neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_base3);
-+                neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_base4);
-+                neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_base5);
-+                neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_base6);
-+                neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_base7);
-+                neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_base8);
++                neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_base1);
++                neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_base2);
++                neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_base3);
++                neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_base4);
++                neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_base5);
++                neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_base6);
++                neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_base7);
++                neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_base8);
 +            }
 +        }
 +        for (; i <= d - single_round; i += single_round) {
@@ -12992,14 +13101,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base7 = vsubq_f32(neon_base7, neon_query);
 +            neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_base5);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_base6);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_base7);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_base8);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_base5);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_base6);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_base7);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_base8);
 +
 +            neon_base1 = vld1q_f32(y[8] + i);
 +            neon_base2 = vld1q_f32(y[9] + i);
@@ -13019,14 +13128,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base7 = vsubq_f32(neon_base7, neon_query);
 +            neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_base1);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_base2);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_base3);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_base4);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_base5);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_base6);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_base7);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_base8);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_base1);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_base2);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_base3);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_base4);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_base5);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_base6);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_base7);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_base8);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -13120,14 +13229,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base7 = vsubq_f32(neon_base7, neon_query);
 +            neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_base5);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_base6);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_base7);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_base8);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_base5);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_base6);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_base7);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_base8);
 +
 +            neon_base1 = vld1q_f32(y[8] + i);
 +            neon_base2 = vld1q_f32(y[9] + i);
@@ -13147,14 +13256,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base7 = vsubq_f32(neon_base7, neon_query);
 +            neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_base1);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_base2);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_base3);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_base4);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_base5);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_base6);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_base7);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_base8);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_base1);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_base2);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_base3);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_base4);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_base5);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_base6);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_base7);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_base8);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -13400,10 +13509,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[4] + i);
 +            neon_base2 = vld1q_f32(y[5] + i);
@@ -13413,10 +13522,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base1, neon_base1);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base2, neon_base2);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base3, neon_base3);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base1, neon_base1);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base2, neon_base2);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base3, neon_base3);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[8] + i);
 +            neon_base2 = vld1q_f32(y[9] + i);
@@ -13426,10 +13535,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_base1);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_base2);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_base3);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_base4);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_base1);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_base2);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_base3);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[12] + i);
 +            neon_base2 = vld1q_f32(y[13] + i);
@@ -13439,10 +13548,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base1, neon_base1);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base2, neon_base2);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base3, neon_base3);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base4, neon_base4);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base1, neon_base1);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base2, neon_base2);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base3, neon_base3);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[16] + i);
 +            neon_base2 = vld1q_f32(y[17] + i);
@@ -13452,10 +13561,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res17 = vmlaq_f32(neon_res17, neon_base1, neon_base1);
-+            neon_res18 = vmlaq_f32(neon_res18, neon_base2, neon_base2);
-+            neon_res19 = vmlaq_f32(neon_res19, neon_base3, neon_base3);
-+            neon_res20 = vmlaq_f32(neon_res20, neon_base4, neon_base4);
++            neon_res17 = vfmaq_f32(neon_res17, neon_base1, neon_base1);
++            neon_res18 = vfmaq_f32(neon_res18, neon_base2, neon_base2);
++            neon_res19 = vfmaq_f32(neon_res19, neon_base3, neon_base3);
++            neon_res20 = vfmaq_f32(neon_res20, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[20] + i);
 +            neon_base2 = vld1q_f32(y[21] + i);
@@ -13465,10 +13574,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res21 = vmlaq_f32(neon_res21, neon_base1, neon_base1);
-+            neon_res22 = vmlaq_f32(neon_res22, neon_base2, neon_base2);
-+            neon_res23 = vmlaq_f32(neon_res23, neon_base3, neon_base3);
-+            neon_res24 = vmlaq_f32(neon_res24, neon_base4, neon_base4);
++            neon_res21 = vfmaq_f32(neon_res21, neon_base1, neon_base1);
++            neon_res22 = vfmaq_f32(neon_res22, neon_base2, neon_base2);
++            neon_res23 = vfmaq_f32(neon_res23, neon_base3, neon_base3);
++            neon_res24 = vfmaq_f32(neon_res24, neon_base4, neon_base4);
 +        }
 +        for (; i < d - multi_round; i += multi_round) {
 +            prefetch_L1(x + i + multi_round);
@@ -13506,10 +13615,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +                neon_base2 = vsubq_f32(neon_base2, neon_query);
 +                neon_base3 = vsubq_f32(neon_base3, neon_query);
 +                neon_base4 = vsubq_f32(neon_base4, neon_query);
-+                neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+                neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+                neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+                neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
++                neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++                neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++                neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++                neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
 +
 +                neon_base1 = vld1q_f32(y[4] + j);
 +                neon_base2 = vld1q_f32(y[5] + j);
@@ -13519,10 +13628,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +                neon_base2 = vsubq_f32(neon_base2, neon_query);
 +                neon_base3 = vsubq_f32(neon_base3, neon_query);
 +                neon_base4 = vsubq_f32(neon_base4, neon_query);
-+                neon_res5 = vmlaq_f32(neon_res5, neon_base1, neon_base1);
-+                neon_res6 = vmlaq_f32(neon_res6, neon_base2, neon_base2);
-+                neon_res7 = vmlaq_f32(neon_res7, neon_base3, neon_base3);
-+                neon_res8 = vmlaq_f32(neon_res8, neon_base4, neon_base4);
++                neon_res5 = vfmaq_f32(neon_res5, neon_base1, neon_base1);
++                neon_res6 = vfmaq_f32(neon_res6, neon_base2, neon_base2);
++                neon_res7 = vfmaq_f32(neon_res7, neon_base3, neon_base3);
++                neon_res8 = vfmaq_f32(neon_res8, neon_base4, neon_base4);
 +
 +                neon_base1 = vld1q_f32(y[8] + j);
 +                neon_base2 = vld1q_f32(y[9] + j);
@@ -13532,10 +13641,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +                neon_base2 = vsubq_f32(neon_base2, neon_query);
 +                neon_base3 = vsubq_f32(neon_base3, neon_query);
 +                neon_base4 = vsubq_f32(neon_base4, neon_query);
-+                neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_base1);
-+                neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_base2);
-+                neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_base3);
-+                neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_base4);
++                neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_base1);
++                neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_base2);
++                neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_base3);
++                neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_base4);
 +
 +                neon_base1 = vld1q_f32(y[12] + j);
 +                neon_base2 = vld1q_f32(y[13] + j);
@@ -13545,10 +13654,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +                neon_base2 = vsubq_f32(neon_base2, neon_query);
 +                neon_base3 = vsubq_f32(neon_base3, neon_query);
 +                neon_base4 = vsubq_f32(neon_base4, neon_query);
-+                neon_res13 = vmlaq_f32(neon_res13, neon_base1, neon_base1);
-+                neon_res14 = vmlaq_f32(neon_res14, neon_base2, neon_base2);
-+                neon_res15 = vmlaq_f32(neon_res15, neon_base3, neon_base3);
-+                neon_res16 = vmlaq_f32(neon_res16, neon_base4, neon_base4);
++                neon_res13 = vfmaq_f32(neon_res13, neon_base1, neon_base1);
++                neon_res14 = vfmaq_f32(neon_res14, neon_base2, neon_base2);
++                neon_res15 = vfmaq_f32(neon_res15, neon_base3, neon_base3);
++                neon_res16 = vfmaq_f32(neon_res16, neon_base4, neon_base4);
 +
 +                neon_base1 = vld1q_f32(y[16] + j);
 +                neon_base2 = vld1q_f32(y[17] + j);
@@ -13558,10 +13667,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +                neon_base2 = vsubq_f32(neon_base2, neon_query);
 +                neon_base3 = vsubq_f32(neon_base3, neon_query);
 +                neon_base4 = vsubq_f32(neon_base4, neon_query);
-+                neon_res17 = vmlaq_f32(neon_res17, neon_base1, neon_base1);
-+                neon_res18 = vmlaq_f32(neon_res18, neon_base2, neon_base2);
-+                neon_res19 = vmlaq_f32(neon_res19, neon_base3, neon_base3);
-+                neon_res20 = vmlaq_f32(neon_res20, neon_base4, neon_base4);
++                neon_res17 = vfmaq_f32(neon_res17, neon_base1, neon_base1);
++                neon_res18 = vfmaq_f32(neon_res18, neon_base2, neon_base2);
++                neon_res19 = vfmaq_f32(neon_res19, neon_base3, neon_base3);
++                neon_res20 = vfmaq_f32(neon_res20, neon_base4, neon_base4);
 +
 +                neon_base1 = vld1q_f32(y[20] + j);
 +                neon_base2 = vld1q_f32(y[21] + j);
@@ -13571,10 +13680,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +                neon_base2 = vsubq_f32(neon_base2, neon_query);
 +                neon_base3 = vsubq_f32(neon_base3, neon_query);
 +                neon_base4 = vsubq_f32(neon_base4, neon_query);
-+                neon_res21 = vmlaq_f32(neon_res21, neon_base1, neon_base1);
-+                neon_res22 = vmlaq_f32(neon_res22, neon_base2, neon_base2);
-+                neon_res23 = vmlaq_f32(neon_res23, neon_base3, neon_base3);
-+                neon_res24 = vmlaq_f32(neon_res24, neon_base4, neon_base4);
++                neon_res21 = vfmaq_f32(neon_res21, neon_base1, neon_base1);
++                neon_res22 = vfmaq_f32(neon_res22, neon_base2, neon_base2);
++                neon_res23 = vfmaq_f32(neon_res23, neon_base3, neon_base3);
++                neon_res24 = vfmaq_f32(neon_res24, neon_base4, neon_base4);
 +            }
 +        }
 +        for (; i <= d - single_round; i += single_round) {
@@ -13587,10 +13696,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[4] + i);
 +            neon_base2 = vld1q_f32(y[5] + i);
@@ -13600,10 +13709,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base1, neon_base1);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base2, neon_base2);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base3, neon_base3);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base1, neon_base1);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base2, neon_base2);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base3, neon_base3);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[8] + i);
 +            neon_base2 = vld1q_f32(y[9] + i);
@@ -13613,10 +13722,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_base1);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_base2);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_base3);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_base4);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_base1);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_base2);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_base3);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[12] + i);
 +            neon_base2 = vld1q_f32(y[13] + i);
@@ -13626,10 +13735,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base1, neon_base1);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base2, neon_base2);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base3, neon_base3);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base4, neon_base4);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base1, neon_base1);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base2, neon_base2);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base3, neon_base3);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[16] + i);
 +            neon_base2 = vld1q_f32(y[17] + i);
@@ -13639,10 +13748,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res17 = vmlaq_f32(neon_res17, neon_base1, neon_base1);
-+            neon_res18 = vmlaq_f32(neon_res18, neon_base2, neon_base2);
-+            neon_res19 = vmlaq_f32(neon_res19, neon_base3, neon_base3);
-+            neon_res20 = vmlaq_f32(neon_res20, neon_base4, neon_base4);
++            neon_res17 = vfmaq_f32(neon_res17, neon_base1, neon_base1);
++            neon_res18 = vfmaq_f32(neon_res18, neon_base2, neon_base2);
++            neon_res19 = vfmaq_f32(neon_res19, neon_base3, neon_base3);
++            neon_res20 = vfmaq_f32(neon_res20, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[20] + i);
 +            neon_base2 = vld1q_f32(y[21] + i);
@@ -13652,10 +13761,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res21 = vmlaq_f32(neon_res21, neon_base1, neon_base1);
-+            neon_res22 = vmlaq_f32(neon_res22, neon_base2, neon_base2);
-+            neon_res23 = vmlaq_f32(neon_res23, neon_base3, neon_base3);
-+            neon_res24 = vmlaq_f32(neon_res24, neon_base4, neon_base4);
++            neon_res21 = vfmaq_f32(neon_res21, neon_base1, neon_base1);
++            neon_res22 = vfmaq_f32(neon_res22, neon_base2, neon_base2);
++            neon_res23 = vfmaq_f32(neon_res23, neon_base3, neon_base3);
++            neon_res24 = vfmaq_f32(neon_res24, neon_base4, neon_base4);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -13770,10 +13879,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[4] + i);
 +            neon_base2 = vld1q_f32(y[5] + i);
@@ -13783,10 +13892,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base1, neon_base1);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base2, neon_base2);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base3, neon_base3);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base1, neon_base1);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base2, neon_base2);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base3, neon_base3);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[8] + i);
 +            neon_base2 = vld1q_f32(y[9] + i);
@@ -13796,10 +13905,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_base1);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_base2);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_base3);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_base4);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_base1);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_base2);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_base3);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[12] + i);
 +            neon_base2 = vld1q_f32(y[13] + i);
@@ -13809,10 +13918,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base1, neon_base1);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base2, neon_base2);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base3, neon_base3);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base4, neon_base4);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base1, neon_base1);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base2, neon_base2);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base3, neon_base3);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[16] + i);
 +            neon_base2 = vld1q_f32(y[17] + i);
@@ -13822,10 +13931,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res17 = vmlaq_f32(neon_res17, neon_base1, neon_base1);
-+            neon_res18 = vmlaq_f32(neon_res18, neon_base2, neon_base2);
-+            neon_res19 = vmlaq_f32(neon_res19, neon_base3, neon_base3);
-+            neon_res20 = vmlaq_f32(neon_res20, neon_base4, neon_base4);
++            neon_res17 = vfmaq_f32(neon_res17, neon_base1, neon_base1);
++            neon_res18 = vfmaq_f32(neon_res18, neon_base2, neon_base2);
++            neon_res19 = vfmaq_f32(neon_res19, neon_base3, neon_base3);
++            neon_res20 = vfmaq_f32(neon_res20, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y[20] + i);
 +            neon_base2 = vld1q_f32(y[21] + i);
@@ -13835,10 +13944,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res21 = vmlaq_f32(neon_res21, neon_base1, neon_base1);
-+            neon_res22 = vmlaq_f32(neon_res22, neon_base2, neon_base2);
-+            neon_res23 = vmlaq_f32(neon_res23, neon_base3, neon_base3);
-+            neon_res24 = vmlaq_f32(neon_res24, neon_base4, neon_base4);
++            neon_res21 = vfmaq_f32(neon_res21, neon_base1, neon_base1);
++            neon_res22 = vfmaq_f32(neon_res22, neon_base2, neon_base2);
++            neon_res23 = vfmaq_f32(neon_res23, neon_base3, neon_base3);
++            neon_res24 = vfmaq_f32(neon_res24, neon_base4, neon_base4);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -14034,16 +14143,16 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            y1_0 = vld1q_f32(y + d + i);
 +            const float32x4_t q0_0 = vsubq_f32(x_0, y0_0);
 +            const float32x4_t q1_0 = vsubq_f32(x_0, y1_0);
-+            d0_0 = vmlaq_f32(d0_0, q0_0, q0_0);
-+            d1_0 = vmlaq_f32(d1_0, q1_0, q1_0);
++            d0_0 = vfmaq_f32(d0_0, q0_0, q0_0);
++            d1_0 = vfmaq_f32(d1_0, q1_0, q1_0);
 +
 +            x_1 = vld1q_f32(x + i + 4);
 +            y0_1 = vld1q_f32(y + i + 4);
 +            y1_1 = vld1q_f32(y + d + i + 4);
 +            const float32x4_t q0_1 = vsubq_f32(x_1, y0_1);
 +            const float32x4_t q1_1 = vsubq_f32(x_1, y1_1);
-+            d0_1 = vmlaq_f32(d0_1, q0_1, q0_1);
-+            d1_1 = vmlaq_f32(d1_1, q1_1, q1_1);
++            d0_1 = vfmaq_f32(d0_1, q0_1, q0_1);
++            d1_1 = vfmaq_f32(d1_1, q1_1, q1_1);
 +        }
 +
 +        d0_0 = vaddq_f32(d0_0, d0_1);
@@ -14108,10 +14217,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            q2 = vsubq_f32(q2, b);
 +            q3 = vsubq_f32(q3, b);
 +
-+            res0 = vmlaq_f32(res0, q0, q0);
-+            res1 = vmlaq_f32(res1, q1, q1);
-+            res2 = vmlaq_f32(res2, q2, q2);
-+            res3 = vmlaq_f32(res3, q3, q3);
++            res0 = vfmaq_f32(res0, q0, q0);
++            res1 = vfmaq_f32(res1, q1, q1);
++            res2 = vfmaq_f32(res2, q2, q2);
++            res3 = vfmaq_f32(res3, q3, q3);
 +        }
 +        dis[0] = vaddvq_f32(res0);
 +        dis[1] = vaddvq_f32(res1);
@@ -14213,14 +14322,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base7 = vsubq_f32(neon_base7, neon_query);
 +            neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_base5);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_base6);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_base7);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_base8);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_base5);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_base6);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_base7);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_base8);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -14372,14 +14481,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base7 = vsubq_f32(neon_base7, neon_query);
 +            neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_base5);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_base6);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_base7);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_base8);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_base5);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_base6);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_base7);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_base8);
 +
 +            neon_base1 = vld1q_f32(y + 8 * d + i);
 +            neon_base2 = vld1q_f32(y + 9 * d + i);
@@ -14399,14 +14508,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base7 = vsubq_f32(neon_base7, neon_query);
 +            neon_base8 = vsubq_f32(neon_base8, neon_query);
 +
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_base1);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_base2);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_base3);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_base4);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_base5);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_base6);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_base7);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_base8);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_base1);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_base2);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_base3);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_base4);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_base5);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_base6);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_base7);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_base8);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -14618,10 +14727,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_base1);
-+            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_base2);
-+            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_base3);
-+            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_base4);
++            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_base1);
++            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_base2);
++            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_base3);
++            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y + 4 * d + i);
 +            neon_base2 = vld1q_f32(y + 5 * d + i);
@@ -14631,10 +14740,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res5 = vmlaq_f32(neon_res5, neon_base1, neon_base1);
-+            neon_res6 = vmlaq_f32(neon_res6, neon_base2, neon_base2);
-+            neon_res7 = vmlaq_f32(neon_res7, neon_base3, neon_base3);
-+            neon_res8 = vmlaq_f32(neon_res8, neon_base4, neon_base4);
++            neon_res5 = vfmaq_f32(neon_res5, neon_base1, neon_base1);
++            neon_res6 = vfmaq_f32(neon_res6, neon_base2, neon_base2);
++            neon_res7 = vfmaq_f32(neon_res7, neon_base3, neon_base3);
++            neon_res8 = vfmaq_f32(neon_res8, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y + 8 * d + i);
 +            neon_base2 = vld1q_f32(y + 9 * d + i);
@@ -14644,10 +14753,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_base1);
-+            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_base2);
-+            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_base3);
-+            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_base4);
++            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_base1);
++            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_base2);
++            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_base3);
++            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y + 12 * d + i);
 +            neon_base2 = vld1q_f32(y + 13 * d + i);
@@ -14657,10 +14766,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res13 = vmlaq_f32(neon_res13, neon_base1, neon_base1);
-+            neon_res14 = vmlaq_f32(neon_res14, neon_base2, neon_base2);
-+            neon_res15 = vmlaq_f32(neon_res15, neon_base3, neon_base3);
-+            neon_res16 = vmlaq_f32(neon_res16, neon_base4, neon_base4);
++            neon_res13 = vfmaq_f32(neon_res13, neon_base1, neon_base1);
++            neon_res14 = vfmaq_f32(neon_res14, neon_base2, neon_base2);
++            neon_res15 = vfmaq_f32(neon_res15, neon_base3, neon_base3);
++            neon_res16 = vfmaq_f32(neon_res16, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y + 16 * d + i);
 +            neon_base2 = vld1q_f32(y + 17 * d + i);
@@ -14670,10 +14779,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res17 = vmlaq_f32(neon_res17, neon_base1, neon_base1);
-+            neon_res18 = vmlaq_f32(neon_res18, neon_base2, neon_base2);
-+            neon_res19 = vmlaq_f32(neon_res19, neon_base3, neon_base3);
-+            neon_res20 = vmlaq_f32(neon_res20, neon_base4, neon_base4);
++            neon_res17 = vfmaq_f32(neon_res17, neon_base1, neon_base1);
++            neon_res18 = vfmaq_f32(neon_res18, neon_base2, neon_base2);
++            neon_res19 = vfmaq_f32(neon_res19, neon_base3, neon_base3);
++            neon_res20 = vfmaq_f32(neon_res20, neon_base4, neon_base4);
 +
 +            neon_base1 = vld1q_f32(y + 20 * d + i);
 +            neon_base2 = vld1q_f32(y + 21 * d + i);
@@ -14683,10 +14792,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base2 = vsubq_f32(neon_base2, neon_query);
 +            neon_base3 = vsubq_f32(neon_base3, neon_query);
 +            neon_base4 = vsubq_f32(neon_base4, neon_query);
-+            neon_res21 = vmlaq_f32(neon_res21, neon_base1, neon_base1);
-+            neon_res22 = vmlaq_f32(neon_res22, neon_base2, neon_base2);
-+            neon_res23 = vmlaq_f32(neon_res23, neon_base3, neon_base3);
-+            neon_res24 = vmlaq_f32(neon_res24, neon_base4, neon_base4);
++            neon_res21 = vfmaq_f32(neon_res21, neon_base1, neon_base1);
++            neon_res22 = vfmaq_f32(neon_res22, neon_base2, neon_base2);
++            neon_res23 = vfmaq_f32(neon_res23, neon_base3, neon_base3);
++            neon_res24 = vfmaq_f32(neon_res24, neon_base4, neon_base4);
 +        }
 +        dis[0] = vaddvq_f32(neon_res1);
 +        dis[1] = vaddvq_f32(neon_res2);
@@ -14936,14 +15045,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +        neon_base[6] = vsubq_f32(neon_base[6], single_query);
 +        neon_base[7] = vsubq_f32(neon_base[7], single_query);
 +
-+        neon_res[0] = vmlaq_f32(neon_res[0], neon_base[0], neon_base[0]);
-+        neon_res[1] = vmlaq_f32(neon_res[1], neon_base[1], neon_base[1]);
-+        neon_res[2] = vmlaq_f32(neon_res[2], neon_base[2], neon_base[2]);
-+        neon_res[3] = vmlaq_f32(neon_res[3], neon_base[3], neon_base[3]);
-+        neon_res[4] = vmlaq_f32(neon_res[4], neon_base[4], neon_base[4]);
-+        neon_res[5] = vmlaq_f32(neon_res[5], neon_base[5], neon_base[5]);
-+        neon_res[6] = vmlaq_f32(neon_res[6], neon_base[6], neon_base[6]);
-+        neon_res[7] = vmlaq_f32(neon_res[7], neon_base[7], neon_base[7]);
++        neon_res[0] = vfmaq_f32(neon_res[0], neon_base[0], neon_base[0]);
++        neon_res[1] = vfmaq_f32(neon_res[1], neon_base[1], neon_base[1]);
++        neon_res[2] = vfmaq_f32(neon_res[2], neon_base[2], neon_base[2]);
++        neon_res[3] = vfmaq_f32(neon_res[3], neon_base[3], neon_base[3]);
++        neon_res[4] = vfmaq_f32(neon_res[4], neon_base[4], neon_base[4]);
++        neon_res[5] = vfmaq_f32(neon_res[5], neon_base[5], neon_base[5]);
++        neon_res[6] = vfmaq_f32(neon_res[6], neon_base[6], neon_base[6]);
++        neon_res[7] = vfmaq_f32(neon_res[7], neon_base[7], neon_base[7]);
 +
 +        neon_base[0] = vld1q_f32(y + 64 * i + 32);
 +        neon_base[1] = vld1q_f32(y + 64 * i + 36);
@@ -14963,14 +15072,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +        neon_base[6] = vsubq_f32(neon_base[6], single_query);
 +        neon_base[7] = vsubq_f32(neon_base[7], single_query);
 +
-+        neon_res[8] = vmlaq_f32(neon_res[8], neon_base[0], neon_base[0]);
-+        neon_res[9] = vmlaq_f32(neon_res[9], neon_base[1], neon_base[1]);
-+        neon_res[10] = vmlaq_f32(neon_res[10], neon_base[2], neon_base[2]);
-+        neon_res[11] = vmlaq_f32(neon_res[11], neon_base[3], neon_base[3]);
-+        neon_res[12] = vmlaq_f32(neon_res[12], neon_base[4], neon_base[4]);
-+        neon_res[13] = vmlaq_f32(neon_res[13], neon_base[5], neon_base[5]);
-+        neon_res[14] = vmlaq_f32(neon_res[14], neon_base[6], neon_base[6]);
-+        neon_res[15] = vmlaq_f32(neon_res[15], neon_base[7], neon_base[7]);
++        neon_res[8] = vfmaq_f32(neon_res[8], neon_base[0], neon_base[0]);
++        neon_res[9] = vfmaq_f32(neon_res[9], neon_base[1], neon_base[1]);
++        neon_res[10] = vfmaq_f32(neon_res[10], neon_base[2], neon_base[2]);
++        neon_res[11] = vfmaq_f32(neon_res[11], neon_base[3], neon_base[3]);
++        neon_res[12] = vfmaq_f32(neon_res[12], neon_base[4], neon_base[4]);
++        neon_res[13] = vfmaq_f32(neon_res[13], neon_base[5], neon_base[5]);
++        neon_res[14] = vfmaq_f32(neon_res[14], neon_base[6], neon_base[6]);
++        neon_res[15] = vfmaq_f32(neon_res[15], neon_base[7], neon_base[7]);
 +    }
 +    {
 +        vst1q_f32(dis, neon_res[0]);
@@ -15074,14 +15183,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base[6] = vld1q_f32(y + 32 * i + 24);
 +            neon_base[7] = vld1q_f32(y + 32 * i + 28);
 +
-+            neon_res[0] = vmlaq_f32(neon_res[0], neon_diff[0], neon_diff[0]);
-+            neon_res[1] = vmlaq_f32(neon_res[1], neon_diff[1], neon_diff[1]);
-+            neon_res[2] = vmlaq_f32(neon_res[2], neon_diff[2], neon_diff[2]);
-+            neon_res[3] = vmlaq_f32(neon_res[3], neon_diff[3], neon_diff[3]);
-+            neon_res[4] = vmlaq_f32(neon_res[4], neon_diff[4], neon_diff[4]);
-+            neon_res[5] = vmlaq_f32(neon_res[5], neon_diff[5], neon_diff[5]);
-+            neon_res[6] = vmlaq_f32(neon_res[6], neon_diff[6], neon_diff[6]);
-+            neon_res[7] = vmlaq_f32(neon_res[7], neon_diff[7], neon_diff[7]);
++            neon_res[0] = vfmaq_f32(neon_res[0], neon_diff[0], neon_diff[0]);
++            neon_res[1] = vfmaq_f32(neon_res[1], neon_diff[1], neon_diff[1]);
++            neon_res[2] = vfmaq_f32(neon_res[2], neon_diff[2], neon_diff[2]);
++            neon_res[3] = vfmaq_f32(neon_res[3], neon_diff[3], neon_diff[3]);
++            neon_res[4] = vfmaq_f32(neon_res[4], neon_diff[4], neon_diff[4]);
++            neon_res[5] = vfmaq_f32(neon_res[5], neon_diff[5], neon_diff[5]);
++            neon_res[6] = vfmaq_f32(neon_res[6], neon_diff[6], neon_diff[6]);
++            neon_res[7] = vfmaq_f32(neon_res[7], neon_diff[7], neon_diff[7]);
 +        }
 +        {
 +            neon_diff[0] = vsubq_f32(neon_base[0], single_query);
@@ -15093,14 +15202,14 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_diff[6] = vsubq_f32(neon_base[6], single_query);
 +            neon_diff[7] = vsubq_f32(neon_base[7], single_query);
 +
-+            neon_res[0] = vmlaq_f32(neon_res[0], neon_diff[0], neon_diff[0]);
-+            neon_res[1] = vmlaq_f32(neon_res[1], neon_diff[1], neon_diff[1]);
-+            neon_res[2] = vmlaq_f32(neon_res[2], neon_diff[2], neon_diff[2]);
-+            neon_res[3] = vmlaq_f32(neon_res[3], neon_diff[3], neon_diff[3]);
-+            neon_res[4] = vmlaq_f32(neon_res[4], neon_diff[4], neon_diff[4]);
-+            neon_res[5] = vmlaq_f32(neon_res[5], neon_diff[5], neon_diff[5]);
-+            neon_res[6] = vmlaq_f32(neon_res[6], neon_diff[6], neon_diff[6]);
-+            neon_res[7] = vmlaq_f32(neon_res[7], neon_diff[7], neon_diff[7]);
++            neon_res[0] = vfmaq_f32(neon_res[0], neon_diff[0], neon_diff[0]);
++            neon_res[1] = vfmaq_f32(neon_res[1], neon_diff[1], neon_diff[1]);
++            neon_res[2] = vfmaq_f32(neon_res[2], neon_diff[2], neon_diff[2]);
++            neon_res[3] = vfmaq_f32(neon_res[3], neon_diff[3], neon_diff[3]);
++            neon_res[4] = vfmaq_f32(neon_res[4], neon_diff[4], neon_diff[4]);
++            neon_res[5] = vfmaq_f32(neon_res[5], neon_diff[5], neon_diff[5]);
++            neon_res[6] = vfmaq_f32(neon_res[6], neon_diff[6], neon_diff[6]);
++            neon_res[7] = vfmaq_f32(neon_res[7], neon_diff[7], neon_diff[7]);
 +        }
 +    }
 +    vst1q_f32(dis, neon_res[0]);
@@ -15161,10 +15270,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_base3 = vld1q_f32(y + 16 * i + 8);
 +            neon_base4 = vld1q_f32(y + 16 * i + 12);
 +
-+            neon_res[0] = vmlaq_f32(neon_res[0], neon_diff1, neon_diff1);
-+            neon_res[1] = vmlaq_f32(neon_res[1], neon_diff2, neon_diff2);
-+            neon_res[2] = vmlaq_f32(neon_res[2], neon_diff3, neon_diff3);
-+            neon_res[3] = vmlaq_f32(neon_res[3], neon_diff4, neon_diff4);
++            neon_res[0] = vfmaq_f32(neon_res[0], neon_diff1, neon_diff1);
++            neon_res[1] = vfmaq_f32(neon_res[1], neon_diff2, neon_diff2);
++            neon_res[2] = vfmaq_f32(neon_res[2], neon_diff3, neon_diff3);
++            neon_res[3] = vfmaq_f32(neon_res[3], neon_diff4, neon_diff4);
 +        }
 +        {
 +            neon_diff1 = vsubq_f32(neon_base1, single_query);
@@ -15172,10 +15281,10 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 +            neon_diff3 = vsubq_f32(neon_base3, single_query);
 +            neon_diff4 = vsubq_f32(neon_base4, single_query);
 +
-+            neon_res[0] = vmlaq_f32(neon_res[0], neon_diff1, neon_diff1);
-+            neon_res[1] = vmlaq_f32(neon_res[1], neon_diff2, neon_diff2);
-+            neon_res[2] = vmlaq_f32(neon_res[2], neon_diff3, neon_diff3);
-+            neon_res[3] = vmlaq_f32(neon_res[3], neon_diff4, neon_diff4);
++            neon_res[0] = vfmaq_f32(neon_res[0], neon_diff1, neon_diff1);
++            neon_res[1] = vfmaq_f32(neon_res[1], neon_diff2, neon_diff2);
++            neon_res[2] = vfmaq_f32(neon_res[2], neon_diff3, neon_diff3);
++            neon_res[3] = vfmaq_f32(neon_res[3], neon_diff4, neon_diff4);
 +        }
 +    }
 +
@@ -15499,7 +15608,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distance_simd_f16.c faiss-patch/faiss/sra_krl/src/L2distance_simd_f16.c
 --- faiss/faiss/sra_krl/src/L2distance_simd_f16.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/L2distance_simd_f16.c	2026-06-16 10:36:25.256481500 +0800
++++ faiss-patch/faiss/sra_krl/src/L2distance_simd_f16.c	2026-08-17 19:31:58.189667800 +0800
 @@ -0,0 +1,2672 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -18176,7 +18285,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distance_simd_f16f32.c faiss-patch/faiss/sra_krl/src/L2distance_simd_f16f32.c
 --- faiss/faiss/sra_krl/src/L2distance_simd_f16f32.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/L2distance_simd_f16f32.c	2026-06-16 10:36:25.256481500 +0800
++++ faiss-patch/faiss/sra_krl/src/L2distance_simd_f16f32.c	2026-08-17 19:31:58.189667800 +0800
 @@ -0,0 +1,3102 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -21283,7 +21392,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distance_simd_u8.c faiss-patch/faiss/sra_krl/src/L2distance_simd_u8.c
 --- faiss/faiss/sra_krl/src/L2distance_simd_u8.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/L2distance_simd_u8.c	2026-06-16 10:36:25.258420400 +0800
++++ faiss-patch/faiss/sra_krl/src/L2distance_simd_u8.c	2026-08-17 19:31:58.191190700 +0800
 @@ -0,0 +1,2631 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -23919,7 +24028,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/L2distan
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/MinMax_quant.c faiss-patch/faiss/sra_krl/src/MinMax_quant.c
 --- faiss/faiss/sra_krl/src/MinMax_quant.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/MinMax_quant.c	2026-06-16 10:36:25.258420400 +0800
++++ faiss-patch/faiss/sra_krl/src/MinMax_quant.c	2026-08-17 19:31:58.191190700 +0800
 @@ -0,0 +1,570 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -24494,7 +24603,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/MinMax_q
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c
 --- faiss/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c	2026-06-16 10:36:25.258420400 +0800
++++ faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_f16f32.c	2026-08-17 19:31:58.191190700 +0800
 @@ -0,0 +1,1177 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -25676,7 +25785,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/NegaIPdi
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/NegaIPdistance_simd_s8.c faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_s8.c
 --- faiss/faiss/sra_krl/src/NegaIPdistance_simd_s8.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_s8.c	2026-06-16 10:36:25.258420400 +0800
++++ faiss-patch/faiss/sra_krl/src/NegaIPdistance_simd_s8.c	2026-08-17 19:31:58.191190700 +0800
 @@ -0,0 +1,474 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -26154,7 +26263,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/NegaIPdi
 +KRL_IMPRECISE_FUNCTION_END
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/handle_IO.c faiss-patch/faiss/sra_krl/src/handle_IO.c
 --- faiss/faiss/sra_krl/src/handle_IO.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/handle_IO.c	2026-06-16 10:36:25.258420400 +0800
++++ faiss-patch/faiss/sra_krl/src/handle_IO.c	2026-08-17 19:31:58.191190700 +0800
 @@ -0,0 +1,201 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -26359,7 +26468,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/handle_I
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/krl_handles.c faiss-patch/faiss/sra_krl/src/krl_handles.c
 --- faiss/faiss/sra_krl/src/krl_handles.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/krl_handles.c	2026-06-16 10:36:25.258420400 +0800
++++ faiss-patch/faiss/sra_krl/src/krl_handles.c	2026-08-17 19:31:58.191190700 +0800
 @@ -0,0 +1,398 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -26761,7 +26870,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/krl_hand
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/matrix_block_transpose.c faiss-patch/faiss/sra_krl/src/matrix_block_transpose.c
 --- faiss/faiss/sra_krl/src/matrix_block_transpose.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/matrix_block_transpose.c	2026-06-16 10:36:25.258420400 +0800
++++ faiss-patch/faiss/sra_krl/src/matrix_block_transpose.c	2026-08-17 19:31:58.191190700 +0800
 @@ -0,0 +1,108 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -26874,7 +26983,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/matrix_b
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_search_with_table_4bit.c faiss-patch/faiss/sra_krl/src/pq_search_with_table_4bit.c
 --- faiss/faiss/sra_krl/src/pq_search_with_table_4bit.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_4bit.c	2026-06-16 10:36:25.258420400 +0800
++++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_4bit.c	2026-08-17 19:31:58.192736800 +0800
 @@ -0,0 +1,1302 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -28181,8 +28290,8 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_searc
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_search_with_table_4bit_sve2.c faiss-patch/faiss/sra_krl/src/pq_search_with_table_4bit_sve2.c
 --- faiss/faiss/sra_krl/src/pq_search_with_table_4bit_sve2.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_4bit_sve2.c	2026-06-16 10:36:25.259930800 +0800
-@@ -0,0 +1,597 @@
++++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_4bit_sve2.c	2026-08-17 19:31:58.192736800 +0800
+@@ -0,0 +1,784 @@
 +/*
 +   Copyright 2026 Huawei Technologies Co., Ltd.
 +
@@ -28780,9 +28889,196 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_searc
 +    return SUCCESS;
 +}
 +
++/*
++ * @brief Accumulate LUT results for NQ queries sharing the same codes block.
++ *        SVE2 multi-query kernel -- codes loaded once, shared across NQ queries.
++ *        Each query uses 2 SVE accumulators (lo + hi), NQ=4 needs 8 of 32 registers.
++ *        NQ is a template parameter because SVE types cannot be placed in arrays.
++ * @param nsq Number of subquantizers.
++ * @param codes Pointer to the codes array, layout (nsq, batch=32).
++ * @param LUT Pointer to the precomputed distances for NQ queries, layout (NQ, nsq, 16).
++ * @param distance Pointer to the array storing computed distances, layout (NQ, 32).
++ * @param threshold Pointer to the filter threshold array, length NQ.
++ * @param lt_mask Pointer to the array storing filter results, length NQ.
++ */
++template <int NQ, int keep_min>
++static inline void krl_lut_accumulate_filter_sve2(
++    int nsq, const uint8_t *codes, const uint8_t *LUT,
++    uint16_t *distance, const uint16_t *threshold, uint32_t *lt_mask)
++{
++    const svbool_t pg8 = svptrue_b8();
++    const svbool_t pg16 = svptrue_b16();
++
++    svuint16_t rl0 = svdup_n_u16(0), rh0 = svdup_n_u16(0);
++    svuint16_t rl1 = svdup_n_u16(0), rh1 = svdup_n_u16(0);
++    svuint16_t rl2 = svdup_n_u16(0), rh2 = svdup_n_u16(0);
++    svuint16_t rl3 = svdup_n_u16(0), rh3 = svdup_n_u16(0);
++
++    svuint8_t code0 = svld1_u8(pg8, codes);
++    codes += 32;
++
++    const svuint8_t const_01 = svreinterpret_u8_u16(svdup_n_u16(0x0100));
++    const svuint8_t const_10 = svreinterpret_u8_u16(svdup_n_u16(0x1000));
++
++    if (__builtin_expect(nsq > 2, 1)) {
++        svuint8_t idx_lo = svsli_n_u8(code0, const_01, 4);
++        svuint8_t idx_hi = svsri_n_u8(const_10, code0, 4);
++        code0 = svld1_u8(pg8, codes);
++        codes += 32;
++
++        { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl0 = svadalp_u16_x(pg16, rl0, svtbl_u8(d, idx_lo)); rh0 = svadalp_u16_x(pg16, rh0, svtbl_u8(d, idx_hi)); }
++        if constexpr (NQ > 1) { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl1 = svadalp_u16_x(pg16, rl1, svtbl_u8(d, idx_lo)); rh1 = svadalp_u16_x(pg16, rh1, svtbl_u8(d, idx_hi)); }
++        if constexpr (NQ > 2) { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl2 = svadalp_u16_x(pg16, rl2, svtbl_u8(d, idx_lo)); rh2 = svadalp_u16_x(pg16, rh2, svtbl_u8(d, idx_hi)); }
++        if constexpr (NQ > 3) { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl3 = svadalp_u16_x(pg16, rl3, svtbl_u8(d, idx_lo)); rh3 = svadalp_u16_x(pg16, rh3, svtbl_u8(d, idx_hi)); }
++
++        for (int sq = 4; sq < nsq; sq += 2) {
++            idx_lo = svsli_n_u8(code0, const_01, 4);
++            idx_hi = svsri_n_u8(const_10, code0, 4);
++            code0 = svld1_u8(pg8, codes);
++            codes += 32;
++
++            { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl0 = svadalp_u16_x(pg16, rl0, svtbl_u8(d, idx_lo)); rh0 = svadalp_u16_x(pg16, rh0, svtbl_u8(d, idx_hi)); }
++            if constexpr (NQ > 1) { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl1 = svadalp_u16_x(pg16, rl1, svtbl_u8(d, idx_lo)); rh1 = svadalp_u16_x(pg16, rh1, svtbl_u8(d, idx_hi)); }
++            if constexpr (NQ > 2) { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl2 = svadalp_u16_x(pg16, rl2, svtbl_u8(d, idx_lo)); rh2 = svadalp_u16_x(pg16, rh2, svtbl_u8(d, idx_hi)); }
++            if constexpr (NQ > 3) { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl3 = svadalp_u16_x(pg16, rl3, svtbl_u8(d, idx_lo)); rh3 = svadalp_u16_x(pg16, rh3, svtbl_u8(d, idx_hi)); }
++        }
++    }
++
++    {
++        svuint8_t idx_lo = svsli_n_u8(code0, const_01, 4);
++        svuint8_t idx_hi = svsri_n_u8(const_10, code0, 4);
++
++        { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl0 = svadalp_u16_x(pg16, rl0, svtbl_u8(d, idx_lo)); rh0 = svadalp_u16_x(pg16, rh0, svtbl_u8(d, idx_hi)); }
++        if constexpr (NQ > 1) { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl1 = svadalp_u16_x(pg16, rl1, svtbl_u8(d, idx_lo)); rh1 = svadalp_u16_x(pg16, rh1, svtbl_u8(d, idx_hi)); }
++        if constexpr (NQ > 2) { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl2 = svadalp_u16_x(pg16, rl2, svtbl_u8(d, idx_lo)); rh2 = svadalp_u16_x(pg16, rh2, svtbl_u8(d, idx_hi)); }
++        if constexpr (NQ > 3) { svuint8_t d = svld1_u8(pg8, LUT); LUT += 32; rl3 = svadalp_u16_x(pg16, rl3, svtbl_u8(d, idx_lo)); rh3 = svadalp_u16_x(pg16, rh3, svtbl_u8(d, idx_hi)); }
++    }
++
++    /* store q=0 */
++    {
++        uint16_t *dist = distance;
++        store_halves_u16_sve2(dist, dist + 16, rl0);
++        store_halves_u16_sve2(dist + 8, dist + 24, rh0);
++        svuint16_t d0 = svld1_u16(pg16, dist);
++        svuint16_t d1 = svld1_u16(pg16, dist + 16);
++        svuint16_t th = svdup_n_u16(threshold[0]);
++        svuint16_t bo = svld1_u16(pg16, FILTER_OFFSET_DATA);
++        svuint16_t z  = svdup_n_u16(0);
++        svbool_t c0, c1;
++        if constexpr (keep_min == 0) { c0 = svcmpgt_u16(pg16, d0, th); c1 = svcmpgt_u16(pg16, d1, th); }
++        else                         { c0 = svcmplt_u16(pg16, d0, th); c1 = svcmplt_u16(pg16, d1, th); }
++        lt_mask[0] = (uint32_t)svaddv_u16(pg16, svsel_u16(c0, bo, z))
++                   | ((uint32_t)svaddv_u16(pg16, svsel_u16(c1, bo, z)) << 16);
++    }
++    if constexpr (NQ > 1) {
++        uint16_t *dist = distance + 32;
++        store_halves_u16_sve2(dist, dist + 16, rl1);
++        store_halves_u16_sve2(dist + 8, dist + 24, rh1);
++        svuint16_t d0 = svld1_u16(pg16, dist);
++        svuint16_t d1 = svld1_u16(pg16, dist + 16);
++        svuint16_t th = svdup_n_u16(threshold[1]);
++        svuint16_t bo = svld1_u16(pg16, FILTER_OFFSET_DATA);
++        svuint16_t z  = svdup_n_u16(0);
++        svbool_t c0, c1;
++        if constexpr (keep_min == 0) { c0 = svcmpgt_u16(pg16, d0, th); c1 = svcmpgt_u16(pg16, d1, th); }
++        else                         { c0 = svcmplt_u16(pg16, d0, th); c1 = svcmplt_u16(pg16, d1, th); }
++        lt_mask[1] = (uint32_t)svaddv_u16(pg16, svsel_u16(c0, bo, z))
++                   | ((uint32_t)svaddv_u16(pg16, svsel_u16(c1, bo, z)) << 16);
++    }
++    if constexpr (NQ > 2) {
++        uint16_t *dist = distance + 64;
++        store_halves_u16_sve2(dist, dist + 16, rl2);
++        store_halves_u16_sve2(dist + 8, dist + 24, rh2);
++        svuint16_t d0 = svld1_u16(pg16, dist);
++        svuint16_t d1 = svld1_u16(pg16, dist + 16);
++        svuint16_t th = svdup_n_u16(threshold[2]);
++        svuint16_t bo = svld1_u16(pg16, FILTER_OFFSET_DATA);
++        svuint16_t z  = svdup_n_u16(0);
++        svbool_t c0, c1;
++        if constexpr (keep_min == 0) { c0 = svcmpgt_u16(pg16, d0, th); c1 = svcmpgt_u16(pg16, d1, th); }
++        else                         { c0 = svcmplt_u16(pg16, d0, th); c1 = svcmplt_u16(pg16, d1, th); }
++        lt_mask[2] = (uint32_t)svaddv_u16(pg16, svsel_u16(c0, bo, z))
++                   | ((uint32_t)svaddv_u16(pg16, svsel_u16(c1, bo, z)) << 16);
++    }
++    if constexpr (NQ > 3) {
++        uint16_t *dist = distance + 96;
++        store_halves_u16_sve2(dist, dist + 16, rl3);
++        store_halves_u16_sve2(dist + 8, dist + 24, rh3);
++        svuint16_t d0 = svld1_u16(pg16, dist);
++        svuint16_t d1 = svld1_u16(pg16, dist + 16);
++        svuint16_t th = svdup_n_u16(threshold[3]);
++        svuint16_t bo = svld1_u16(pg16, FILTER_OFFSET_DATA);
++        svuint16_t z  = svdup_n_u16(0);
++        svbool_t c0, c1;
++        if constexpr (keep_min == 0) { c0 = svcmpgt_u16(pg16, d0, th); c1 = svcmpgt_u16(pg16, d1, th); }
++        else                         { c0 = svcmplt_u16(pg16, d0, th); c1 = svcmplt_u16(pg16, d1, th); }
++        lt_mask[3] = (uint32_t)svaddv_u16(pg16, svsel_u16(c0, bo, z))
++                   | ((uint32_t)svaddv_u16(pg16, svsel_u16(c1, bo, z)) << 16);
++    }
++}
++
++/* dispatch helper: call krl_lut_accumulate_filter_sve2 with the right NQ template */
++template <int keep_min>
++static inline void krl_lut_accumulate_filter_sve2_dispatch(
++    int nq, int nsq, const uint8_t *codes, const uint8_t *LUT,
++    uint16_t *distance, const uint16_t *threshold, uint32_t *lt_mask)
++{
++    switch (nq) {
++        case 4: krl_lut_accumulate_filter_sve2<4, keep_min>(nsq, codes, LUT, distance, threshold, lt_mask); break;
++        case 3: krl_lut_accumulate_filter_sve2<3, keep_min>(nsq, codes, LUT, distance, threshold, lt_mask); break;
++        case 2: krl_lut_accumulate_filter_sve2<2, keep_min>(nsq, codes, LUT, distance, threshold, lt_mask); break;
++        case 1: krl_lut_accumulate_filter_sve2<1, keep_min>(nsq, codes, LUT, distance, threshold, lt_mask); break;
++        default: break;
++    }
++}
++
++/*
++ * @brief Perform fast table lookup and filtering for multiple queries with batch size 32.
++ *        SVE2 version -- groups queries in batches of 4, codes shared within each batch.
++ *        Solves the register pressure issue: SVE2 has 32 fully-usable registers (no GCC
++ *        inline asm clobber), nq=4 needs only ~22 of 32, leaving ample headroom.
++ * @param nq Total number of queries.
++ * @param nsq Number of subquantizers.
++ * @param codes Pointer to the codes array, layout (nsq, batch=32).
++ * @param LUT Pointer to the precomputed distances array, layout (nq, nsq, ksub=16).
++ * @param dis Pointer to the array storing computed distances.
++ * @param threshold Pointer to the filter threshold array.
++ * @param lt_mask Pointer to the array storing filter results.
++ * @param keep_min Filter comparison rule (0 for IP/keep max, 1 for L2/keep min).
++ * @param codes_size Length of codes.
++ * @param LUT_size Length of LUT.
++ * @param threshold_size Length of threshold.
++ * @param lt_mask_size Length of lt_mask.
++ */
++int krl_fast_table_lookup_step_sve2(int nq, int nsq, const uint8_t *codes, const uint8_t *LUT,
++    uint16_t *dis, const uint16_t *threshold, uint32_t *lt_mask, int keep_min,
++    size_t codes_size, size_t LUT_size, size_t threshold_size, size_t lt_mask_size)
++{
++    int q = 0;
++    const int left_q = nq & 3;
++    for (; q <= nq - 4; q += 4) {
++        if (keep_min) {
++            krl_lut_accumulate_filter_sve2<4, 1>(nsq, codes, LUT + q * nsq * 16,
++                dis + q * 32, threshold + q, lt_mask + q);
++        } else {
++            krl_lut_accumulate_filter_sve2<4, 0>(nsq, codes, LUT + q * nsq * 16,
++                dis + q * 32, threshold + q, lt_mask + q);
++        }
++    }
++    if (left_q) {
++        if (keep_min) {
++            krl_lut_accumulate_filter_sve2_dispatch<1>(left_q, nsq, codes, LUT + q * nsq * 16,
++                dis + q * 32, threshold + q, lt_mask + q);
++        } else {
++            krl_lut_accumulate_filter_sve2_dispatch<0>(left_q, nsq, codes, LUT + q * nsq * 16,
++                dis + q * 32, threshold + q, lt_mask + q);
++        }
++    }
++    return SUCCESS;
++}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_search_with_table_8bit.c faiss-patch/faiss/sra_krl/src/pq_search_with_table_8bit.c
 --- faiss/faiss/sra_krl/src/pq_search_with_table_8bit.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_8bit.c	2026-06-16 10:36:25.259930800 +0800
++++ faiss-patch/faiss/sra_krl/src/pq_search_with_table_8bit.c	2026-08-17 19:31:58.194300000 +0800
 @@ -0,0 +1,418 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -29204,7 +29500,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/pq_searc
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/reorder_2_vectors.c faiss-patch/faiss/sra_krl/src/reorder_2_vectors.c
 --- faiss/faiss/sra_krl/src/reorder_2_vectors.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/reorder_2_vectors.c	2026-06-16 10:36:25.259930800 +0800
++++ faiss-patch/faiss/sra_krl/src/reorder_2_vectors.c	2026-08-17 19:31:58.194300000 +0800
 @@ -0,0 +1,311 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -29519,7 +29815,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/reorder_
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/sve_search_codes.c faiss-patch/faiss/sra_krl/src/sve_search_codes.c
 --- faiss/faiss/sra_krl/src/sve_search_codes.c	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/faiss/sra_krl/src/sve_search_codes.c	2026-06-16 10:36:25.259930800 +0800
++++ faiss-patch/faiss/sra_krl/src/sve_search_codes.c	2026-08-17 19:31:58.194812400 +0800
 @@ -0,0 +1,129 @@
 +/*
 +   Copyright 2025 Huawei Technologies Co., Ltd.
@@ -29652,7 +29948,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/sra_krl/src/sve_sear
 +}
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/distances_simd.cpp faiss-patch/faiss/utils/distances_simd.cpp
 --- faiss/faiss/utils/distances_simd.cpp	2026-06-10 15:21:27.731259600 +0800
-+++ faiss-patch/faiss/utils/distances_simd.cpp	2026-06-16 10:36:25.263485900 +0800
++++ faiss-patch/faiss/utils/distances_simd.cpp	2026-08-17 19:31:58.199450500 +0800
 @@ -29,6 +29,11 @@
  
  #ifdef __aarch64__
@@ -29697,7 +29993,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/faiss/utils/distances_simd
      const float32x4_t bfv = vdupq_n_f32(bf);
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/CMakeLists.txt faiss-patch/tests/CMakeLists.txt
 --- faiss/tests/CMakeLists.txt	2026-06-10 15:21:27.735807000 +0800
-+++ faiss-patch/tests/CMakeLists.txt	2026-06-16 10:36:25.268018300 +0800
++++ faiss-patch/tests/CMakeLists.txt	2026-08-17 19:31:58.206514000 +0800
 @@ -34,6 +34,16 @@
    test_fastscan_perf.cpp
  )
@@ -29717,7 +30013,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/CMakeLists.txt faiss
  if(NOT FAISS_OPT_LEVEL STREQUAL "avx2" AND NOT FAISS_OPT_LEVEL STREQUAL "avx512")
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_refine.cpp faiss-patch/tests/test_index_refine.cpp
 --- faiss/tests/test_index_refine.cpp	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/test_index_refine.cpp	2026-06-16 10:36:25.272622900 +0800
++++ faiss-patch/tests/test_index_refine.cpp	2026-08-17 19:31:58.211061000 +0800
 @@ -0,0 +1,211 @@
 +/**
 + * Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
@@ -29933,7 +30229,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_index_refine.cp
 \ No newline at end of file
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_params_override.cpp faiss-patch/tests/test_params_override.cpp
 --- faiss/tests/test_params_override.cpp	2026-06-10 15:21:27.742951400 +0800
-+++ faiss-patch/tests/test_params_override.cpp	2026-06-16 10:36:25.275642800 +0800
++++ faiss-patch/tests/test_params_override.cpp	2026-08-17 19:31:58.214117200 +0800
 @@ -150,7 +150,51 @@
      auto new_result = search_index_with_params(index.get(), xq.data(), &params);
  
@@ -30025,7 +30321,7 @@ diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/test_params_override
  /*************************************************************
 diff -Naur '--exclude=.git' '--exclude=.vscode' faiss/tests/ut_test_ivfpq.sh faiss-patch/tests/ut_test_ivfpq.sh
 --- faiss/tests/ut_test_ivfpq.sh	1970-01-01 08:00:00.000000000 +0800
-+++ faiss-patch/tests/ut_test_ivfpq.sh	2026-06-16 10:36:25.276663400 +0800
++++ faiss-patch/tests/ut_test_ivfpq.sh	2026-08-17 19:31:58.216657700 +0800
 @@ -0,0 +1,222 @@
 +#!/usr/bin/env bash
 +set -euo pipefail

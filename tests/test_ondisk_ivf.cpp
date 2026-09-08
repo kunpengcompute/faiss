@@ -103,6 +103,13 @@ TEST(ONDISK, test_add) {
         faiss::float_rand(x.data(), d * nlist, 12345);
         quantizer.add(nlist, x.data());
     }
+#ifdef KRL
+    // KRL: read_index always rebuilds the quantizer's reorder handle, so
+    // create it here as well. Otherwise ref searches use the standard knn
+    // path while the reloaded index uses the KRL reorder path, and results
+    // may differ on near-tie coarse assignments.
+    quantizer.train(-1, (const float*)nullptr);
+#endif
     std::vector<float> xb(d * nb);
     faiss::float_rand(xb.data(), d * nb, 23456);
 

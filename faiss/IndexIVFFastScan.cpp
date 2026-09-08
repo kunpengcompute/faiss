@@ -972,6 +972,10 @@ void IndexIVFFastScan::search_implem_12(
 
     size_t ndis = 0;
 
+    const int max_nc = qbs2;
+    AlignedTable<uint8_t> LUT(max_nc * dim12);
+    std::vector<int> q_map(max_nc), lut_entries(max_nc);
+
     size_t i0 = 0;
     uint64_t t_copy_pack = 0, t_scan = 0;
     while (i0 < qcs.size()) {
@@ -996,8 +1000,6 @@ void IndexIVFFastScan::search_implem_12(
         // re-organize LUTs and biases into the right order
         int nc = i1 - i0;
 
-        std::vector<int> q_map(nc), lut_entries(nc);
-        AlignedTable<uint8_t> LUT(nc * dim12);
         memset(LUT.get(), -1, nc * dim12);
         int qbs = pq4_preferred_qbs(nc);
 
@@ -1173,6 +1175,9 @@ void IndexIVFFastScan::search_implem_14(
             tmp_bias.resize(qbs2);
             handler->dbias = tmp_bias.data();
         }
+        const int max_nc = qbs2;
+        AlignedTable<uint8_t> LUT(max_nc * dim12);
+        std::vector<int> q_map(max_nc), lut_entries(max_nc);
         std::set<int> q_set;
         uint64_t t_copy_pack = 0, t_scan = 0;
 #pragma omp for schedule(dynamic)
@@ -1186,8 +1191,6 @@ void IndexIVFFastScan::search_implem_14(
             // re-organize LUTs and biases into the right order
             int nc = i1 - i0;
 
-            std::vector<int> q_map(nc), lut_entries(nc);
-            AlignedTable<uint8_t> LUT(nc * dim12);
             memset(LUT.get(), -1, nc * dim12);
             int qbs = pq4_preferred_qbs(nc);
 

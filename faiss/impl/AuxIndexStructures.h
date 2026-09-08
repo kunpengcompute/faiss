@@ -19,6 +19,9 @@
 #include <mutex>
 #include <vector>
 
+#include <fstream>
+#include <string>
+
 #include <faiss/MetricType.h>
 #include <faiss/impl/platform_macros.h>
 
@@ -162,20 +165,53 @@ struct FAISS_API InterruptCallback {
     static size_t get_period_hint(size_t flops);
 };
 
+/// Detect L3 cache size at runtime from sysfs. Returns 0 if detection fails.
+inline size_t get_l3_cache_size() {
+    std::ifstream f("/sys/devices/system/cpu/cpu0/cache/index3/size");
+    if (!f.is_open())
+        return 0;
+    std::string s;
+    f >> s;
+    if (s.empty())
+        return 0;
+    size_t val = std::stoull(s);
+    char unit = s.back();
+    if (unit == 'K' || unit == 'k')
+        val *= 1024;
+    else if (unit == 'M' || unit == 'm')
+        val *= 1024 * 1024;
+    return val;
+}
+
+/// Compute hashset threshold from L3 cache size at runtime.
+/// Divisor of 8 accounts for: multiple threads sharing L3, other data
+/// competing for cache, and safety margin.
+/// Falls back to 3M if L3 detection fails.
+///
+/// The L3 size never changes over the process lifetime, and reading it
+/// involves file I/O + string parsing that must NOT be paid on every
+/// VisitedTable construction (which happens on the search hot path).
+/// So we compute it exactly once and cache it in a function-local static.
+/// C++11 guarantees this initialization is thread-safe.
+inline int compute_hashset_threshold() {
+    static const int threshold = [] {
+        size_t l3 = get_l3_cache_size();
+        if (l3 == 0)
+            return 3000000; // fallback for unknown L3
+        // threshold = L3_cache_size / 8 bytes -> ntotal nodes
+        return static_cast<int>(l3 / 8);
+    }();
+    return threshold;
+}
+
 /// set implementation optimized for fast access.
 struct VisitedTable {
     std::vector<uint8_t> visited;
     std::unordered_set<int> visited_set;
     uint8_t visno;
 
-    // Use hashset when ntotal >= this threshold.
-    // Vector: O(1) get/set, O(ntotal) reset. Hashset: O(1) reset, slower get/set.
-    // At ntotal=10M the memset cost dominates on x86; hashset wins by ~3-4x.
-    // WARNING: On ARM this causes 10% regression due to cache miss overhead.
-    static const int hashset_threshold = 500000;
-
     explicit VisitedTable(int size)
-            : visno(size >= hashset_threshold ? 0 : 1) {
+            : visno(size >= compute_hashset_threshold() ? 0 : 1) {
         if (visno != 0) {
             visited.resize(size, 0);
         } else {

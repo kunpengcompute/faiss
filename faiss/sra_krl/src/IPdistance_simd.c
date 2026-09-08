@@ -53,19 +53,19 @@ int krl_ipdis(const float *x, const float *__restrict y, const size_t d, float *
         for (i = single_round; i <= d - single_round; i += single_round) {
             x8_0 = vld1q_f32(x + i);
             y8_0 = vld1q_f32(y + i);
-            d8_0 = vmlaq_f32(d8_0, x8_0, y8_0);
+            d8_0 = vfmaq_f32(d8_0, x8_0, y8_0);
 
             x8_1 = vld1q_f32(x + i + 4);
             y8_1 = vld1q_f32(y + i + 4);
-            d8_1 = vmlaq_f32(d8_1, x8_1, y8_1);
+            d8_1 = vfmaq_f32(d8_1, x8_1, y8_1);
 
             x8_2 = vld1q_f32(x + i + 8);
             y8_2 = vld1q_f32(y + i + 8);
-            d8_2 = vmlaq_f32(d8_2, x8_2, y8_2);
+            d8_2 = vfmaq_f32(d8_2, x8_2, y8_2);
 
             x8_3 = vld1q_f32(x + i + 12);
             y8_3 = vld1q_f32(y + i + 12);
-            d8_3 = vmlaq_f32(d8_3, x8_3, y8_3);
+            d8_3 = vfmaq_f32(d8_3, x8_3, y8_3);
         }
 
         d8_0 = vaddq_f32(d8_0, d8_1);
@@ -117,14 +117,14 @@ static void krl_inner_product_batch2(const float *x, const float *__restrict y, 
             x_0 = vld1q_f32(x + i);
             y0_0 = vld1q_f32(y + i);
             y1_0 = vld1q_f32(y + d + i);
-            d0_0 = vmlaq_f32(d0_0, x_0, y0_0);
-            d1_0 = vmlaq_f32(d1_0, x_0, y1_0);
+            d0_0 = vfmaq_f32(d0_0, x_0, y0_0);
+            d1_0 = vfmaq_f32(d1_0, x_0, y1_0);
 
             x_1 = vld1q_f32(x + i + 4);
             y0_1 = vld1q_f32(y + i + 4);
             y1_1 = vld1q_f32(y + d + i + 4);
-            d0_1 = vmlaq_f32(d0_1, x_1, y0_1);
-            d1_1 = vmlaq_f32(d1_1, x_1, y1_1);
+            d0_1 = vfmaq_f32(d0_1, x_1, y0_1);
+            d1_1 = vfmaq_f32(d1_1, x_1, y1_1);
         }
 
         d0_0 = vaddq_f32(d0_0, d0_1);
@@ -178,10 +178,10 @@ static void krl_inner_product_batch4(const float *x, const float *__restrict y, 
             neon_base3 = vld1q_f32(y + 2 * d + i);
             neon_base4 = vld1q_f32(y + 3 * d + i);
 
-            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
+            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
+            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
+            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
+            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
         }
         dis[0] = vaddvq_f32(neon_res1);
         dis[1] = vaddvq_f32(neon_res2);
@@ -258,14 +258,14 @@ static void krl_inner_product_batch8(const float *x, const float *__restrict y, 
             neon_base7 = vld1q_f32(y + 6 * d + i);
             neon_base8 = vld1q_f32(y + 7 * d + i);
 
-            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
+            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
+            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
+            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
+            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
+            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
+            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
+            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
+            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
         }
 
         dis[0] = vaddvq_f32(neon_res1);
@@ -383,14 +383,14 @@ static void krl_inner_product_batch16(const float *x, const float *__restrict y,
             neon_base8 = vld1q_f32(y + 7 * d + i);
 
             /* Update inner products for first 8 vectors */
-            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
+            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
+            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
+            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
+            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
+            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
+            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
+            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
+            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 
             /* Update database vectors for additional 8 vectors */
             neon_base1 = vld1q_f32(y + 8 * d + i);
@@ -403,14 +403,14 @@ static void krl_inner_product_batch16(const float *x, const float *__restrict y,
             neon_base8 = vld1q_f32(y + 15 * d + i);
 
             /* Update inner products for additional 8 vectors */
-            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
+            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
+            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
+            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
+            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
+            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
+            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
+            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
+            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
         }
 
         /* Store results for all 16 vectors */
@@ -528,14 +528,14 @@ static void krl_inner_product_idx_batch2(
             x_0 = vld1q_f32(x + i);
             y0_0 = vld1q_f32(y0 + i);
             y1_0 = vld1q_f32(y1 + i);
-            d0_0 = vmlaq_f32(d0_0, x_0, y0_0);
-            d1_0 = vmlaq_f32(d1_0, x_0, y1_0);
+            d0_0 = vfmaq_f32(d0_0, x_0, y0_0);
+            d1_0 = vfmaq_f32(d1_0, x_0, y1_0);
 
             x_1 = vld1q_f32(x + i + 4);
             y0_1 = vld1q_f32(y0 + i + 4);
             y1_1 = vld1q_f32(y1 + i + 4);
-            d0_1 = vmlaq_f32(d0_1, x_1, y0_1);
-            d1_1 = vmlaq_f32(d1_1, x_1, y1_1);
+            d0_1 = vfmaq_f32(d0_1, x_1, y0_1);
+            d1_1 = vfmaq_f32(d1_1, x_1, y1_1);
         }
 
         d0_0 = vaddq_f32(d0_0, d0_1);
@@ -588,10 +588,10 @@ static void krl_inner_product_idx_batch4(const float *x, const float *__restrict
             neon_base3 = vld1q_f32(y[2] + i);
             neon_base4 = vld1q_f32(y[3] + i);
 
-            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
+            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
+            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
+            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
+            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
         }
         dis[0] = vaddvq_f32(neon_res1);
         dis[1] = vaddvq_f32(neon_res2);
@@ -666,14 +666,14 @@ static void krl_inner_product_idx_batch8(const float *x, const float *__restrict
             neon_base7 = vld1q_f32(y[6] + i);
             neon_base8 = vld1q_f32(y[7] + i);
 
-            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
+            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
+            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
+            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
+            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
+            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
+            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
+            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
+            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
         }
         dis[0] = vaddvq_f32(neon_res1);
         dis[1] = vaddvq_f32(neon_res2);
@@ -805,14 +805,14 @@ static void krl_inner_product_idx_prefetch_batch16(
             float32x4_t neon_base7 = vld1q_f32(y[6] + i);
             float32x4_t neon_base8 = vld1q_f32(y[7] + i);
 
-            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
+            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
+            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
+            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
+            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
+            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
+            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
+            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
+            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 
             neon_base1 = vld1q_f32(y[8] + i);
             neon_base2 = vld1q_f32(y[9] + i);
@@ -823,14 +823,14 @@ static void krl_inner_product_idx_prefetch_batch16(
             neon_base7 = vld1q_f32(y[14] + i);
             neon_base8 = vld1q_f32(y[15] + i);
 
-            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
+            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
+            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
+            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
+            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
+            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
+            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
+            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
+            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
         }
         for (; i < d - multi_round; i += multi_round) {
             prefetch_L1(x + multi_round + i);
@@ -861,14 +861,14 @@ static void krl_inner_product_idx_prefetch_batch16(
                 float32x4_t neon_base7 = vld1q_f32(y[6] + i + j);
                 float32x4_t neon_base8 = vld1q_f32(y[7] + i + j);
 
-                neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-                neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-                neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-                neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-                neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-                neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-                neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-                neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
+                neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
+                neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
+                neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
+                neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
+                neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
+                neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
+                neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
+                neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 
                 neon_base1 = vld1q_f32(y[8] + i + j);
                 neon_base2 = vld1q_f32(y[9] + i + j);
@@ -879,14 +879,14 @@ static void krl_inner_product_idx_prefetch_batch16(
                 neon_base7 = vld1q_f32(y[14] + i + j);
                 neon_base8 = vld1q_f32(y[15] + i + j);
 
-                neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-                neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-                neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-                neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-                neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-                neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-                neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-                neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
+                neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
+                neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
+                neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
+                neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
+                neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
+                neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
+                neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
+                neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
             }
         }
         for (; i <= d - single_round; i += single_round) {
@@ -900,14 +900,14 @@ static void krl_inner_product_idx_prefetch_batch16(
             float32x4_t neon_base7 = vld1q_f32(y[6] + i);
             float32x4_t neon_base8 = vld1q_f32(y[7] + i);
 
-            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
+            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
+            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
+            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
+            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
+            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
+            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
+            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
+            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 
             neon_base1 = vld1q_f32(y[8] + i);
             neon_base2 = vld1q_f32(y[9] + i);
@@ -918,14 +918,14 @@ static void krl_inner_product_idx_prefetch_batch16(
             neon_base7 = vld1q_f32(y[14] + i);
             neon_base8 = vld1q_f32(y[15] + i);
 
-            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
+            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
+            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
+            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
+            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
+            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
+            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
+            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
+            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
         }
         dis[0] = vaddvq_f32(neon_res1);
         dis[1] = vaddvq_f32(neon_res2);
@@ -991,14 +991,14 @@ static void krl_inner_product_idx_prefetch_batch16(
             neon_base7 = vld1q_f32(y[6] + i);
             neon_base8 = vld1q_f32(y[7] + i);
 
-            neon_res1 = vmlaq_f32(neon_res1, neon_base1, neon_query);
-            neon_res2 = vmlaq_f32(neon_res2, neon_base2, neon_query);
-            neon_res3 = vmlaq_f32(neon_res3, neon_base3, neon_query);
-            neon_res4 = vmlaq_f32(neon_res4, neon_base4, neon_query);
-            neon_res5 = vmlaq_f32(neon_res5, neon_base5, neon_query);
-            neon_res6 = vmlaq_f32(neon_res6, neon_base6, neon_query);
-            neon_res7 = vmlaq_f32(neon_res7, neon_base7, neon_query);
-            neon_res8 = vmlaq_f32(neon_res8, neon_base8, neon_query);
+            neon_res1 = vfmaq_f32(neon_res1, neon_base1, neon_query);
+            neon_res2 = vfmaq_f32(neon_res2, neon_base2, neon_query);
+            neon_res3 = vfmaq_f32(neon_res3, neon_base3, neon_query);
+            neon_res4 = vfmaq_f32(neon_res4, neon_base4, neon_query);
+            neon_res5 = vfmaq_f32(neon_res5, neon_base5, neon_query);
+            neon_res6 = vfmaq_f32(neon_res6, neon_base6, neon_query);
+            neon_res7 = vfmaq_f32(neon_res7, neon_base7, neon_query);
+            neon_res8 = vfmaq_f32(neon_res8, neon_base8, neon_query);
 
             neon_base1 = vld1q_f32(y[8] + i);
             neon_base2 = vld1q_f32(y[9] + i);
@@ -1009,14 +1009,14 @@ static void krl_inner_product_idx_prefetch_batch16(
             neon_base7 = vld1q_f32(y[14] + i);
             neon_base8 = vld1q_f32(y[15] + i);
 
-            neon_res9 = vmlaq_f32(neon_res9, neon_base1, neon_query);
-            neon_res10 = vmlaq_f32(neon_res10, neon_base2, neon_query);
-            neon_res11 = vmlaq_f32(neon_res11, neon_base3, neon_query);
-            neon_res12 = vmlaq_f32(neon_res12, neon_base4, neon_query);
-            neon_res13 = vmlaq_f32(neon_res13, neon_base5, neon_query);
-            neon_res14 = vmlaq_f32(neon_res14, neon_base6, neon_query);
-            neon_res15 = vmlaq_f32(neon_res15, neon_base7, neon_query);
-            neon_res16 = vmlaq_f32(neon_res16, neon_base8, neon_query);
+            neon_res9 = vfmaq_f32(neon_res9, neon_base1, neon_query);
+            neon_res10 = vfmaq_f32(neon_res10, neon_base2, neon_query);
+            neon_res11 = vfmaq_f32(neon_res11, neon_base3, neon_query);
+            neon_res12 = vfmaq_f32(neon_res12, neon_base4, neon_query);
+            neon_res13 = vfmaq_f32(neon_res13, neon_base5, neon_query);
+            neon_res14 = vfmaq_f32(neon_res14, neon_base6, neon_query);
+            neon_res15 = vfmaq_f32(neon_res15, neon_base7, neon_query);
+            neon_res16 = vfmaq_f32(neon_res16, neon_base8, neon_query);
         }
         dis[0] = vaddvq_f32(neon_res1);
         dis[1] = vaddvq_f32(neon_res2);
@@ -1157,14 +1157,14 @@ static void krl_inner_product_continuous_transpose_large_kernel(
         neon_base7 = vld1q_f32(y + 64 * i + 24);
         neon_base8 = vld1q_f32(y + 64 * i + 28);
 
-        neon_res[0] = vmlaq_f32(neon_res[0], neon_base1, single_query);
-        neon_res[1] = vmlaq_f32(neon_res[1], neon_base2, single_query);
-        neon_res[2] = vmlaq_f32(neon_res[2], neon_base3, single_query);
-        neon_res[3] = vmlaq_f32(neon_res[3], neon_base4, single_query);
-        neon_res[4] = vmlaq_f32(neon_res[4], neon_base5, single_query);
-        neon_res[5] = vmlaq_f32(neon_res[5], neon_base6, single_query);
-        neon_res[6] = vmlaq_f32(neon_res[6], neon_base7, single_query);
-        neon_res[7] = vmlaq_f32(neon_res[7], neon_base8, single_query);
+        neon_res[0] = vfmaq_f32(neon_res[0], neon_base1, single_query);
+        neon_res[1] = vfmaq_f32(neon_res[1], neon_base2, single_query);
+        neon_res[2] = vfmaq_f32(neon_res[2], neon_base3, single_query);
+        neon_res[3] = vfmaq_f32(neon_res[3], neon_base4, single_query);
+        neon_res[4] = vfmaq_f32(neon_res[4], neon_base5, single_query);
+        neon_res[5] = vfmaq_f32(neon_res[5], neon_base6, single_query);
+        neon_res[6] = vfmaq_f32(neon_res[6], neon_base7, single_query);
+        neon_res[7] = vfmaq_f32(neon_res[7], neon_base8, single_query);
 
         neon_base1 = vld1q_f32(y + 64 * i + 32);
         neon_base2 = vld1q_f32(y + 64 * i + 36);
@@ -1175,14 +1175,14 @@ static void krl_inner_product_continuous_transpose_large_kernel(
         neon_base7 = vld1q_f32(y + 64 * i + 56);
         neon_base8 = vld1q_f32(y + 64 * i + 60);
 
-        neon_res[8] = vmlaq_f32(neon_res[8], neon_base1, single_query);
-        neon_res[9] = vmlaq_f32(neon_res[9], neon_base2, single_query);
-        neon_res[10] = vmlaq_f32(neon_res[10], neon_base3, single_query);
-        neon_res[11] = vmlaq_f32(neon_res[11], neon_base4, single_query);
-        neon_res[12] = vmlaq_f32(neon_res[12], neon_base5, single_query);
-        neon_res[13] = vmlaq_f32(neon_res[13], neon_base6, single_query);
-        neon_res[14] = vmlaq_f32(neon_res[14], neon_base7, single_query);
-        neon_res[15] = vmlaq_f32(neon_res[15], neon_base8, single_query);
+        neon_res[8] = vfmaq_f32(neon_res[8], neon_base1, single_query);
+        neon_res[9] = vfmaq_f32(neon_res[9], neon_base2, single_query);
+        neon_res[10] = vfmaq_f32(neon_res[10], neon_base3, single_query);
+        neon_res[11] = vfmaq_f32(neon_res[11], neon_base4, single_query);
+        neon_res[12] = vfmaq_f32(neon_res[12], neon_base5, single_query);
+        neon_res[13] = vfmaq_f32(neon_res[13], neon_base6, single_query);
+        neon_res[14] = vfmaq_f32(neon_res[14], neon_base7, single_query);
+        neon_res[15] = vfmaq_f32(neon_res[15], neon_base8, single_query);
     }
     {
         vst1q_f32(dis, neon_res[0]);
@@ -1248,14 +1248,14 @@ static void krl_inner_product_continuous_transpose_medium_kernel(
         neon_base7 = vld1q_f32(y + 32 * i + 24);
         neon_base8 = vld1q_f32(y + 32 * i + 28);
 
-        neon_res[0] = vmlaq_f32(neon_res[0], neon_base1, single_query);
-        neon_res[1] = vmlaq_f32(neon_res[1], neon_base2, single_query);
-        neon_res[2] = vmlaq_f32(neon_res[2], neon_base3, single_query);
-        neon_res[3] = vmlaq_f32(neon_res[3], neon_base4, single_query);
-        neon_res[4] = vmlaq_f32(neon_res[4], neon_base5, single_query);
-        neon_res[5] = vmlaq_f32(neon_res[5], neon_base6, single_query);
-        neon_res[6] = vmlaq_f32(neon_res[6], neon_base7, single_query);
-        neon_res[7] = vmlaq_f32(neon_res[7], neon_base8, single_query);
+        neon_res[0] = vfmaq_f32(neon_res[0], neon_base1, single_query);
+        neon_res[1] = vfmaq_f32(neon_res[1], neon_base2, single_query);
+        neon_res[2] = vfmaq_f32(neon_res[2], neon_base3, single_query);
+        neon_res[3] = vfmaq_f32(neon_res[3], neon_base4, single_query);
+        neon_res[4] = vfmaq_f32(neon_res[4], neon_base5, single_query);
+        neon_res[5] = vfmaq_f32(neon_res[5], neon_base6, single_query);
+        neon_res[6] = vfmaq_f32(neon_res[6], neon_base7, single_query);
+        neon_res[7] = vfmaq_f32(neon_res[7], neon_base8, single_query);
     }
     {
         vst1q_f32(dis, neon_res[0]);
@@ -1301,10 +1301,10 @@ static void krl_inner_product_continuous_transpose_mini_kernel(
         neon_base3 = vld1q_f32(y + 16 * i + 8);
         neon_base4 = vld1q_f32(y + 16 * i + 12);
 
-        neon_res[0] = vmlaq_f32(neon_res[0], neon_base1, single_query);
-        neon_res[1] = vmlaq_f32(neon_res[1], neon_base2, single_query);
-        neon_res[2] = vmlaq_f32(neon_res[2], neon_base3, single_query);
-        neon_res[3] = vmlaq_f32(neon_res[3], neon_base4, single_query);
+        neon_res[0] = vfmaq_f32(neon_res[0], neon_base1, single_query);
+        neon_res[1] = vfmaq_f32(neon_res[1], neon_base2, single_query);
+        neon_res[2] = vfmaq_f32(neon_res[2], neon_base3, single_query);
+        neon_res[3] = vfmaq_f32(neon_res[3], neon_base4, single_query);
     }
 
     vst1q_f32(dis, neon_res[0]);

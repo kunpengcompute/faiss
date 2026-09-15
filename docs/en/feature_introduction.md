@@ -1,12 +1,10 @@
 # Feature Introduction
 
-<!-- md-trans-meta sourceCommit=b3fa0113be2c76a6eff0fa7146f0d2468f223bac translatedAt=2026-08-06T08:57:57.155Z pushedAt=2026-08-07T01:07:09.479Z -->
-
 ## Architecture
 
 This document describes the logical structure of the main Faiss algorithms, as well as the definitions and functions of the modules. The Faiss system consists of three major layers: the API layer, the index factory layer, and underlying dependencies. Built with a C++ core, it provides upper-tier invocations via a Python wrapper. The index factory layer consists of two sub-layers: algorithm abstraction and basic algorithms. The algorithm abstraction layer encapsulates multiple index types (HNSW, IVF, PQ, and their combinations), while the basic algorithm layer provides the underlying data structures and computational methods.
 
-Core indexing capabilities:
+Core indexing capabilities.
 
 - HNSW implements efficient approximate nearest neighbor (ANN) search via multi-layer navigable small-world graphs.
 
@@ -106,3 +104,9 @@ While keeping the native Faiss APIs unchanged, extension APIs are added to enabl
 | LUT-based parallel construction | RaBitQ's lookup table construction comprises three steps: subset-sum writes, residual type conversion with multiply-add, and range normalization combined with type conversion quantization, all performed as scalar loops. The KRL path merges multiple scattered subset-sum writes into a few vectorized store operations, and uses vectorized parallelism for both residual conversion and normalization quantization, thereby shortening the instruction dependency chain. |
 | Heap operation batch processing | Heap operations occur frequently in the RaBitQ search path. The KRL path replaces the standard heap implementation with a custom binary heap, performs distance correction and heap insertions in parallel batches using vectorized operations, and leverages software prefetching to load subsequent code block data in advance, thereby reducing heap maintenance overhead and cache misses. |
 | Code layout rearrangement | RaBitQ processes distance calculations in batches of multiple vectors, but the default code layout is not aligned with batch-wise processing. The KRL path rearranges code blocks during index loading to achieve memory access alignment. Under batch queries, it also pre-allocates buffers (e.g., lookup tables) per thread and reuses them across inverted-list iterations, eliminating repetitive per-iteration memory allocations. |
+
+## Change History
+
+| Issue | Date | Description |
+| ---- | ---- | -- |
+| 01 | 2026-09-30 | This is the first official release. |

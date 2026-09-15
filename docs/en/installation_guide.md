@@ -1,7 +1,5 @@
 # Installation Guide
 
-<!-- md-trans-meta sourceCommit=f37b02b5e16979c51738f39f4644194f3b94deff translatedAt=2026-08-06T08:58:40.115Z pushedAt=2026-08-07T01:07:09.484Z -->
-
 ## Verified Environments
 
 To use Faiss smoothly and securely, ensure that your environment is one of the verified environments.
@@ -62,7 +60,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     git clone --branch v1.1.0 https://gitcode.com/boostkit/faiss.git faiss-patch
     ```
 
-    >![note](public_sys-resources/icon-note.gif) **NOTE:**
+    >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
     >The following explains the patch files optimized for Kunpeng. Select a patch file as required.
     >- `0001-faiss_1.8.0-optimize-neq.patch`: non-equivalence optimization patch. It delivers optimal performance and ensures precision, but does not guarantee that the values or sequence of top K results are completely consistent with the original version.
     >- `0002-faiss_1.8.0-optimize-eqv.patch`: equivalence optimization patch. It ensures that the values and sequence of top K results are completely consistent with the original version.
@@ -89,7 +87,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     make install
     ```
 
-    >![note](public_sys-resources/icon-note.gif) **NOTE:**
+    >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
     >You can run the `make install PREFIX=/path/to/openblas/install` command to specify the installation path `/path/to/openblas/install`. The default installation path is `/opt/OpenBLAS`.
 
 6. Install the patch file `0001-faiss\_1.8.0-optimize-neq.patch` or `0002-faiss\_1.8.0-optimize-eqv.patch`.
@@ -100,7 +98,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     # patch -p1 < /path/to/faiss-patch/0002-faiss_1.8.0-optimize-eqv.patch
     ```
 
-    The full directory structure of Faiss after applying the patches is as follows:
+    The full directory structure of Faiss after applying the patches is as follows.
 
     ```text
     faiss/
@@ -200,7 +198,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     make -C build install
     ```
 
-   - If you choose to use the non-equivalence optimization patch `0001-faiss_1.8.0-optimize-neq.patch`, you can enable either of the following macros to improve performance (the two macros are mutually exclusive):
+   - If you choose to use the non-equivalence optimization patch `0001-faiss_1.8.0-optimize-neq.patch`, you can enable either of the following macros to improve performance (the two macros are mutually exclusive).
 
      - `-DKRL=ON`: non-equivalence optimization for HNSW, IVFPQ, IVFPQFS, PQFS, and IVFFLAT. It delivers optimal performance and ensures precision, but does not guarantee that the values or sequence of top K results are completely consistent with the original version.
 
@@ -210,8 +208,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
 
      - `-DKRL=ON`: non-equivalence optimization for HNSW, IVFPQ, IVFPQFS, PQFS, and IVFFLAT. It ensures that the values and sequence of top K results are completely consistent with the original version.
 
-    >
-    >**Note:**
+    >![icon-note](./public_sys-resources/icon-note.gif)**Note:**
     >
     >- During compilation, you can add the compilation option `-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install` to specify the installation path `/path/to/faiss/install`. The default installation path is `/usr/local`.
     >- The compilation option `-DMKL_LIBRARIES` must be set to the installation path of OpenBLAS in step [5](#li880635723510).
@@ -233,8 +230,8 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     git clone --branch v1.1.0 https://gitcode.com/boostkit/faiss.git faiss-patch
     ```
 
-    >![note](public_sys-resources/icon-note.gif) **NOTE**
-    >The Kunpeng optimization patch files are described as follows:
+    >![icon-note](public_sys-resources/icon-note.gif) **NOTE**
+    >The Kunpeng optimization patch files are described as follows.
     >- 0001-faiss\_1.14.3-optimize-rabitq.patch: A RaBitQ index optimization patch based on v1.14.3, which ensures accuracy but does not guarantee that the Top-K values or order are fully consistent with the original.
 
 3. Install Make, CMake, and GCC. The GCC 12 installation procedure applies to openEuler 22.03 LTS SP3. openEuler 24.03 LTS SP3 comes with GCC 12 pre-installed, so you only need to install Make and CMake.
@@ -259,7 +256,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     make install
     ```
 
-    >![note](public_sys-resources/icon-note.gif) **NOTE:**
+    >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
     >You can run the `make install PREFIX=/path/to/openblas/install` command to specify the installation path `/path/to/openblas/install`. The default installation path is `/opt/OpenBLAS`.
 
 6. Install the patch file 0001-faiss\_1.14.3-optimize-rabitq.patch.
@@ -269,7 +266,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     patch -p1 < /path/to/faiss-patch/0001-faiss_1.14.3-optimize-rabitq.patch
     ```
 
-    The full directory structure of Faiss after applying the patches is as follows:
+    The full directory structure of Faiss after applying the patches is as follows.
 
     ```text
     faiss/
@@ -373,7 +370,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     ```
 
     >
-    >**NOTE**
+    >![icon-note](./public_sys-resources/icon-note.gif)**NOTE**
     >
     >- During compilation, you can add the compilation option **-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install** to specify the installation path `/path/to/faiss/install`. The default installation path is `/usr/local`.
     >- The compilation option **-DMKL_LIBRARIES** must be set to the installation path of OpenBLAS in step [5](#li880635723510).
@@ -434,7 +431,7 @@ This section describes how to verify the compatibility of the open-source Faiss 
     make hnsw_test
     ```
 
-    >![note](public_sys-resources/icon-note.gif) **NOTE:**
+    >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
     >During the test, select the appropriate compilation instruction for each algorithm.
     >- HNSW: `make hnsw_test`
     >- PQFS: `make pqfs_test`
@@ -450,6 +447,12 @@ This section describes how to verify the compatibility of the open-source Faiss 
     numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
     ```
 
-The command output is as follows:
+The command output is as follows.
 
 <img src="figures/faiss-installation_guide.jpg" alt="faiss-installation_guide-command output" width="800"/>
+
+## Change History
+
+| Issue | Date | Description |
+| ---- | ---- | -- |
+| 01 | 2026-09-30 | This is the first official release. |

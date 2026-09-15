@@ -70,7 +70,7 @@
 
 ### v1.8.0
 
-从Github获取Faiss开源代码，安装必要的依赖工具、库，从GitCode获取基于鲲鹏平台优化后的补丁，然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
+从Github获取Faiss开源代码，安装必要的依赖工具、库。从GitCode获取基于鲲鹏平台优化后的补丁，然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
 
 1. 获取Faiss开源代码，标签为**v1.8.0**。假设代码存放于“/path/to/faiss”。
 
@@ -84,10 +84,10 @@
     git clone --branch v1.1.0 https://gitcode.com/boostkit/faiss.git faiss-patch
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >鲲鹏优化补丁文件描述如下，请根据需要自行选择：
-    >- 0001-faiss\_1.8.0-optimize-neq.patch：全量优化补丁，性能最优，保证精度，但不保证Top-K的值或顺序与原生完全一致。
-    >- 0002-faiss\_1.8.0-optimize-eqv.patch：等价优化补丁，保证Top-K的值与顺序与原生保持完全一致。
+    >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
+    >鲲鹏优化补丁文件描述如下，请根据需要自行选择。
+    >- 0001-faiss\_1.8.0-optimize-neq.patch：全量优化补丁，性能最优，保证精度，但不保证Top-K的值或顺序与开源Faiss完全一致。
+    >- 0002-faiss\_1.8.0-optimize-eqv.patch：等价优化补丁，保证Top-K的值与顺序与开源Faiss保持完全一致。
 
 3. 安装Make、CMake、GCC。
 
@@ -102,9 +102,9 @@
     export PATH=/opt/openEuler/gcc-toolset-12/root/usr/bin/:$PATH
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
-    
+
 5. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29”。
-    
+
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
     ```
@@ -117,7 +117,7 @@
     make install
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
+    >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
     >您可通过**make install PREFIX=/path/to/openblas/install**设置“/path/to/openblas/install”以指定安装路径，默认安装路径为“/opt/OpenBLAS”。
 
 7. 安装补丁文件0001-faiss\_1.8.0-optimize-neq.patch或0002-faiss\_1.8.0-optimize-eqv.patch。
@@ -128,9 +128,9 @@
     # patch -p1 < /path/to/faiss-patch/0002-faiss_1.8.0-optimize-eqv.patch
     ```
 
-    使用补丁后Faiss完整的目录结构如下所示：
+    使用补丁后Faiss完整的目录结构如下所示。
 
-    ```text
+    ```output
     faiss/
     ├─ benchs/                                     // 基准测试
     ├─ c_api/                                      // C语言API封装
@@ -228,13 +228,13 @@
     make -C build install
     ```
 
-   - 若您选择使用全量优化补丁0001-faiss\_1.8.0-optimize-neq.patch，可选择开启以下宏获得性能提升（二者不可同时开启）：
-     - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，性能最优，保证精度，但不保证Top-K的值或顺序与原生完全一致；
-     - **-DOPTI\_IVFPQ=ON**：针对IVFPQ的独特优化，在IVFPQ索引上性能优于KRL宏，保证Top-K的值与顺序与原生保持完全一致。
-   - 若您选择使用等价优化补丁0002-faiss\_1.8.0-optimize-eqv.patch，可选择开启以下宏获得性能提升：
-     - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，保证Top-K的值与顺序与原生保持完全一致。
+   - 若您选择使用全量优化补丁0001-faiss\_1.8.0-optimize-neq.patch，可选择开启以下宏获得性能提升（二者不可同时开启）。
+     - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，性能最优，保证精度，但不保证Top-K的值或顺序与开源完全一致；
+     - **-DOPTI\_IVFPQ=ON**：针对IVFPQ的独特优化，在IVFPQ索引上性能优于KRL宏，保证Top-K的值与顺序与开源保持完全一致。
+   - 若您选择使用等价优化补丁0002-faiss\_1.8.0-optimize-eqv.patch，可选择开启以下宏获得性能提升。
+     - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，保证Top-K的值与顺序与开源保持完全一致。
     >
-    >**说明：** 
+    >![表示说明的图片](./public_sys-resources/icon-note.gif)**说明：**
     >
     >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
     >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
@@ -242,7 +242,7 @@
 
 ### v1.14.3
 
-从Github获取Faiss开源代码，安装必要的依赖工具、库，从GitCode获取基于鲲鹏平台优化后的补丁，然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
+从Github获取Faiss开源代码，安装必要的依赖工具、库。从GitCode获取基于鲲鹏平台优化后的补丁，然后重新编译Faiss，以便应用优化后特性，降低计算时延，提升计算效率。
 
 1. 获取Faiss开源代码，标签为**v1.14.3**。假设代码存放于“/path/to/faiss“。
 
@@ -256,9 +256,9 @@
     git clone --branch v1.1.0 https://gitcode.com/boostkit/faiss.git faiss-patch
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >鲲鹏优化补丁文件描述如下：
-    >- 0001-faiss\_1.14.3-optimize-rabitq.patch：基于v1.14.3版本的RabitQ索引优化补丁，保证精度，但不保证Top-K的值或顺序与原生完全一致。
+    >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
+    >鲲鹏优化补丁文件描述如下。
+    >- 0001-faiss\_1.14.3-optimize-rabitq.patch：基于v1.14.3版本的RabitQ索引优化补丁，保证精度，但不保证Top-K的值或顺序与开源完全一致。
 
 3. 安装Make、CMake、GCC。
 
@@ -288,7 +288,7 @@
     make install
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
+    >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
     >您可通过**make install PREFIX=/path/to/openblas/install**设置“/path/to/openblas/install“以指定安装路径，默认安装路径为“/opt/OpenBLAS”。
 
 7. 安装补丁文件0001-faiss\_1.14.3-optimize-rabitq.patch。
@@ -298,9 +298,9 @@
     patch -p1 < /path/to/faiss-patch/0001-faiss_1.14.3-optimize-rabitq.patch
     ```
 
-    使用补丁后Faiss完整的目录结构如下所示：
+    使用补丁后Faiss完整的目录结构如下所示。
 
-    ```text
+    ```output
     faiss/
     ├─ benchs/                                     // 基准测试
     ├─ c_api/                                      // C语言API封装
@@ -401,7 +401,7 @@
     make -C build install
     ```
     >
-    >**说明：** 
+    >![表示说明的图片](./public_sys-resources/icon-note.gif)**说明：**
     >
     >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install”以指定安装路径，默认安装路径为“/usr/local”。
     >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
@@ -461,8 +461,8 @@
     make hnsw_test
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >测试时不同的算法需要选择不同的编译指令：
+    >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
+    >测试时不同的算法需要选择不同的编译指令。
     >- HNSW算法：**make hnsw\_test**
     >- PQFS算法：**make pqfs\_test**
     >- IVFPQ算法：**make ivfpq\_test**
@@ -476,6 +476,12 @@
     numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
     ```
 
-运行结果如下所示：
+运行结果如下所示。
 
 <img src="figures/faiss-installation_guide.jpg" alt="faiss-installation_guide-运行结果" width="800"/>
+
+## 修订记录
+
+| 文档版本 | 发布日期 | 修改说明 |
+| ---- | ---- | -- |
+| 01 | 2026-09-30 | 第一次正式发布。 |

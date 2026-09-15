@@ -1,7 +1,5 @@
 # API Reference
 
-<!-- md-trans-meta sourceCommit=785bd573f46c89673b1d78ef6e49395db94b4e66 translatedAt=2026-08-06T08:59:31.746Z pushedAt=2026-08-07T01:07:09.487Z -->
-
 ## API List
 
 This document describes the APIs that support FP16 in Faiss. Currently, only C++ FP16 APIs are provided, and open-source Python APIs remain unmodified with no new APIs added. While fully maintaining compatibility with the open-source C++ APIs of version 1.8.0, support for the FP16 data type is added by leveraging the extension APIs of version v1.13.2.
@@ -12,7 +10,7 @@ This document describes the APIs that support FP16 in Faiss. Currently, only C++
 
 - Currently, the extension APIs support only the FP16 data type. Any future requirements for other data types can also be supported and invoked through the extension APIs.
 
-Taking the `add` function in `IndexHNSW.h` as an example:
+Taking the `add` function in `IndexHNSW.h` as an example.
 
 <a name="table99541454172315"></a>
 <table><thead align="left"><tr id="row6954165419237"><th class="cellrowborder" valign="top" width="21.02%" id="mcps1.1.3.1.1"><p id="p5954454172319"><a name="p5954454172319"></a><a name="p5954454172319"></a>API Description</p></th>
@@ -33,7 +31,7 @@ Taking the `add` function in `IndexHNSW.h` as an example:
 
 The extension API is an external API. When `add_ex` is called externally with `numeric_type` set to the FP16 data type, it internally invokes the newly added FP16 `add` API to execute the specific functionality.
 
->![](public_sys-resources/icon-note.gif) **NOTE**
+>![icon-note](public_sys-resources/icon-note.gif) **NOTE**
 >`HNSWFlat` provides FP16 APIs and complete FP16 functionality.
 >`HNSWPQ`, `HNSWSQ`, and `HNSW2Level` currently only provide FP16 APIs; the input FP16 data is internally converted to FP32 data type before calling the native APIs.
 
@@ -71,9 +69,9 @@ The FP16 external APIs provided by Faiss-HNSW are shown in [**Table 1**](#fp16-e
 
 **API Definition<a name="section55611644173112"></a>**
 
-IndexHNSW\(int d, int M, NumericType ntype, MetricType metric\);
+IndexHNSW\(int d, int M, NumericType ntype, MetricType metric\).
 
-IndexHNSW\(Index\* storage, NumericType ntype, int M = 32\);
+IndexHNSW\(Index\* storage, NumericType ntype, int M = 32\).
 
 **Function<a name="section14731398326"></a>**
 
@@ -133,7 +131,7 @@ faiss::IndexHNSW index_with_storage(storage, faiss::NumericType::Float16);
 
 **API Definition<a name="section55611644173112"></a>**
 
-IndexHNSWFlat\(int d, int M, NumericType ntype = NumericType::Float32, MetricType metric = METRIC\_L2\);
+IndexHNSWFlat\(int d, int M, NumericType ntype = NumericType::Float32, MetricType metric = METRIC\_L2\).
 
 **Function<a name="section14731398326"></a>**
 
@@ -182,7 +180,7 @@ faiss::IndexHNSWFlat index_fp16(d, M, faiss::NumericType::Float16, faiss::METRIC
 
 **API Definition<a name="section55611644173112"></a>**
 
-void train\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\);
+void train\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\).
 
 **Function<a name="section14731398326"></a>**
 
@@ -236,7 +234,7 @@ index.train_ex(n_train, train_data.data(), faiss::NumericType::Float16);
 
 **API Definition<a name="section55611644173112"></a>**
 
-void add_ex(idx_t n, const void* x, NumericType numeric_type);
+void add_ex(idx_t n, const void* x, NumericType numeric_type).
 
 **Function<a name="section14731398326"></a>**
 
@@ -381,7 +379,7 @@ for (int i = 0; i < n_query; i++) {
 
 **API Definition<a name="section55611644173112"></a>**
 
-void range\_search\_ex\(idx\_t n, const void\* x, float radius, RangeSearchResult\* result, NumericType numeric\_type, const SearchParameters\* params = nullptr\);
+void range\_search\_ex\(idx\_t n, const void\* x, float radius, RangeSearchResult\* result, NumericType numeric\_type, const SearchParameters\* params = nullptr\).
 
 **Function<a name="section14731398326"></a>**
 
@@ -468,7 +466,7 @@ for (int i = 0; i < n_query; i++) {
 
 **API Definition<a name="section55611644173112"></a>**
 
-void reconstruct_ex(idx_t key, void* recons, NumericType numeric_type);
+void reconstruct_ex(idx_t key, void* recons, NumericType numeric_type).
 
 **Function<a name="section14731398326"></a>**
 
@@ -531,7 +529,7 @@ for (int i = 0; i < std::min(5, d); i++) {
 
 **API Definition<a name="section55611644173112"></a>**
 
-void search_level_0_ex(idx_t n, const void*x, idx_t k, const storage_idx_t* nearest, const float*nearest_d, float*distances, idx_t*labels, NumericType numeric_type, int nprobe = 1, int search_type = 1);
+void search_level_0_ex(idx_t n, const void*x, idx_t k, const storage_idx_t* nearest, const float*nearest_d, float*distances, idx_t*labels, NumericType numeric_type, int nprobe = 1, int search_type = 1).
 
 **Function<a name="section14731398326"></a>**
 
@@ -644,3 +642,9 @@ for (int i = 0; i < n_query; i++) {
     }
 }
 ```
+
+## Change History
+
+| Issue | Date | Description |
+| ---- | ---- | -- |
+| 01 | 2026-09-30 | This is the first official release. |

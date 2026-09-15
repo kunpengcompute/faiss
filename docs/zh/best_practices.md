@@ -8,7 +8,7 @@
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
-1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示：
+1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示。
 
     ```text
     ├── configs                                                   // 存放对应算法和数据集配置文件
@@ -50,15 +50,16 @@
     ```
 
 2. 请参考《[安装指南](./installation_guide.md)》编译安装Faiss。
-   >**说明：** 作为全量优化后Faiss测试，需开启与鲲鹏优化相关的宏，此处以 **-DOPTI\_IVFPQ=ON**为例。
+   >![表示说明的图片](public_sys-resources/icon-note.gif)**说明：** 作为全量优化后Faiss测试，需开启与鲲鹏优化相关的宏，此处以 **-DOPTI\_IVFPQ=ON**为例。
 3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在路径。注意，请根据命令行提示同步开 **-DOPTI\_IVFPQ=ON** 。若步骤[2](#li1673311431218)选择开启  **-DKRL=ON**，则此处也需同步开启。
 
     ```bash
     make ivfpq_test
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >测试时不同的算法需要选择不同的编译指令：
+    >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
+    >
+    >测试时不同的算法需要选择不同的编译指令。
     >- HNSW算法：**make hnsw\_test**
     >- HNSW算法（FP16）：**make hnsw\_fp16_test**
     >- PQFS算法：**make pqfs\_test**
@@ -66,14 +67,14 @@
     >- IVFPQFS算法：**make ivfpqfs\_test**
     >- IVFFLAT算法：**make ivfflat\_test**
 
-4. 若是第一次执行，确保ivfpq\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
+4. 若是第一次执行，确保ivfrabitqfs\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
 5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
 
     ```bash
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
-测试结果如下所示：
+测试结果如下所示。
 
 <img src="figures/faiss-best_practices-neq.jpg" alt="faiss-best_practices-neq" width="800"/>
 
@@ -83,7 +84,7 @@
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
-1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示：
+1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示。
 
     ```text
     ├── configs                                                   // 存放对应算法和数据集配置文件
@@ -126,15 +127,16 @@
     ```
 
 2. 请参考《[安装指南](./installation_guide.md)》安装Faiss。
-   > **说明：** 作为等价优化后Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
+   > ！[表示说明的图片](./public_sys-resources/icon-note.gif)**说明：** 作为等价优化后Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
 3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在的路径。注意，请根据命令行提示同步开启 **-DKRL=ON**。
 
     ```bash
     make ivfpq_test
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >测试时不同的算法需要选择不同的编译指令：
+    >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
+    >
+    >测试时不同的算法需要选择不同的编译指令。
     >- HNSW算法：**make hnsw\_test**
     >- HNSW算法（FP16）：**make hnsw\_fp16_test**
     >- PQFS算法：**make pqfs\_test**
@@ -149,7 +151,7 @@
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
-测试结果如下所示：
+测试结果如下所示。
 
 <img src="figures/faiss-best_practices-eqv.jpg" alt="faiss-best_practices-eqv" width="800"/>
 
@@ -159,7 +161,7 @@
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
-1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示：
+1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示。
 
     ```text
     ├── configs                                                   // 存放对应算法和数据集配置文件
@@ -207,8 +209,9 @@
     make hnsw_fp16_test
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >测试时不同的算法需要选择不同的编译指令：
+    >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
+    >
+    >测试时不同的算法需要选择不同的编译指令。
     >- HNSW算法：**make hnsw\_test**
     >- HNSW算法（FP16）：**make hnsw\_fp16_test**
     >- PQFS算法：**make pqfs\_test**
@@ -223,7 +226,7 @@
     numactl -C 0-31 -m 0 ./hnsw_fp16_test hnsw_fp16 sift-128-euclidean
     ```
 
-测试结果如下所示：
+测试结果如下所示。
 
 <img src="figures/faiss-best_practices-fp16.jpg" alt="faiss-best_practices-fp16" width="800"/>
 
@@ -233,7 +236,7 @@
 
 **获取数据集与测试程序<a name="section5124167418"></a>**
 
-1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示：
+1. 获取[测试程序](https://atomgit.com/openeuler/sra_test.git)。分支为**v2.1.0**，假设程序运行的目录为“/path/to/sra\_test“，完整的目录结构应如下所示。
 
     ```text
     ├── configs                                                   // 存放对应算法和数据集配置文件
@@ -275,25 +278,32 @@
     ```
 
 2. 请参考《[安装指南](./installation_guide.md)》编译安装Faiss。
-   >**说明：** 作为基于v1.14.3优化后的Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
+   >![表示说明的图片](./public_sys-resources/icon-note.gif)**说明：** 作为基于v1.14.3优化后的Faiss测试，需开启与鲲鹏优化相关的宏 **-DKRL=ON**。
 3. 编译可执行文件。根据命令行提示输入Faiss安装路径及其他所需依赖所在的路径。注意，请根据命令行提示同步开启 **-DKRL=ON** 。若提示缺少头文件，则需键入 **-I/path/to/faiss**。
 
     ```bash
     make ivfrabitqfs_test
     ```
 
-    >![](public_sys-resources/icon-note.gif) **说明：** 
-    >测试时不同的算法需要选择不同的编译指令：
+    >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
+    >
+    >测试时不同的算法需要选择不同的编译指令。
     >- IVFRabitQFS算法：**make ivfrabitqfs\_test**
     >- IVFRabitQ算法：**make ivfrabitq\_test**
 
-4. 若是第一次执行，确保ivfpq\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
+4. 若是第一次执行，确保ivfrabitqfs\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
 5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
 
     ```bash
     numactl -C 0-31 -m 0 ./ivfrabitqfs_test ivfrabitqfs sift-128-euclidean
     ```
 
-测试结果如下所示：
+测试结果如下所示。
 
 <img src="figures/faiss-best_practices-1.14.3-rabitq.jpg" alt="faiss-best_practices-1.14.3-rabitq" width="800"/>
+
+## 修订记录
+
+| 文档版本 | 发布日期 | 修改说明 |
+| ---- | ---- | -- |
+| 01 | 2026-09-30 | 第一次正式发布。 |

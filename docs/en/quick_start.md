@@ -1,7 +1,5 @@
 # Quick Start
 
-<!-- md-trans-meta sourceCommit=3e2fefee58f1611dbf13ddb8e6d17fcf6073b661 translatedAt=2026-08-06T08:57:24.240Z pushedAt=2026-08-07T01:07:09.478Z -->
-
 This document provides straightforward guidance for quickly getting started with Faiss core features.
 
 ## Core Concepts
@@ -66,7 +64,7 @@ int main() {
 }
 ```
 
-The expected output is as follows:
+The expected output is as follows.
 
 <img src="figures/faiss-quick_start.jpg" alt="faiss-quick_start" width="600"/>
 
@@ -96,8 +94,9 @@ int main() {
     for (auto& v : query_vectors) v = dist(rng);
 
     // Create a quantizer and an IVF index.
-    faiss::IndexFlatL2* quantizer = new faiss::IndexFlatL2(d);
-    faiss::IndexIVFFlat ivf_index(quantizer, d, nlist);
+    faiss::IndexFlatL2 quantizer(d);
+    faiss::IndexIVFFlat ivf_index(&quantizer, d, nlist);
+    ivf_index.nprobe = 10;
 
     ivf_index.train(nb, db_vectors.data());
     ivf_index.add(nb, db_vectors.data());
@@ -122,6 +121,12 @@ int main() {
 }
 ```
 
-The expected output is as follows:
+The expected output is as follows.
 
 <img src="figures/faiss-advanced.jpg" alt="faiss-advanced" width="600"/>
+
+## Change History
+
+| Issue | Date | Description |
+| ---- | ---- | -- |
+| 01 | 2026-09-30 | This is the first official release. |

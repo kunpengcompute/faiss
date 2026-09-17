@@ -1,6 +1,6 @@
 # Introduction to Faiss
 
-<!-- md-trans-meta sourceCommit=5ffaf4a8395f3e273eb84b9b8cafc6aa1edf1293 translatedAt=2026-08-06T08:58:34.403Z pushedAt=2026-08-07T01:07:09.483Z -->
+English|[简体中文](./README.md)
 
 ## Latest Updates
 
@@ -30,7 +30,7 @@ faiss/
 ├─ README.md                                   // Project introduction
 └── docs
    ├── LICENSE
-   └── zh
+   └── en
       ├── api_reference.md                        // API Reference
       ├── feature_introduction.md                 // Feature Introduction
       ├── best_practices.md                       // Best Practices

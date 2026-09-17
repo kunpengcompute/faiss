@@ -1,6 +1,6 @@
 # 快速入门
 
-本节提供Faiss核心功能快速入门的简易指导。
+本文档提供Faiss核心功能快速入门的简易指导。
 
 ## 核心概念
 
@@ -8,7 +8,7 @@ Faiss的核心是索引（Index），即专门用于存储向量并高效执行�
 
 - 向量：开源Faiss支持float32类型的向量。
 - 索引类型：入门优先使用IndexFlatL2（暴力搜索，无近似，结果精确，适合学习），后续可尝试IndexIVFFlat（近似搜索，速度更快）。
-- 核心流程：创建索引 → 向索引添加向量 → 执行相似性搜索
+- 核心流程：创建索引——向索引添加向量——执行相似性搜索。
 
 ## 快速入门示例
 
@@ -62,7 +62,7 @@ int main() {
 }
 ```
 
-预期结果如下：
+预期结果如下。
 
 <img src="figures/faiss-quick_start.jpg" alt="faiss-quick_start" width="600"/>
 
@@ -92,8 +92,9 @@ int main() {
     for (auto& v : query_vectors) v = dist(rng);
 
     // 创建量化器和IVF索引
-    faiss::IndexFlatL2* quantizer = new faiss::IndexFlatL2(d);
-    faiss::IndexIVFFlat ivf_index(quantizer, d, nlist);
+    faiss::IndexFlatL2 quantizer(d);
+    faiss::IndexIVFFlat ivf_index(&quantizer, d, nlist);
+    ivf_index.nprobe = 10;
 
     ivf_index.train(nb, db_vectors.data());
     ivf_index.add(nb, db_vectors.data());
@@ -118,6 +119,12 @@ int main() {
 }
 ```
 
-预期结果如下：
+预期结果如下。
 
 <img src="figures/faiss-advanced.jpg" alt="faiss-advanced" width="600"/>
+
+## 修订记录
+
+| 文档版本 | 发布日期 | 修改说明 |
+| ---- | ---- | -- |
+| 01 | 2026-09-30 | 第一次正式发布。 |

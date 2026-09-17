@@ -95,7 +95,7 @@
 
 ### 使用注意事项
 
-请参见《[安装指南](./installation_guide.md)》。
+使用注意事项请参见《[安装指南](./installation_guide.md)》。
 
 ## v1.1.0
 
@@ -103,7 +103,7 @@
 
 **新增特性<a name="section11862975"></a>**
 
-提供基于Faiss v1.14.3版本的RabitQ索引优化补丁，
+提供基于Faiss v1.14.3版本的RabitQ索引优化补丁。
 
 **修改特性<a name="section16450949161512"></a>**
 

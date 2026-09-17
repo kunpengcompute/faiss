@@ -1,5 +1,7 @@
 # Faiss介绍
 
+简体中文|[English](./README_en.md)
+
 ## 最新消息
 
 - \[2026.09.30\]：提供基于Faiss v1.14.3版本的RabitQ索引优化补丁。
@@ -11,11 +13,11 @@
 
 Faiss是由Facebook开发的用于高效相似搜索和密集向量聚类的算法库，其核心采用C++编写，并为Python/numpy提供完整封装接口。Faiss提供IVFFlat、IVFPQ、HNSW、IVFPQFS、PQFS等索引方式。鲲鹏优化基于开源Faiss代码做侵入式修改，保持原有接口。
 
-HNSW是Faiss提供的一种近似最近邻（ANN）图检索算法，开源Faiss（HNSW）接口支持FP32数据类型。为优化计算效率与内存占用，对原生Faiss进行适配改造，增加FP16接口，使其在鲲鹏ARM架构下同样支持基于FP16的高效召回计算。
+HNSW是Faiss提供的一种近似最近邻（ANN）图检索算法，开源Faiss（HNSW）接口支持FP32数据类型。为优化计算效率与内存占用，对开源Faiss进行适配改造，增加FP16接口，使其在鲲鹏ARM架构下同样支持基于FP16的高效召回计算。
 
 ## 目录结构
 
-代码仓目录结构如下：
+代码仓目录结构如下。
 
 ```text
 faiss/
@@ -82,7 +84,7 @@ faiss/
 
 ## 免责声明
 
-此代码仓计划参与Faiss开源组件，编码风格遵照原生开源软件，继承原生开源软件安全设计，不破坏原生开源软件设计及编码风格和方式，软件的任何漏洞与安全问题，均由相应的上游社区根据其漏洞和安全响应机制解决。请密切关注上游社区发布的通知和版本更新。鲲鹏计算社区对软件的漏洞及安全问题不承担任何责任。
+此代码仓计划参与Faiss开源组件，编码风格遵照开源软件，继承开源软件安全设计，不破坏开源软件设计及编码风格和方式。软件的任何漏洞与安全问题，均由相应的上游社区根据其漏洞和安全响应机制解决。请密切关注上游社区发布的通知和版本更新。鲲鹏计算社区对软件的漏洞及安全问题不承担任何责任。
 
 ## License
 
@@ -92,7 +94,7 @@ Faiss采用MIT License许可证授权，支持修改代码和再开源，具体�
 
 ## 贡献声明
 
-欢迎大家为社区做贡献，如果使用过程中有任何问题/建议，或者需要反馈特性需求和bug报告，可以提交[Issues](https://gitcode.com/boostkit/community/blob/master/docs/contributor/issue-submit.md)联系我们，具体贡献方法可参考[这里](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md)。同时也欢迎大家在[讨论专区](https://gitcode.com/boostkit/community/discussions)展开讨论交流。感谢您的支持。
+欢迎大家为社区做贡献，如果使用过程中有任何问题或建议，或者需要反馈特性需求和bug报告，可以提交[Issues](https://gitcode.com/boostkit/community/blob/master/docs/contributor/issue-submit.md)联系我们，具体贡献方法可参考[这里](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md)。同时也欢迎大家在[讨论专区](https://gitcode.com/boostkit/community/discussions)展开讨论交流。感谢您的支持。
 
 ## 致谢
 

@@ -59,7 +59,7 @@ This section describes how to test Faiss after full optimization based on Faiss 
     make ivfpq_test
     ```
 
-    >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
+    >![icon-note](public_sys-resources/icon-note.gif) **Note:**
     >During the test, select the appropriate compilation instruction for each algorithm.
     >- HNSW: `make hnsw_test`
     >- HNSW (FP16): `make hnsw_fp16_test`
@@ -76,9 +76,9 @@ This section describes how to test Faiss after full optimization based on Faiss 
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
-The test result is as follows.
+   The test result is as follows.
 
-<img src="figures/faiss-best_practices-neq.jpg" alt="faiss-best_practices-neq" width="800"/>
+   <img src="figures/faiss-best_practices-neq.jpg" alt="faiss-best_practices-neq" width="800"/>
 
 ### Equivalence Optimization
 
@@ -154,9 +154,9 @@ This section describes how to test Faiss after equivalence optimization on the K
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
-The test result is as follows.
+   The test result is as follows.
 
-<img src="figures/faiss-best_practices-eqv.jpg" alt="faiss-best_practices-eqv" width="800"/>
+   <img src="figures/faiss-best_practices-eqv.jpg" alt="faiss-best_practices-eqv" width="800"/>
 
 ### HNSW FP16 Support
 
@@ -230,9 +230,9 @@ This section describes how to test Faiss with HNSW FP16 interface support based 
     numactl -C 0-31 -m 0 ./hnsw_fp16_test hnsw_fp16 sift-128-euclidean
     ```
 
-The test result is as follows.
+   The test result is as follows.
 
-<img src="figures/faiss-best_practices-fp16.jpg" alt="faiss-best_practices-fp16" width="800"/>
+   <img src="figures/faiss-best_practices-fp16.jpg" alt="faiss-best_practices-fp16" width="800"/>
 
 ## v1.14.3
 
@@ -304,12 +304,12 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
     numactl -C 0-31 -m 0 ./ivfrabitqfs_test ivfrabitqfs sift-128-euclidean
     ```
 
-The test result is as follows.
+   The test result is as follows.
 
-<img src="figures/faiss-best_practices-1.14.3-rabitq.jpg" alt="faiss-best_practices-1.14.3-rabitq" width="800"/>
+   <img src="figures/faiss-best_practices-1.14.3-rabitq.jpg" alt="faiss-best_practices-1.14.3-rabitq" width="800"/>
 
 ## Change History
 
-| Issue | Date | Description |
-| ---- | ---- | -- |
+| Version | Date | Description |
+| :--- | :--- | :--- |
 | 01 | 2026-09-30 | This is the first official release. |

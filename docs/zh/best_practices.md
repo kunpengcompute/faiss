@@ -74,9 +74,9 @@
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
-测试结果如下所示。
+   测试结果如下所示。
 
-<img src="figures/faiss-best_practices-neq.jpg" alt="faiss-best_practices-neq" width="800"/>
+   <img src="figures/faiss-best_practices-neq.jpg" alt="faiss-best_practices-neq" width="800"/>
 
 ### 等价优化
 
@@ -151,9 +151,9 @@
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
-测试结果如下所示。
+   测试结果如下所示。
 
-<img src="figures/faiss-best_practices-eqv.jpg" alt="faiss-best_practices-eqv" width="800"/>
+   <img src="figures/faiss-best_practices-eqv.jpg" alt="faiss-best_practices-eqv" width="800"/>
 
 ### HNSW FP16支持
 
@@ -226,9 +226,9 @@
     numactl -C 0-31 -m 0 ./hnsw_fp16_test hnsw_fp16 sift-128-euclidean
     ```
 
-测试结果如下所示。
+   测试结果如下所示。
 
-<img src="figures/faiss-best_practices-fp16.jpg" alt="faiss-best_practices-fp16" width="800"/>
+   <img src="figures/faiss-best_practices-fp16.jpg" alt="faiss-best_practices-fp16" width="800"/>
 
 ## v1.14.3
 
@@ -298,9 +298,9 @@
     numactl -C 0-31 -m 0 ./ivfrabitqfs_test ivfrabitqfs sift-128-euclidean
     ```
 
-测试结果如下所示。
+   测试结果如下所示。
 
-<img src="figures/faiss-best_practices-1.14.3-rabitq.jpg" alt="faiss-best_practices-1.14.3-rabitq" width="800"/>
+   <img src="figures/faiss-best_practices-1.14.3-rabitq.jpg"    alt="faiss-best_practices-1.14.3-rabitq" width="800"/>
 
 ## 修订记录
 

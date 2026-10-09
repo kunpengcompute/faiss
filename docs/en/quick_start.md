@@ -127,6 +127,6 @@ The expected output is as follows.
 
 ## Change History
 
-| Issue | Date | Description |
-| ---- | ---- | -- |
+| Version | Date | Description |
+| :--- | :--- | :--- |
 | 01 | 2026-09-30 | This is the first official release. |

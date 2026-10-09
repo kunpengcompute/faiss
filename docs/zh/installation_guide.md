@@ -476,9 +476,9 @@
     numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
     ```
 
-运行结果如下所示。
+   运行结果如下所示。
 
-<img src="figures/faiss-installation_guide.jpg" alt="faiss-installation_guide-运行结果" width="800"/>
+   <img src="figures/faiss-installation_guide.jpg" alt="faiss-installation_guide-运行结果" width="800"/>
 
 ## 修订记录
 

@@ -107,6 +107,6 @@ While keeping the native Faiss APIs unchanged, extension APIs are added to enabl
 
 ## Change History
 
-| Issue | Date | Description |
-| ---- | ---- | -- |
+| Version | Date | Description |
+| :--- | :--- | :--- |
 | 01 | 2026-09-30 | This is the first official release. |

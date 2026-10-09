@@ -447,12 +447,12 @@ This section describes how to verify the compatibility of the open-source Faiss 
     numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
     ```
 
-The command output is as follows.
+   The command output is as follows.
 
-<img src="figures/faiss-installation_guide.jpg" alt="faiss-installation_guide-command output" width="800"/>
+   <img src="figures/faiss-installation_guide.jpg" alt="faiss-installation_guide-command output" width="800"/>
 
 ## Change History
 
-| Issue | Date | Description |
-| ---- | ---- | -- |
+| Version | Date | Description |
+| :--- | :--- | :--- |
 | 01 | 2026-09-30 | This is the first official release. |

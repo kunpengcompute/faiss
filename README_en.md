@@ -4,9 +4,9 @@ English|[简体中文](./README.md)
 
 ## Latest Updates
 
-- [September 30, 2026]: A RabitQ index optimization patch based on Faiss v1.14.3 is provided.
+- [2026.09.30]: A RabitQ index optimization patch based on Faiss v1.14.3 is provided.
 
-- [June 30, 2026]: The VisitedTable access flags are optimized by replacing the full memset reset with a generation-based flag similar to a hashset, reducing VisitedTable updates from O(N) to O(1). The 4-bit lookup operator is implemented using SVE2..
+- [2026.06.30]: The VisitedTable access flags are optimized by replacing the full memset reset with a generation-based flag similar to a hashset, reducing VisitedTable updates from O(N) to O(1). The 4-bit lookup operator is implemented using SVE2..
 
 - [2026.03.30]: Faiss provides a non-equivalence optimization patch and an equivalence optimization patch. The non-equivalence optimization patch further optimizes the IVFPQ algorithm and supports the HNSW FP16 interface.
 

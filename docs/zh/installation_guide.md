@@ -234,7 +234,7 @@
    - 若您选择使用等价优化补丁0002-faiss\_1.8.0-optimize-eqv.patch，可选择开启以下宏获得性能提升。
      - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，保证Top-K的值与顺序与开源保持完全一致。
     >
-    >![表示说明的图片](./public_sys-resources/icon-note.gif)**说明：**
+    >![表示说明的图片](./public_sys-resources/icon-note.gif) **说明：**
     >
     >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
     >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
@@ -401,7 +401,7 @@
     make -C build install
     ```
     >
-    >![表示说明的图片](./public_sys-resources/icon-note.gif)**说明：**
+    >![表示说明的图片](./public_sys-resources/icon-note.gif) **说明：**
     >
     >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install”以指定安装路径，默认安装路径为“/usr/local”。
     >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。

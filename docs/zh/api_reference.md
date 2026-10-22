@@ -8,7 +8,7 @@
 - 扩展接口的调用：能够根据传入参数的数据类型，自动调用对应的功能实现。
 - 扩展接口支持的数据类型：目前仅支持FP16数据类型，后续如果有其他数据类型的实现需求，均可通过扩展接口进行调用。
 
-以IndexHNSW.h中的add功能为例：
+以IndexHNSW.h中的add功能为例。
 
 <a name="table99541454172315"></a>
 <table><thead align="left"><tr id="row6954165419237"><th class="cellrowborder" valign="top" width="21.02%" id="mcps1.1.3.1.1"><p id="p5954454172319"><a name="p5954454172319"></a><a name="p5954454172319"></a>接口说明</p>
@@ -37,7 +37,7 @@
 
 扩展接口为外部接口，外部调用add\_ex并且传入的numeric\_type为FP16数据类型时，将在函数内部调用新增的add FP16接口实现具体功能。
 
->![](public_sys-resources/icon-note.gif) **说明：** 
+>![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
 >HNSWFlat提供FP16接口和完整的FP16功能实现。
 >HNSWPQ、HNSWSQ和HNSW2Level目前仅提供FP16接口，输入的FP16数据将在内部转换为FP32数据类型调用原生接口。
 
@@ -312,7 +312,7 @@ index.train_ex(n_train, train_data.data(), faiss::NumericType::Float16);
 
 ## add_ex
 
-**接口定义<a name="section55611644173112"></a>**
+**接口定义**
 
 void add\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\);
 
@@ -320,7 +320,7 @@ void add\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\);
 
 向索引中添加向量。
 
-**参数说明<a name="section162221119163417"></a>**
+**参数说明**
 
 <a name="table1463464643311"></a>
 <table><thead align="left"><tr id="row16634946173317"><th class="cellrowborder" valign="top" width="14.92%" id="mcps1.1.5.1.1"><p id="p167971503617"><a name="p167971503617"></a><a name="p167971503617"></a>参数名称</p>
@@ -855,6 +855,7 @@ for (int i = 0; i < n_query; i++) {
     }
 }
 ```
+
 ## 修订记录
 
 | 文档版本 | 发布日期 | 修改说明 |

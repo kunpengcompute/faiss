@@ -1,13 +1,15 @@
 # Faiss介绍
 
+本文档介绍Faiss，说明该算法库的相似搜索与密集向量聚类能力、提供的索引方式及鲲鹏FP16/HNSW等优化特性，并提供学习文档与版本说明入口，适用于需要使用Faiss进行高效向量检索的用户。
+
 简体中文|[English](./README_en.md)
 
 ## 最新消息
 
-- [2026.09.30]：提供基于Faiss v1.14.3版本的RabitQ索引优化补丁。
-- [2026.06.30]：优化访问表访问标记，采用类hashset的generation-based标记替代全量memset重置，将访问表更新从O(N)优化至O(1)。4bit查表算子增加SVE2实现。
-- [2026.03.30]：Faiss提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。
-- [2025.12.30]：Faiss发布于Gitcode平台，实现IVFFLAT、IVFPQ、IVFPQFS、PQFS、HNSW优化。
+- [2026-09-30]：提供基于Faiss v1.14.3版本的RabitQ索引优化补丁。
+- [2026-06-30]：优化访问表访问标记，采用类hashset的generation-based标记替代全量memset重置，将访问表更新从O(N)优化至O(1)。4bit查表算子增加SVE2实现。
+- [2026-03-30]：Faiss提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。
+- [2025-12-30]：Faiss发布于Gitcode平台，实现IVFFlat、IVFPQ、IVFPQFS、PQFS、HNSW优化。
 
 ## 项目介绍
 
@@ -94,7 +96,7 @@ Faiss采用MIT License许可证授权，支持修改代码和再开源，具体�
 
 ## 贡献声明
 
-欢迎大家为社区做贡献，如果使用过程中有任何问题或建议，或者需要反馈特性需求和bug报告，可以提交[Issues](https://gitcode.com/boostkit/community/blob/master/docs/contributor/issue-submit.md)联系我们，具体贡献方法可参考[这里](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md)。同时也欢迎大家在[讨论专区](https://gitcode.com/boostkit/community/discussions)展开讨论交流。感谢您的支持。
+欢迎大家为社区做贡献，如果使用过程中有任何问题或建议，或者需要反馈特性需求和bug报告，可以提交[Issues](https://gitcode.com/boostkit/community/blob/master/docs/contributor/issue-submit.md)联系我们，具体贡献方法可参考[社区贡献](https://gitcode.com/boostkit/community/blob/master/docs/contributor/contributing.md)。同时也欢迎大家在[讨论专区](https://gitcode.com/boostkit/community/discussions)展开讨论交流。感谢您的支持。
 
 ## 致谢
 

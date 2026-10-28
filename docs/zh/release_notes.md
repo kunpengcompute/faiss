@@ -53,7 +53,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p1118821124015"><a name="p1118821124015"></a><a name="p1118821124015"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p18389155712168"><a name="p18389155712168"></a><a name="p18389155712168"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p18389155712168"><a name="p18389155712168"></a><a name="p18389155712168"></a>3.22.0及以上</p>
 </td>
 </tr>
 <td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p1321915499910"><a name="p1321915499910"></a><a name="p1321915499910"></a>Debian 12</p>
@@ -64,7 +64,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p172198491297"><a name="p172198491297"></a><a name="p172198491297"></a>GCC 12.2.0 / LLVM 16.0.6</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p19219164917914"><a name="p19219164917914"></a><a name="p19219164917914"></a>CMake&gt;=3.25.1</p>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p19219164917914"><a name="p19219164917914"></a><a name="p19219164917914"></a>3.25.1及以上</p>
 </td>
 <tr id="row159615141350"><td class="cellrowborder" valign="top" width="20.86%" headers="mcps1.2.6.1.1 "><p id="p179611141352"><a name="p179611141352"></a><a name="p179611141352"></a>openEuler 24.03 LTS SP3</p>
 </td>
@@ -74,7 +74,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="17.549999999999997%" headers="mcps1.2.6.1.4 "><p id="p496115148515"><a name="p496115148515"></a><a name="p496115148515"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p109611114654"><a name="p109611114654"></a><a name="p109611114654"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p109611114654"><a name="p109611114654"></a><a name="p109611114654"></a>3.22.0及以上</p>
 </td>
 </tr>
 <tr id="row1837942531312"><td class="cellrowborder" valign="top" width="20.86%" headers="mcps1.2.6.1.1 "><p id="p1438015251131"><a name="p1438015251131"></a><a name="p1438015251131"></a>Debian 12</p>
@@ -85,7 +85,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="17.549999999999997%" headers="mcps1.2.6.1.4 "><p id="p821894241316"><a name="p821894241316"></a><a name="p821894241316"></a>GCC 12.2.0 / LLVM 16.0.6</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p1021810427131"><a name="p1021810427131"></a><a name="p1021810427131"></a>CMake&gt;=3.25.1</p>
+<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p1021810427131"><a name="p1021810427131"></a><a name="p1021810427131"></a>3.25.1及以上</p>
 </td>
 </tr>
 </tbody>
@@ -103,7 +103,7 @@
 
 **新增特性<a name="section11862975"></a>**
 
-提供基于Faiss v1.14.3版本的RabitQ索引优化补丁。
+提供基于Faiss v1.14.3版本的RaBitQ索引优化补丁。
 
 **修改特性<a name="section16450949161512"></a>**
 
@@ -127,7 +127,7 @@
 
 **新增特性<a name="section11862975"></a>**
 
-提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。补丁发布至Gitcode平台，代码分支版本号为**v1.0.0**。
+提供全量优化补丁与等价优化补丁。其中，全量优化补丁针对IVFPQ算法进一步优化，新增支持HNSW FP16接口。补丁发布至GitCode平台，代码分支版本号为**v1.0.0**。
 
 **修改特性<a name="section16450949161512"></a>**
 
@@ -151,7 +151,7 @@
 
 **新增特性<a name="section11862975"></a>**
 
-新增Faiss子库，代码开源发布。Faiss需要通过源代码编译后使用。补丁发布至Gitcode平台，代码分支版本号为**v1.8.0-2512**。
+新增Faiss子库，代码开源发布。Faiss需要通过源代码编译后使用。补丁发布至GitCode平台，代码分支版本号为**v1.8.0-2512**。
 
 **修改特性<a name="section16450949161512"></a>**
 

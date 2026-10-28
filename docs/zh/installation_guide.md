@@ -1,5 +1,7 @@
 # 安装指南
 
+本文档介绍Faiss在鲲鹏平台的编译安装，涵盖v1.8.0与v1.14.3两个版本的鲲鹏优化补丁安装与编译，以及开源Faiss兼容性验证，适用于在鲲鹏平台部署Faiss的用户。
+
 ## 已验证环境
 
 为保证您可以顺利安全地使用Faiss，请确保所使用的环境信息在已验证环境范围内。
@@ -103,7 +105,7 @@
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-5. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29”。
+5. Faiss依赖数学库，从[GitHub](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29”。
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
@@ -236,9 +238,9 @@
     >
     >![表示说明的图片](./public_sys-resources/icon-note.gif) **说明：**
     >
-    >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
-    >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
-    >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt“文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)“修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)“。
+    >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install”以指定安装路径，默认安装路径为“/usr/local”。
+    >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤5中OpenBLAS的安装路径。
+    >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt”文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)”修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)”。
 
 ### v1.14.3
 
@@ -258,7 +260,7 @@
 
     >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
     >鲲鹏优化补丁文件描述如下。
-    >- 0001-faiss\_1.14.3-optimize-rabitq.patch：基于v1.14.3版本的RabitQ索引优化补丁，保证精度，但不保证Top-K的值或顺序与开源完全一致。
+    >0001-faiss\_1.14.3-optimize-rabitq.patch：基于v1.14.3版本的RaBitQ索引优化补丁，保证精度，但不保证Top-K的值或顺序与开源完全一致。
 
 3. 安装Make、CMake、GCC。
 
@@ -274,7 +276,7 @@
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-5. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
+5. Faiss依赖数学库，从[GitHub](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git

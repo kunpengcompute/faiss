@@ -1,8 +1,8 @@
 # API参考
 
-## 接口列表
-
 本文档提供Faiss支持FP16的接口说明。目前仅提供C++的FP16接口，不对开源Python接口做修改或新增。在完全保持Faiss v1.8.0版本开源C++接口兼容性的前提下，利用v1.13.2版本扩展接口增加对FP16数据类型的支持。
+
+## 接口列表
 
 - 扩展接口的命名：在原生接口名称的基础上添加`_ex`后缀。
 - 扩展接口的调用：能够根据传入参数的数据类型，自动调用对应的功能实现。
@@ -104,9 +104,9 @@ IndexHNSW新增的构造函数。
 </th>
 <th class="cellrowborder" valign="top" width="17.97%" id="mcps1.1.5.1.2"><p id="p3787454133320"><a name="p3787454133320"></a><a name="p3787454133320"></a>参数类型</p>
 </th>
-<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p7787165415336"><a name="p7787165415336"></a><a name="p7787165415336"></a>描述</p>
+<th class="cellrowborder" valign="top" width="28.38%" id="mcps1.1.5.1.3"><p id="p7787165415336"><a name="p7787165415336"></a><a name="p7787165415336"></a>参数描述</p>
 </th>
-<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p078717549335"><a name="p078717549335"></a><a name="p078717549335"></a>取值范围</p>
+<th class="cellrowborder" valign="top" width="38.73%" id="mcps1.1.5.1.4"><p id="p078717549335"><a name="p078717549335"></a><a name="p078717549335"></a>参数取值范围</p>
 </th>
 </tr>
 </thead>

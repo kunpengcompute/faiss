@@ -73,9 +73,10 @@
     >- IVFFLAT算法：**make ivfflat\_test**
 
 4. 若是第一次执行，确保ivfpq\_sift-128-euclidean.config文件中的“save\_or\_load”为“save”；后续执行时可改为“load”，使用构建好的图索引或检索器查询。
-5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
+5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量LD_LIBRARY_PATH后运行测试。以下命令以OpenBLAS与Faiss的默认安装路径为例，若安装时指定了其他路径，请替换为实际的库文件路径。
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
@@ -153,9 +154,10 @@
     >- IVFFLAT算法：**make ivfflat\_test**
 
 4. 若是第一次执行，确保ivfpq\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
-5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
+5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量LD_LIBRARY_PATH后运行测试。以下命令以OpenBLAS与Faiss的默认安装路径为例，若安装时指定了其他路径，请替换为实际的库文件路径。
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
@@ -228,9 +230,10 @@
     >- IVFFLAT算法：**make ivfflat\_test**
 
 4. 若是第一次执行，确保hnsw\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
-5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
+5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量LD_LIBRARY_PATH后运行测试。以下命令以OpenBLAS与Faiss的默认安装路径为例，若安装时指定了其他路径，请替换为实际的库文件路径。
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./hnsw_fp16_test hnsw_fp16 sift-128-euclidean
     ```
 
@@ -303,9 +306,10 @@
     >- IVFRabitQ算法：**make ivfrabitq\_test**
 
 4. 若是第一次执行，确保ivfrabitqfs\_sift-128-euclidean.config文件中的“save\_or\_load“为“save“；后续执行时可改为“load“，使用构建好的图索引或检索器查询。
-5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
+5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量LD_LIBRARY_PATH后运行测试。以下命令以OpenBLAS与Faiss的默认安装路径为例，若安装时指定了其他路径，请替换为实际的库文件路径。
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./ivfrabitqfs_test ivfrabitqfs sift-128-euclidean
     ```
 

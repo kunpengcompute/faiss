@@ -72,10 +72,11 @@ This section describes how to test Faiss after full optimization based on Faiss 
     >- IVFPQFS: `make ivfpqfs_test`
     >- IVFFLAT: `make ivfflat_test`
 
-4. For the first run, ensure that `save_or_load` in the `ivfrabitqfs_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
+4. For the first run, ensure that `save_or_load` in the `ivfpq_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
@@ -152,9 +153,10 @@ This section describes how to test Faiss after equivalence optimization on the K
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `ivfpq_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
@@ -227,9 +229,10 @@ This section describes how to test Faiss with HNSW FP16 interface support based 
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `hnsw_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./hnsw_fp16_test hnsw_fp16 sift-128-euclidean
     ```
 
@@ -302,9 +305,10 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
     >- IVFRabitQ algorithm: `make ivfrabitq_test`
 
 4. For the first run, ensure that `save_or_load` in the `ivfrabitqfs_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./ivfrabitqfs_test ivfrabitqfs sift-128-euclidean
     ```
 

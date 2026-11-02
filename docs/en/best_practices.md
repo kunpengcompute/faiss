@@ -1,5 +1,7 @@
 # Best Practices
 
+<!-- md-trans-meta sourceCommit=2b057fbbcdac81f9980a5b1e539eaeabee60a5e3 translatedAt=2026-10-23T08:58:23.447Z pushedAt=2026-10-26T01:07:09.481Z -->
+
 ## v1.8.0
 
 ### Non-Equivalence Optimization
@@ -8,7 +10,7 @@ This section describes how to test Faiss after full optimization based on Faiss 
 
 **Obtaining the Dataset and Test Program <a name="section5124167418"></a>**
 
-1. Obtain the [test program](https://atomgit.com/openeuler/sra_test.git). The branch is `v2.1.0`. Assume that the program runs at the `/path/to/sra_test` directory. The full directory structure is as follows:
+1. Obtain the [test program](https://atomgit.com/openeuler/sra_test.git). The branch is `v2.1.0`. Assume that the program runs at the `/path/to/sra_test` directory. The full directory structure is as follows.
 
     ```text
     ├── configs                                                   // Stores configuration files for the corresponding algorithms and datasets.
@@ -34,7 +36,7 @@ This section describes how to test Faiss after full optimization based on Faiss 
     └── ivfpq_test                                                // Executable file generated after compilation
     ```
 
-2. <a name="li1673311431218"></a>Obtain the dataset and save it to <code>/path/to/sra\_test/data</code>.
+2. <a name="li1673311431218"></a>Obtain the dataset and save it to <code>/path/to/sra_test/data</code>.
 
     ```bash
     cd /path/to/sra_test/data
@@ -49,17 +51,19 @@ This section describes how to test Faiss after full optimization based on Faiss 
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. Compile and install Faiss as described in [*Installation Guide*](./installation_guide.md).<a id="li1673311431218"></a>
+2. Compile and install Faiss as described in [Installation Guide](./installation_guide.md).
 
-   >![icon-note](./public_sys-resources/icon-note.gif)**Note:** For the Faiss test after non-equivalence optimization, enable the macros related to Kunpeng optimization. The following uses `-DOPTI_IVFPQ=ON` for illustration.
+   >![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
+   >For the Faiss test after full optimization, enable the macros related to Kunpeng optimization. The following uses `-DOPTI_IVFPQ=ON` for illustration.
 
-3. Build the executable file. Enter the Faiss installation path and the paths to other required dependencies as prompted by the command line. Note: Set `-DOPTI_IVFPQ` to `ON` as prompted. If `-DKRL` is set to `ON` in step [2](#li1673311431218), enable it here as well.
+3. Build the executable file. Enter the Faiss installation path and the paths to other required dependencies as prompted by the command line. Note: Set `-DOPTI_IVFPQ` to `ON` as prompted. If `-DKRL` is set to `ON` in step 2, enable it here as well.
 
     ```bash
     make ivfpq_test
     ```
 
-    >![icon-note](public_sys-resources/icon-note.gif) **Note:**
+    >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
+    >
     >During the test, select the appropriate compilation instruction for each algorithm.
     >- HNSW: `make hnsw_test`
     >- HNSW (FP16): `make hnsw_fp16_test`
@@ -69,7 +73,6 @@ This section describes how to test Faiss after full optimization based on Faiss 
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `ivfrabitqfs_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-
 5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
 
     ```bash
@@ -129,7 +132,8 @@ This section describes how to test Faiss after equivalence optimization on the K
 
 2. Install Faiss by referring to the [Installation Guide](./installation_guide.md).
 
-   > ![icon-note](./public_sys-resources/icon-note.gif)**Note:** For the Faiss test after equivalence optimization, enable the macro related to Kunpeng optimization: `-DKRL=ON`.
+   > ![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
+   >For the Faiss test after equivalence optimization, enable the macro related to Kunpeng optimization: `-DKRL=ON`.
 
 3. Build the executable file. Enter the Faiss installation path and the paths to other required dependencies as prompted by the command line. Note: Set `-DKRL` to `ON` as prompted.
 
@@ -138,6 +142,7 @@ This section describes how to test Faiss after equivalence optimization on the K
     ```
 
     >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
+    >
     >During the test, select the appropriate compilation instruction for each algorithm.
     >- HNSW: `make hnsw_test`
     >- HNSW (FP16): `make hnsw_fp16_test`
@@ -146,8 +151,7 @@ This section describes how to test Faiss after equivalence optimization on the K
     >- IVFPQFS: `make ivfpqfs_test`
     >- IVFFLAT: `make ivfflat_test`
 
-4. For the first run, ensure that `save\_or\_load` in the `ivfpq\_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-
+4. For the first run, ensure that `save_or_load` in the `ivfpq_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
 5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
 
     ```bash
@@ -160,11 +164,11 @@ This section describes how to test Faiss after equivalence optimization on the K
 
 ### HNSW FP16 Support
 
-This section describes how to test Faiss with HNSW FP16 interface support based on Faiss v1.8.0 on the Kunpeng platform. The test depends on the Kunpeng optimization patch file `0001-faiss\_1.8.0-optimize-neq.patch` or `0002-faiss\_1.8.0-optimize-eqv.patch`. The example uses the `sift-128-euclidean.hdf5` dataset, Faiss-supported algorithm (HNSW), and 32 threads.
+This section describes how to test Faiss with HNSW FP16 interface support based on Faiss v1.8.0 on the Kunpeng platform. The test depends on the Kunpeng optimization patch file `0001-faiss_1.8.0-optimize-neq.patch` or `0002-faiss_1.8.0-optimize-eqv.patch`. The example uses the `sift-128-euclidean.hdf5` dataset, Faiss-supported algorithm (HNSW), and 32 threads.
 
 **Obtaining the Dataset and Test Program <a name="section5124167418"></a>**
 
-1. Obtain the [test program](https://atomgit.com/openeuler/sra_test.git). The branch is `v2.1.0`. Assume that the program runs at the `/path/to/sra\_test` directory. The full directory structure is as follows.
+1. Obtain the [test program](https://atomgit.com/openeuler/sra_test.git). The branch is `v2.1.0`. Assume that the program runs at the `/path/to/sra_test` directory. The full directory structure is as follows.
 
     ```text
     ├── configs                                                   // Store configuration files for the corresponding algorithms and datasets.
@@ -205,8 +209,7 @@ This section describes how to test Faiss with HNSW FP16 interface support based 
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. Compile and install Faiss as described in [<i>Installation Guide</i>](./installation_guide.md).
-
+2. Compile and install Faiss as described in [Installation Guide](./installation_guide.md).
 3. Build the executable file. Enter the Faiss installation path and the paths to other required dependencies as prompted by the command line. Note: set `-DKRL` to `ON` and set `-DUSE_FP16` to `ON` as prompted.
 
     ```bash
@@ -214,6 +217,7 @@ This section describes how to test Faiss with HNSW FP16 interface support based 
     ```
 
     >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
+    >
     >During the test, select the appropriate compilation instruction for each algorithm.
     >- HNSW: `make hnsw_test`
     >- HNSW (FP16): `make hnsw_fp16_test`
@@ -223,7 +227,6 @@ This section describes how to test Faiss with HNSW FP16 interface support based 
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `hnsw_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-
 5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
 
     ```bash
@@ -266,7 +269,7 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
     └── ivfrabitqfs_test                                          // Executable file generated after compilation.
     ```
 
-2. <a name="li1673311431218"></a>Obtain the dataset and save it to <code>/path/to/sra\_test/data</code>.
+2. <a name="li1673311431218"></a>Obtain the dataset and save it to <code>/path/to/sra_test/data</code>.
 
     ```bash
     cd /path/to/sra_test/data
@@ -281,9 +284,10 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. Compile and install Faiss as described in [*Installation Guide*](./installation_guide.md).
+2. Compile and install Faiss as described in [Installation Guide](./installation_guide.md).
 
-   >![icon-note](./public_sys-resources/icon-note.gif)**NOTE** For the Faiss test optimized based on v1.14.3, enable the macro related to Kunpeng optimization: `-DKRL=ON`.
+   >![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
+   >For the Faiss test optimized based on v1.14.3, enable the macro related to Kunpeng optimization: `-DKRL=ON`.
 
 3. Compile the executable file. Enter the Faiss installation path and the paths of other required dependencies as prompted by the command line. Note that you must also enable `-DKRL=ON` as prompted. If a missing header file is reported, enter `-I/path/to/faiss`.
 
@@ -291,13 +295,13 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
     make ivfrabitqfs_test
     ```
 
-    >![icon-note](public_sys-resources/icon-note.gif) **NOTE**
+    >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
+    >
     >Different algorithms require different compilation commands during testing.
-    >- IVFRabitQFS algorithm: **make ivfrabitqfs\_test**
-    >- IVFRabitQ algorithm: **make ivfrabitq\_test**
+    >- IVFRabitQFS algorithm: `make ivfrabitqfs_test`
+    >- IVFRabitQ algorithm: `make ivfrabitq_test`
 
-4. For the first run, ensure that `save\_or\_load` in the `ivfrabitqfs\_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-
+4. For the first run, ensure that `save_or_load` in the `ivfrabitqfs_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
 5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
 
     ```bash
@@ -311,5 +315,5 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
 ## Change History
 
 | Version | Date | Description |
-| :--- | :--- | :--- |
+| --- | --- | --- |
 | 01 | 2026-09-30 | This is the first official release. |

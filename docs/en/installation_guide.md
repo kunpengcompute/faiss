@@ -1,5 +1,7 @@
 # Installation Guide
 
+<!-- md-trans-meta sourceCommit=2b057fbbcdac81f9980a5b1e539eaeabee60a5e3 translatedAt=2026-10-23T08:58:40.115Z pushedAt=2026-10-26T01:07:09.484Z -->
+
 ## Verified Environments
 
 To use Faiss smoothly and securely, ensure that your environment is one of the verified environments.
@@ -7,37 +9,61 @@ To use Faiss smoothly and securely, ensure that your environment is one of the v
 **Table 1** Verified environments for Faiss<a id="verified-environments-for-faiss "></a>
 
 <a name="table4692134313211"></a>
-
-<table><thead align="left"><tr id="row1169294312212"><th class="cellrowborder" valign="top" width="21.8%" id="mcps1.2.6.1.1"><p id="p12692144313211"><a name="p12692144313211"></a><a name="p12692144313211"></a>OS</p></th>
-<th class="cellrowborder" valign="top" width="19.91%" id="mcps1.2.6.1.2"><p id="p06926438214"><a name="p06926438214"></a><a name="p06926438214"></a>CPU</p></th>
-<th class="cellrowborder" valign="top" width="13.700000000000001%" id="mcps1.2.6.1.3"><p id="p269284310216"><a name="p269284310216"></a><a name="p269284310216"></a>Memory</p></th>
-<th class="cellrowborder" valign="top" width="17.34%" id="mcps1.2.6.1.4"><p id="p196922434215"><a name="p196922434215"></a><a name="p196922434215"></a>Compiler</p></th>
-<th class="cellrowborder" valign="top" width="27.250000000000004%" id="mcps1.2.6.1.5"><p id="p1769219435210"><a name="p1769219435210"></a><a name="p1769219435210"></a>Remarks</p></th>
+<table><thead align="left"><tr id="row1169294312212"><th class="cellrowborder" valign="top" width="21.8%" id="mcps1.2.6.1.1"><p id="p12692144313211"><a name="p12692144313211"></a><a name="p12692144313211"></a>OS</p>
+</th>
+<th class="cellrowborder" valign="top" width="19.91%" id="mcps1.2.6.1.2"><p id="p06926438214"><a name="p06926438214"></a><a name="p06926438214"></a>CPU</p>
+</th>
+<th class="cellrowborder" valign="top" width="13.700000000000001%" id="mcps1.2.6.1.3"><p id="p269284310216"><a name="p269284310216"></a><a name="p269284310216"></a>Memory</p>
+</th>
+<th class="cellrowborder" valign="top" width="17.34%" id="mcps1.2.6.1.4"><p id="p196922434215"><a name="p196922434215"></a><a name="p196922434215"></a>Compiler</p>
+</th>
+<th class="cellrowborder" valign="top" width="27.250000000000004%" id="mcps1.2.6.1.5"><p id="p1769219435210"><a name="p1769219435210"></a><a name="p1769219435210"></a>Remarks</p>
+</th>
 </tr>
 </thead>
-<tbody><tr id="row624713534398"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p418818120409"><a name="p418818120409"></a><a name="p418818120409"></a>openEuler 22.03 LTS SP3</p></td>
-<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p468512464216"><a name="p468512464216"></a><a name="p468512464216"></a>New Kunpeng 920 processor model</p></td>
-<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p56685294911"><a name="p56685294911"></a><a name="p56685294911"></a>16 × 32 GB</p></td>
-<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p1118821124015"><a name="p1118821124015"></a><a name="p1118821124015"></a>GCC 12.3.1</p></td>
-<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p18389155712168"><a name="p18389155712168"></a><a name="p18389155712168"></a>CMake&gt;= 3.22.0</p></td>
+<tbody><tr id="row624713534398"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p418818120409"><a name="p418818120409"></a><a name="p418818120409"></a>openEuler 22.03 LTS SP3</p>
+</td>
+<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p468512464216"><a name="p468512464216"></a><a name="p468512464216"></a>New Kunpeng 920 processor model</p>
+</td>
+<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p56685294911"><a name="p56685294911"></a><a name="p56685294911"></a>16 × 32 GB</p>
+</td>
+<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p1118821124015"><a name="p1118821124015"></a><a name="p1118821124015"></a>GCC 12.3.1</p>
+</td>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p18389155712168"><a name="p18389155712168"></a><a name="p18389155712168"></a>CMake&gt;= 3.22.0</p>
+</td>
 </tr>
-<tr id="row8219349894"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p1321915499910"><a name="p1321915499910"></a><a name="p1321915499910"></a>Debian 12</p></td>
-<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p152199497916"><a name="p152199497916"></a><a name="p152199497916"></a>New Kunpeng 920 processor model</p></td>
-<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p1121911491393"><a name="p1121911491393"></a><a name="p1121911491393"></a>16 × 32 GB</p></td>
-<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p172198491297"><a name="p172198491297"></a><a name="p172198491297"></a>GCC 12.2.0 / LLVM 16.0.6</p></td>
-<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p19219164917914"><a name="p19219164917914"></a><a name="p19219164917914"></a>CMake&gt;=3.25.1</p></td>
+<tr id="row8219349894"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p1321915499910"><a name="p1321915499910"></a><a name="p1321915499910"></a>Debian 12</p>
+</td>
+<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p152199497916"><a name="p152199497916"></a><a name="p152199497916"></a>New Kunpeng 920 processor model</p>
+</td>
+<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p1121911491393"><a name="p1121911491393"></a><a name="p1121911491393"></a>16 × 32 GB</p>
+</td>
+<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p172198491297"><a name="p172198491297"></a><a name="p172198491297"></a>GCC 12.2.0 / LLVM 16.0.6</p>
+</td>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p19219164917914"><a name="p19219164917914"></a><a name="p19219164917914"></a>CMake&gt;=3.25.1</p>
+</td>
 </tr>
-<tr id="row159615141350"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p179611141352"><a name="p179611141352"></a><a name="p179611141352"></a>openEuler 24.03 LTS SP3</p></td>
-<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p8961314756"><a name="p8961314756"></a><a name="p8961314756"></a>Kunpeng 950 processor</p></td>
-<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p15961191418510"><a name="p15961191418510"></a><a name="p15961191418510"></a>24 × 64 GB</p></td>
-<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p496115148515"><a name="p496115148515"></a><a name="p496115148515"></a>GCC 12.3.1</p></td>
-<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p109611114654"><a name="p109611114654"></a><a name="p109611114654"></a>CMake&gt;=3.22.0</p></td>
+<tr id="row159615141350"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p179611141352"><a name="p179611141352"></a><a name="p179611141352"></a>openEuler 24.03 LTS SP3</p>
+</td>
+<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p8961314756"><a name="p8961314756"></a><a name="p8961314756"></a>Kunpeng 950 processor</p>
+</td>
+<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p15961191418510"><a name="p15961191418510"></a><a name="p15961191418510"></a>24 × 64 GB</p>
+</td>
+<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p496115148515"><a name="p496115148515"></a><a name="p496115148515"></a>GCC 12.3.1</p>
+</td>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p109611114654"><a name="p109611114654"></a><a name="p109611114654"></a>CMake&gt;=3.22.0</p>
+</td>
 </tr>
-<tr id="row1837942531312"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p1438015251131"><a name="p1438015251131"></a><a name="p1438015251131"></a>Debian 12</p></td>
-<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p578363871318"><a name="p578363871318"></a><a name="p578363871318"></a>Kunpeng 950 processor</p></td>
-<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p127833389131"><a name="p127833389131"></a><a name="p127833389131"></a>24 × 64 GB</p></td>
-<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p821894241316"><a name="p821894241316"></a><a name="p821894241316"></a>GCC 12.2.0 / LLVM 16.0.6</p></td>
-<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p1021810427131"><a name="p1021810427131"></a><a name="p1021810427131"></a>CMake&gt;=3.25.1</p></td>
+<tr id="row1837942531312"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p1438015251131"><a name="p1438015251131"></a><a name="p1438015251131"></a>Debian 12</p>
+</td>
+<td class="cellrowborder" valign="top" width="19.91%" headers="mcps1.2.6.1.2 "><p id="p578363871318"><a name="p578363871318"></a><a name="p578363871318"></a>Kunpeng 950 processor</p>
+</td>
+<td class="cellrowborder" valign="top" width="13.700000000000001%" headers="mcps1.2.6.1.3 "><p id="p127833389131"><a name="p127833389131"></a><a name="p127833389131"></a>24 × 64 GB</p>
+</td>
+<td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p821894241316"><a name="p821894241316"></a><a name="p821894241316"></a>GCC 12.2.0 / LLVM 16.0.6</p>
+</td>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p1021810427131"><a name="p1021810427131"></a><a name="p1021810427131"></a>CMake&gt;=3.25.1</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -62,24 +88,30 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
 
     >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
     >The following explains the patch files optimized for Kunpeng. Select a patch file as required.
-    >- `0001-faiss_1.8.0-optimize-neq.patch`: non-equivalence optimization patch. It delivers optimal performance and ensures precision, but does not guarantee that the values or sequence of top K results are completely consistent with the original version.
-    >- `0002-faiss_1.8.0-optimize-eqv.patch`: equivalence optimization patch. It ensures that the values and sequence of top K results are completely consistent with the original version.
+    >- `0001-faiss_1.8.0-optimize-neq.patch`: non-equivalence optimization patch. It delivers optimal performance and ensures precision, but does not guarantee that the values or sequence of top K results are completely consistent with the open-source version.
+    >- `0002-faiss_1.8.0-optimize-eqv.patch`: equivalence optimization patch. It ensures that the values and sequence of top K results are completely consistent with the open-source version.
 
-3. Install Make, CMake, and GCC. The GCC 12 installation procedure applies to openEuler 22.03 LTS SP3. openEuler 24.03 LTS SP3 comes with GCC 12 pre-installed, so you only need to install Make and CMake.
+3. Install Make, CMake, and GCC.
 
     ```bash
-    yum install make cmake gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
+    yum install make cmake
+    ```
+
+4. The GCC 12 installation procedure applies to openEuler 22.03 LTS SP3. openEuler 24.03 LTS SP3 comes with GCC 12 pre-installed.
+
+    ```bash
+    yum install gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
     export PATH=/opt/openEuler/gcc-toolset-12/root/usr/bin/:$PATH
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-4. Faiss depends on the math library. Download the open-source OpenBLAS source code from the [GitHub repository](https://github.com/OpenMathLib/OpenBLAS.git) using the **v0.3.29** tag. Save the file to a path accessible to the compiler, such as `/path/to/OpenBLAS-0.3.29`.
+5. Faiss depends on the math library. Download the open-source OpenBLAS source code from the [GitHub repository](https://github.com/OpenMathLib/OpenBLAS.git) using the **v0.3.29** tag. Save the file to a path accessible to the compiler, such as `/path/to/OpenBLAS-0.3.29`.
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
     ```
 
-5. <a id="li880635723510"></a>Compile the source code to obtain the `libopenblas.so` file.
+6. <a id="li880635723510"></a>Compile the source code to obtain the `libopenblas.so` file.
 
     ```bash
     cd /path/to/OpenBLAS-0.3.29/OpenBLAS
@@ -90,7 +122,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
     >You can run the `make install PREFIX=/path/to/openblas/install` command to specify the installation path `/path/to/openblas/install`. The default installation path is `/opt/OpenBLAS`.
 
-6. Install the patch file `0001-faiss\_1.8.0-optimize-neq.patch` or `0002-faiss\_1.8.0-optimize-eqv.patch`.
+7. Install the patch file `0001-faiss_1.8.0-optimize-neq.patch` or `0002-faiss_1.8.0-optimize-eqv.patch`.
 
     ```bash
     cd /path/to/faiss
@@ -100,7 +132,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
 
     The full directory structure of Faiss after applying the patches is as follows.
 
-    ```text
+    ```output
     faiss/
     ├─ benchs/                                     // Benchmark tests
     ├─ c_api/                                      // C language API wrapper
@@ -124,8 +156,8 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     │   ├─ IndexIVFFastScan.cpp                    // IVFPQFastScan (CPU) implementation
     │   ├─ IndexHNSW.h                             // HNSW index interface
     │   ├─ IndexHNSW.cpp                           // HNSW index implementation
-    │   ├─ IndexRefine.h                           // Base + refinement combined index interface
-    │   ├─ IndexRefine.cpp                         // Base + refinement combined index implementation
+    │   ├─ IndexRefine.h                           // Baseline + refinement combined index interface
+    │   ├─ IndexRefine.cpp                         // Baseline + refinement combined index implementation
     │   ├─ impl/
     │   │   ├─ DistanceComputer.h                  // Distance computation abstract interface
     │   │   ├─ ProductQuantizer.h                  // Product Quantizer interface
@@ -141,7 +173,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     │   │   └─ InvertedLists.cpp                   // Inverted list implementation
     │   ├─ utils/
     │   │   └─ distances_simd.cpp                  // SIMD L2/IP/L1/Linf implementation
-    │   ├─ sra_krl/
+    │   ├─ sra_krl/                                // KRL retrieval operator (newly added)
     │   │   ├─ include/
     │   │   │   ├─ krl.h                           // Unified external API declaration
     │   │   │   ├─ krl_internal.h                  // Internal structures, macros, and SIMD helper implementation
@@ -182,7 +214,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     └─ README.md
     ```
 
-7. Compile the Faiss code to obtain `libfaiss.so`. Note: You need to enable the Kunpeng optimization macro to improve performance.
+8. Compile the Faiss code to obtain `libfaiss.so`. Note: You need to enable the Kunpeng optimization macro to improve performance.
 
     ```bash
     cd /path/to/faiss
@@ -198,21 +230,17 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     make -C build install
     ```
 
-   - If you choose to use the non-equivalence optimization patch `0001-faiss_1.8.0-optimize-neq.patch`, you can enable either of the following macros to improve performance (the two macros are mutually exclusive).
+   - If you choose to use the non-equivalence optimization patch `0001-faiss_1.8.0-optimize-neq.patch`, you can enable either of the following macros to improve performance (the two macros are mutually exclusive):
+     - `-DKRL=ON`: non-equivalence optimization for HNSW, IVFPQ, IVFPQFS, PQFS, and IVFFLAT. It delivers optimal performance and ensures precision, but does not guarantee that the values or sequence of top K results are completely consistent with the open-source version.
+     - `-DOPTI_IVFPQ=ON`: specific optimization for IVFPQ. Its performance on IVFPQ indexes outperforms that of the KRL macro, and it ensures that the values and sequence of top K results are completely consistent with the open-source version.
+   - If you choose to use the equivalence optimization patch `0002-faiss_1.8.0-optimize-eqv.patch`, you can enable the following macro to improve performance:
+     - `-DKRL=ON`: non-equivalence optimization for HNSW, IVFPQ, IVFPQFS, PQFS, and IVFFLAT. It ensures that the values and sequence of top K results are completely consistent with the open-source version.
 
-     - `-DKRL=ON`: non-equivalence optimization for HNSW, IVFPQ, IVFPQFS, PQFS, and IVFFLAT. It delivers optimal performance and ensures precision, but does not guarantee that the values or sequence of top K results are completely consistent with the original version.
-
-     - `-DOPTI_IVFPQ=ON`: specific optimization for IVFPQ. Its performance on IVFPQ indexes outperforms that of the KRL macro, and it ensures that the values and sequence of top K results are completely consistent with the original version.
-
-   - If you choose to use the equivalence optimization patch `0002-faiss\_1.8.0-optimize-eqv.patch`, you can enable the following macro to improve performance:
-
-     - `-DKRL=ON`: non-equivalence optimization for HNSW, IVFPQ, IVFPQFS, PQFS, and IVFFLAT. It ensures that the values and sequence of top K results are completely consistent with the original version.
-
-    >![icon-note](./public_sys-resources/icon-note.gif)**Note:**
+    >![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
     >
     >- During compilation, you can add the compilation option `-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install` to specify the installation path `/path/to/faiss/install`. The default installation path is `/usr/local`.
     >- The compilation option `-DMKL_LIBRARIES` must be set to the installation path of OpenBLAS in step [5](#li880635723510).
-    >- If the message "CMake 3.23.1 or higher is required.  You are running version 3.22.0" is displayed, modify line 21 in the `/path/to/faiss/CMakeLists.txt` file by changing `cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)` to `cmake_minimum_required(VERSION 3.22.0 FATAL_ERROR)`.
+    >- If the message "CMake 3.23.1 or higher is required. You are running version 3.22.0" is displayed, modify line 21 in the `/path/to/faiss/CMakeLists.txt` file by changing `cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)` to `cmake_minimum_required(VERSION 3.22.0 FATAL_ERROR)`.
 
 ### v1.14.3
 
@@ -230,25 +258,31 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     git clone --branch v1.1.0 https://gitcode.com/boostkit/faiss.git faiss-patch
     ```
 
-    >![icon-note](public_sys-resources/icon-note.gif) **NOTE**
+    >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
     >The Kunpeng optimization patch files are described as follows.
-    >- 0001-faiss\_1.14.3-optimize-rabitq.patch: A RaBitQ index optimization patch based on v1.14.3, which ensures accuracy but does not guarantee that the Top-K values or order are fully consistent with the original.
+    >- `0001-faiss_1.14.3-optimize-rabitq.patch`: A RaBitQ index optimization patch based on v1.14.3, which ensures accuracy but does not guarantee that the Top-K values or order are fully consistent with the open-source version.
 
-3. Install Make, CMake, and GCC. The GCC 12 installation procedure applies to openEuler 22.03 LTS SP3. openEuler 24.03 LTS SP3 comes with GCC 12 pre-installed, so you only need to install Make and CMake.
+3. Install Make, CMake, and GCC.
 
     ```bash
-    yum install make cmake gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
+    yum install make cmake
+    ```
+
+4. The GCC 12 installation procedure applies to openEuler 22.03 LTS SP3. openEuler 24.03 LTS SP3 comes with GCC 12 pre-installed.
+
+    ```bash
+    yum install gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-libstdc++-static gcc-toolset-12-gcc-gfortran
     export PATH=/opt/openEuler/gcc-toolset-12/root/usr/bin/:$PATH
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-4. Faiss depends on the math library. Download the open-source OpenBLAS source code from the [GitHub repository](https://github.com/OpenMathLib/OpenBLAS.git) using the **v0.3.29** tag. Save the file to a path accessible to the compiler, such as `/path/to/OpenBLAS-0.3.29`.
+5. Faiss depends on the math library. Download the open-source OpenBLAS source code from the [GitHub repository](https://github.com/OpenMathLib/OpenBLAS.git) using the **v0.3.29** tag. Save the file to a path accessible to the compiler, such as `/path/to/OpenBLAS-0.3.29`.
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
     ```
 
-5. <a id="li880635723510"></a>Compile the source code to obtain the `libopenblas.so` file.
+6. <a id="li880635723510"></a>Compile the source code to obtain the `libopenblas.so` file.
 
     ```bash
     cd /path/to/OpenBLAS-0.3.29/OpenBLAS
@@ -259,7 +293,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
     >You can run the `make install PREFIX=/path/to/openblas/install` command to specify the installation path `/path/to/openblas/install`. The default installation path is `/opt/OpenBLAS`.
 
-6. Install the patch file 0001-faiss\_1.14.3-optimize-rabitq.patch.
+7. Install the patch file `0001-faiss_1.14.3-optimize-rabitq.patch`.
 
     ```bash
     cd /path/to/faiss
@@ -268,7 +302,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
 
     The full directory structure of Faiss after applying the patches is as follows.
 
-    ```text
+    ```output
     faiss/
     ├─ benchs/                                     // Benchmark tests
     ├─ c_api/                                      // C language API wrapper
@@ -292,8 +326,8 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     │   ├─ IndexIVFFastScan.cpp                    // IVFPQFastScan (CPU) implementation
     │   ├─ IndexHNSW.h                             // HNSW index interface
     │   ├─ IndexHNSW.cpp                           // HNSW index implementation
-    │   ├─ IndexRefine.h                           // baseline + refinement combined index interface
-    │   ├─ IndexRefine.cpp                         // Benchmark + refine combined index implementation
+    │   ├─ IndexRefine.h                           // Baseline + refinement combined index interface
+    │   ├─ IndexRefine.cpp                         // Baseline + refinement combined index implementation
     │   ├─ IndexRaBitQ.h                           // RaBitQ binary quantization index interface
     │   ├─ IndexRaBitQ.cpp                         // RaBitQ binary quantization index implementation
     │   ├─ IndexRaBitQFastScan.h                   // RaBitQ FastScan interface
@@ -317,7 +351,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     │   │   └─ InvertedLists.cpp                   // Inverted list implementation
     │   ├─ utils/
     │   │   └─ distances_simd.cpp                  // SIMD L2/IP/L1/Linf implementation
-    │   ├─ sra_krl/
+    │   ├─ sra_krl/                                // KRL retrieval operator (newly added)
     │   │   ├─ include/
     │   │   │   ├─ krl.h                           // Unified external API declaration
     │   │   │   ├─ krl_heap.h                      // Heap structure interface
@@ -352,7 +386,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     └─ README.md
     ```
 
-7. Compile the Faiss code to obtain `libfaiss.so`. Note: You need to enable the Kunpeng optimization macro to improve performance.
+8. Compile the Faiss code to obtain `libfaiss.so`. Note: You need to enable the Kunpeng optimization macro to improve performance.
 
     ```bash
     cd /path/to/faiss
@@ -369,12 +403,11 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     make -C build install
     ```
 
-    >
-    >![icon-note](./public_sys-resources/icon-note.gif)**NOTE**
+    >![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
     >
     >- During compilation, you can add the compilation option **-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install** to specify the installation path `/path/to/faiss/install`. The default installation path is `/usr/local`.
     >- The compilation option **-DMKL_LIBRARIES** must be set to the installation path of OpenBLAS in step [5](#li880635723510).
-    >- If the message "CMake 3.23.1 or higher is required.  You are running version 3.22.0" is displayed, modify line 21 in the `/path/to/faiss/CMakeLists.txt` file by changing `cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)` to `cmake_minimum_required(VERSION 3.22.0 FATAL_ERROR)`.
+    >- If the message "CMake 3.23.1 or higher is required. You are running version 3.22.0" is displayed, modify line 21 in the `/path/to/faiss/CMakeLists.txt` file by changing `cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)` to `cmake_minimum_required(VERSION 3.22.0 FATAL_ERROR)`.
 
 ## Compatibility Verification
 
@@ -424,7 +457,6 @@ This section describes how to verify the compatibility of the open-source Faiss 
     ```
 
 2. Compile and install Faiss. Note that for open-source Faiss compatibility verification, you do not need to enable macros related to Kunpeng optimization.
-
 3. Build the executable file. Enter the Faiss installation path and the paths to other required dependencies as prompted by the command line.
 
     ```bash
@@ -440,7 +472,6 @@ This section describes how to verify the compatibility of the open-source Faiss 
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that <code>save_or_load</code> in the <code>hnsw_sift-128-euclidean.config</code> file is set to <code>save</code>. In subsequent runs, you can change it to <code>load</code> to use the built graph index or retriever for querying.
-
 5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
 
     ```bash
@@ -454,5 +485,5 @@ This section describes how to verify the compatibility of the open-source Faiss 
 ## Change History
 
 | Version | Date | Description |
-| :--- | :--- | :--- |
+| --- | --- | --- |
 | 01 | 2026-09-30 | This is the first official release. |

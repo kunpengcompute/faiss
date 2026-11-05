@@ -230,11 +230,13 @@
     make -C build install
     ```
 
-   - 若您选择使用全量优化补丁0001-faiss\_1.8.0-optimize-neq.patch，可选择开启以下宏获得性能提升（二者不可同时开启）。
+   - 若您选择使用全量优化补丁0001-faiss\_1.8.0-optimize-neq.patch，可选择开启以下宏获得性能提升（其中-DKRL=ON与-DOPTI\_IVFPQ=ON不可同时开启）。
      - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，性能最优，保证精度，但不保证Top-K的值或顺序与开源完全一致；
      - **-DOPTI\_IVFPQ=ON**：针对IVFPQ的独特优化，在IVFPQ索引上性能优于KRL宏，保证Top-K的值与顺序与开源保持完全一致。
+     - **-DUSE\_SVE2=ON**：开启该宏后，HNSW的FP16距离计算、IVFPQFS和PQFS的4bit查表实现将启用SVE2的优化路径，该宏需要在开启-DKRL=ON的前提下开启。
    - 若您选择使用等价优化补丁0002-faiss\_1.8.0-optimize-eqv.patch，可选择开启以下宏获得性能提升。
      - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，保证Top-K的值与顺序与开源保持完全一致。
+     - **-DUSE\_SVE2=ON**：开启该宏后，HNSW的FP16距离计算、IVFPQFS和PQFS的4bit查表实现将启用SVE2的优化路径，该宏需要在开启-DKRL=ON的前提下开启。
     >
     >![表示说明的图片](./public_sys-resources/icon-note.gif) **说明：**
     >
@@ -472,9 +474,10 @@
     >- IVFFLAT算法：**make ivfflat\_test**
 
 4. 若是第一次执行，确保hnsw\_sift-128-euclidean.config文件中的“save\_or\_load”为“save”；后续执行时可改为“load”，使用构建好的图索引或检索器查询。
-5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
+5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量LD_LIBRARY_PATH后运行测试。以下命令以OpenBLAS与Faiss的默认安装路径为例，若安装时指定了其他路径，请替换为实际的库文件路径。
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
     ```
 

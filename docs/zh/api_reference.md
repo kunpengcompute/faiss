@@ -7,6 +7,7 @@
 - 扩展接口的命名：在原生接口名称的基础上添加`_ex`后缀。
 - 扩展接口的调用：能够根据传入参数的数据类型，自动调用对应的功能实现。
 - 扩展接口支持的数据类型：目前仅支持FP16数据类型，后续如果有其他数据类型的实现需求，均可通过扩展接口进行调用。
+- 参数是否必填：各接口参数说明中注明“可选”及默认值的参数为可选参数，其余参数均为必填参数。
 
 以IndexHNSW.h中的add功能为例。
 
@@ -123,7 +124,7 @@ IndexHNSW新增的构造函数。
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p167876547339"><a name="p167876547339"></a><a name="p167876547339"></a>int</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p678775443311"><a name="p678775443311"></a><a name="p678775443311"></a>每个节点的最大连接数</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p678775443311"><a name="p678775443311"></a><a name="p678775443311"></a>每个节点的最大连接数。在IndexHNSW(storage, ntype, M)中为可选参数，默认值为32</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p19787654133320"><a name="p19787654133320"></a><a name="p19787654133320"></a>大于1的正整数</p>
 </td>
@@ -134,7 +135,7 @@ IndexHNSW新增的构造函数。
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p9787054203313"><a name="p9787054203313"></a><a name="p9787054203313"></a>向量的数据类型</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p187871954183315"><a name="p187871954183315"></a><a name="p187871954183315"></a>NumericType::Float16和NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p187871954183315"><a name="p187871954183315"></a><a name="p187871954183315"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row126351746153315"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p8787165419332"><a name="p8787165419332"></a><a name="p8787165419332"></a>metric</p>
@@ -175,7 +176,7 @@ faiss::IndexHNSW index_with_storage(storage, faiss::NumericType::Float16);
 
 **接口定义<a name="section55611644173112"></a>**
 
-IndexHNSWFlat\(int d, int M, NumericType ntype = NumericType::Float32, MetricType metric = METRIC\_L2\);
+IndexHNSWFlat\(int d, int M, NumericType ntype = NumericType::Float16, MetricType metric = METRIC\_L2\);
 
 **接口用途<a name="section14731398326"></a>**
 
@@ -216,16 +217,16 @@ IndexHNSWFlat新增的构造函数。
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p1851255163512"><a name="p1851255163512"></a><a name="p1851255163512"></a>NumericType</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p2512053351"><a name="p2512053351"></a><a name="p2512053351"></a>向量的数据类型</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p2512053351"><a name="p2512053351"></a><a name="p2512053351"></a>向量的数据类型。接口定义中默认值为NumericType::Float16，但由于与开源构造函数IndexHNSWFlat(int d, int M, MetricType metric = METRIC_L2)存在重载二义性，调用时须显式传入该参数</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p10512458359"><a name="p10512458359"></a><a name="p10512458359"></a>NumericType::Float16和NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p10512458359"><a name="p10512458359"></a><a name="p10512458359"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row126351746153315"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p1451211510358"><a name="p1451211510358"></a><a name="p1451211510358"></a>metric</p>
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p13512252352"><a name="p13512252352"></a><a name="p13512252352"></a>MetricType</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p1551245163519"><a name="p1551245163519"></a><a name="p1551245163519"></a>距离计算类型</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p1551245163519"><a name="p1551245163519"></a><a name="p1551245163519"></a>距离计算类型。可选，默认值为METRIC_L2</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p75120543512"><a name="p75120543512"></a><a name="p75120543512"></a>METRIC_L2和METRIC_INNER_PRODUCT</p>
 </td>
@@ -237,6 +238,8 @@ IndexHNSWFlat新增的构造函数。
 
 ```cpp
 // 创建一个FP16类型的IndexHNSWFlat索引，维度为128，每个节点最大连接数为32，使用内积距离
+int d = 128;
+int M = 32;
 faiss::IndexHNSWFlat index_fp16(d, M, faiss::NumericType::Float16, faiss::METRIC_INNER_PRODUCT);
 ```
 
@@ -287,7 +290,7 @@ void train\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\);
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p7449143763519"><a name="p7449143763519"></a><a name="p7449143763519"></a>向量的数据类型</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p17449163753513"><a name="p17449163753513"></a><a name="p17449163753513"></a>NumericType::Float16和NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p17449163753513"><a name="p17449163753513"></a><a name="p17449163753513"></a>NumericType::Float16</p>
 </td>
 </tr>
 </tbody>
@@ -357,7 +360,7 @@ void add\_ex\(idx\_t n, const void\* x, NumericType numeric\_type\);
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p1379812514363"><a name="p1379812514363"></a><a name="p1379812514363"></a>向量的数据类型</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p8798165133619"><a name="p8798165133619"></a><a name="p8798165133619"></a>NumericType::Float16和NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p8798165133619"><a name="p8798165133619"></a><a name="p8798165133619"></a>NumericType::Float16</p>
 </td>
 </tr>
 </tbody>
@@ -454,14 +457,14 @@ void search\_ex\(idx\_t n, const void\* x, idx\_t k, float\* distances, idx\_t\*
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p123911435360"><a name="p123911435360"></a><a name="p123911435360"></a>向量的数据类型</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p20239164317362"><a name="p20239164317362"></a><a name="p20239164317362"></a>NumericType::Float16和NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p20239164317362"><a name="p20239164317362"></a><a name="p20239164317362"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row18824738123612"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p1023912434365"><a name="p1023912434365"></a><a name="p1023912434365"></a>params</p>
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p182392043163620"><a name="p182392043163620"></a><a name="p182392043163620"></a>const SearchParameters*</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p72392043163619"><a name="p72392043163619"></a><a name="p72392043163619"></a>搜索参数</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p72392043163619"><a name="p72392043163619"></a><a name="p72392043163619"></a>搜索参数。可选，默认值为nullptr，表示使用索引自身的搜索参数</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p10239124312360"><a name="p10239124312360"></a><a name="p10239124312360"></a>无</p>
 </td>
@@ -566,14 +569,14 @@ void range\_search\_ex\(idx\_t n, const void\* x, float radius, RangeSearchResul
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p13874921193713"><a name="p13874921193713"></a><a name="p13874921193713"></a>向量的数据类型</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p19874421113720"><a name="p19874421113720"></a><a name="p19874421113720"></a>NumericType::Float16和NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p19874421113720"><a name="p19874421113720"></a><a name="p19874421113720"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row6551517133719"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p16874421143713"><a name="p16874421143713"></a><a name="p16874421143713"></a>params</p>
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p1987442143715"><a name="p1987442143715"></a><a name="p1987442143715"></a>const SearchParameters*</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p58746212374"><a name="p58746212374"></a><a name="p58746212374"></a>搜索参数</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p58746212374"><a name="p58746212374"></a><a name="p58746212374"></a>搜索参数。可选，默认值为nullptr，表示使用索引自身的搜索参数</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p787542133712"><a name="p787542133712"></a><a name="p787542133712"></a>无</p>
 </td>
@@ -663,7 +666,7 @@ void reconstruct\_ex\(idx\_t key, void\* recons, NumericType numeric\_type\);
 </td>
 <td class="cellrowborder" valign="top" width="28.34%" headers="mcps1.1.5.1.3 "><p id="p143331548163712"><a name="p143331548163712"></a><a name="p143331548163712"></a>向量的数据类型</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.769999999999996%" headers="mcps1.1.5.1.4 "><p id="p153331348193717"><a name="p153331348193717"></a><a name="p153331348193717"></a>NumericType::Float16和NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.769999999999996%" headers="mcps1.1.5.1.4 "><p id="p153331348193717"><a name="p153331348193717"></a><a name="p153331348193717"></a>NumericType::Float16</p>
 </td>
 </tr>
 </tbody>
@@ -749,7 +752,7 @@ HNSW索引在第0层执行批量近似最近邻搜索。
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p11220848153813"><a name="p11220848153813"></a><a name="p11220848153813"></a>const storage_idx_t*</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p822034893817"><a name="p822034893817"></a><a name="p822034893817"></a>预计算的近邻索引数组，提供搜索的初始入口点</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p822034893817"><a name="p822034893817"></a><a name="p822034893817"></a>预计算的入口点索引数组，尺寸为 n * nprobe，每个查询向量对应nprobe个入口点。索引值小于0时，忽略该查询向量的后续入口点</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p132201548113813"><a name="p132201548113813"></a><a name="p132201548113813"></a>无</p>
 </td>
@@ -758,7 +761,7 @@ HNSW索引在第0层执行批量近似最近邻搜索。
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p1622064873815"><a name="p1622064873815"></a><a name="p1622064873815"></a>const float*</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p10220194853812"><a name="p10220194853812"></a><a name="p10220194853812"></a>预计算的近邻距离数组，与nearest对应，减少重复计算</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p10220194853812"><a name="p10220194853812"></a><a name="p10220194853812"></a>预计算的入口点距离数组，尺寸为 n * nprobe，与nearest一一对应</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p192206482388"><a name="p192206482388"></a><a name="p192206482388"></a>无</p>
 </td>
@@ -787,14 +790,14 @@ HNSW索引在第0层执行批量近似最近邻搜索。
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p102211948123815"><a name="p102211948123815"></a><a name="p102211948123815"></a>向量的数据类型</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p122211448193813"><a name="p122211448193813"></a><a name="p122211448193813"></a>NumericType::Float16和NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p122211448193813"><a name="p122211448193813"></a><a name="p122211448193813"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row840793719388"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p322184812387"><a name="p322184812387"></a><a name="p322184812387"></a>nprobe</p>
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p192218481385"><a name="p192218481385"></a><a name="p192218481385"></a>int</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p822118484386"><a name="p822118484386"></a><a name="p822118484386"></a>控制搜索广度，指定每层探索的候选节点数量</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p822118484386"><a name="p822118484386"></a><a name="p822118484386"></a>每个查询向量使用的入口点数量。可选，默认值为1</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p82215484386"><a name="p82215484386"></a><a name="p82215484386"></a>正整数</p>
 </td>
@@ -803,7 +806,7 @@ HNSW索引在第0层执行批量近似最近邻搜索。
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p152211248123818"><a name="p152211248123818"></a><a name="p152211248123818"></a>int</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p12221194883815"><a name="p12221194883815"></a><a name="p12221194883815"></a>搜索策略标识</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p12221194883815"><a name="p12221194883815"></a><a name="p12221194883815"></a>搜索策略标识。可选，默认值为1。1：从每个入口点分别执行一次搜索；2：将所有入口点同时加入候选队列后执行一次搜索</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p1622115480387"><a name="p1622115480387"></a><a name="p1622115480387"></a>1和2</p>
 </td>
@@ -827,13 +830,18 @@ std::vector<faiss::float16_t> query_data(n_query * d);
 // 设置返回结果数量
 int k = 4;
 
-// 准备预计算的近邻信息 (这里简化处理，实际应用中需要预先计算)
-std::vector<faiss::storage_idx_t> nearest(n_query);
-std::vector<float> nearest_d(n_query);
-// 填充预计算的近邻索引和距离...
+// 设置每个查询向量的入口点数量
+int nprobe = 2;
+
+// 准备预计算的入口点信息，尺寸为 n_query * nprobe (这里简化处理，实际应用中需要预先计算)
+std::vector<faiss::storage_idx_t> nearest(n_query * nprobe);
+std::vector<float> nearest_d(n_query * nprobe);
+// 填充预计算的入口点索引和距离...
 for (int i = 0; i < n_query; i++) {
-    nearest[i] = 0; // 假设每个查询的初始近邻是索引0
-    nearest_d[i] = 0.0f;
+    for (int j = 0; j < nprobe; j++) {
+        nearest[i * nprobe + j] = j; // 假设每个查询的入口点是索引0和1
+        nearest_d[i * nprobe + j] = 0.0f;
+    }
 }
 
 // 准备输出结果的内存
@@ -841,7 +849,6 @@ std::vector<float> distances(n_query * k);
 std::vector<faiss::idx_t> labels(n_query * k);
 
 // 调用search_level_0_ex接口在第0层执行搜索
-int nprobe = 2;
 int search_type = 1;
 index.search_level_0_ex(n_query, query_data.data(), k, nearest.data(), nearest_d.data(), 
                        distances.data(), labels.data(), faiss::NumericType::Float16, 

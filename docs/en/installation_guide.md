@@ -230,11 +230,13 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     make -C build install
     ```
 
-   - If you choose to use the non-equivalence optimization patch `0001-faiss_1.8.0-optimize-neq.patch`, you can enable either of the following macros to improve performance (the two macros are mutually exclusive):
+   - If you choose to use the non-equivalence optimization patch `0001-faiss_1.8.0-optimize-neq.patch`, you can enable the following macros to improve performance (`-DKRL=ON` and `-DOPTI_IVFPQ=ON` are mutually exclusive):
      - `-DKRL=ON`: non-equivalence optimization for HNSW, IVFPQ, IVFPQFS, PQFS, and IVFFLAT. It delivers optimal performance and ensures precision, but does not guarantee that the values or sequence of top K results are completely consistent with the open-source version.
      - `-DOPTI_IVFPQ=ON`: specific optimization for IVFPQ. Its performance on IVFPQ indexes outperforms that of the KRL macro, and it ensures that the values and sequence of top K results are completely consistent with the open-source version.
-   - If you choose to use the equivalence optimization patch `0002-faiss_1.8.0-optimize-eqv.patch`, you can enable the following macro to improve performance:
+     - `-DUSE_SVE2=ON`: After this macro is enabled, the SVE2 optimization path is used for FP16 distance computation of HNSW and the 4-bit table lookup of IVFPQFS and PQFS. This macro can be enabled only when `-DKRL=ON` is enabled.
+   - If you choose to use the equivalence optimization patch `0002-faiss_1.8.0-optimize-eqv.patch`, you can enable the following macros to improve performance:
      - `-DKRL=ON`: non-equivalence optimization for HNSW, IVFPQ, IVFPQFS, PQFS, and IVFFLAT. It ensures that the values and sequence of top K results are completely consistent with the open-source version.
+     - `-DUSE_SVE2=ON`: After this macro is enabled, the SVE2 optimization path is used for FP16 distance computation of HNSW and the 4-bit table lookup of IVFPQFS and PQFS. This macro can be enabled only when `-DKRL=ON` is enabled.
 
     >![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
     >
@@ -472,9 +474,10 @@ This section describes how to verify the compatibility of the open-source Faiss 
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that <code>save_or_load</code> in the <code>hnsw_sift-128-euclidean.config</code> file is set to <code>save</code>. In subsequent runs, you can change it to <code>load</code> to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
     ```
 

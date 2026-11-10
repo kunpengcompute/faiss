@@ -64,11 +64,12 @@ int main() {
 
 预期结果如下。
 
-<img src="figures/faiss-quick_start.jpg" alt="faiss-quick_start" width="600"/>
+<img src="figures/faiss-quick_start.jpg" alt="IndexFlatL2快速入门示例的运行输出截图，显示索引中向量总数为10000，以及5个查询各自最近的4个邻居索引与对应L2距离" width="600"/>
 
 ## 进阶扩展
 
 近似搜索索引（IndexIVFFlat）：适合大数据集，核心是先聚类再搜索。
+nlist为训练时划分的聚类簇数（int，示例100，取值需小于训练向量数，越大召回率越高但训练与内存开销越大）；nprobe为查询时探测的簇数（int，示例10，取值范围1~nlist，越大结果越接近精确搜索但查询耗时越长）。
 
 ```cpp
 #include <faiss/IndexFlat.h>
@@ -121,7 +122,7 @@ int main() {
 
 预期结果如下。
 
-<img src="figures/faiss-advanced.jpg" alt="faiss-advanced" width="600"/>
+<img src="figures/faiss-advanced.jpg" alt="IndexIVFFlat进阶示例的运行输出截图，显示同一批查询向量经近似搜索返回的最近邻索引与L2距离列表" width="600"/>
 
 ## 修订记录
 

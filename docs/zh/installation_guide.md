@@ -1,5 +1,7 @@
 # 安装指南
 
+本文档介绍Faiss在鲲鹏平台的编译安装，涵盖v1.8.0与v1.14.3两个版本的鲲鹏优化补丁安装与编译，以及开源Faiss兼容性验证，适用于在鲲鹏平台部署Faiss的用户。
+
 ## 已验证环境
 
 为保证您可以顺利安全地使用Faiss，请确保所使用的环境信息在已验证环境范围内。
@@ -103,7 +105,7 @@
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-5. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29”。
+5. Faiss依赖数学库，从[GitHub](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29”。
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
@@ -228,17 +230,19 @@
     make -C build install
     ```
 
-   - 若您选择使用全量优化补丁0001-faiss\_1.8.0-optimize-neq.patch，可选择开启以下宏获得性能提升（二者不可同时开启）。
+   - 若您选择使用全量优化补丁0001-faiss\_1.8.0-optimize-neq.patch，可选择开启以下宏获得性能提升（其中-DKRL=ON与-DOPTI\_IVFPQ=ON不可同时开启）。
      - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，性能最优，保证精度，但不保证Top-K的值或顺序与开源完全一致；
      - **-DOPTI\_IVFPQ=ON**：针对IVFPQ的独特优化，在IVFPQ索引上性能优于KRL宏，保证Top-K的值与顺序与开源保持完全一致。
+     - **-DUSE\_SVE2=ON**：开启该宏后，HNSW的FP16距离计算、IVFPQFS和PQFS的4bit查表实现将启用SVE2的优化路径，该宏需要在开启-DKRL=ON的前提下开启。
    - 若您选择使用等价优化补丁0002-faiss\_1.8.0-optimize-eqv.patch，可选择开启以下宏获得性能提升。
      - **-DKRL=ON**：针对HNSW、IVFPQ、IVFPQFS、PQFS、IVFFLAT的全量优化，保证Top-K的值与顺序与开源保持完全一致。
+     - **-DUSE\_SVE2=ON**：开启该宏后，HNSW的FP16距离计算、IVFPQFS和PQFS的4bit查表实现将启用SVE2的优化路径，该宏需要在开启-DKRL=ON的前提下开启。
     >
-    >![表示说明的图片](./public_sys-resources/icon-note.gif)**说明：**
+    >![表示说明的图片](./public_sys-resources/icon-note.gif) **说明：**
     >
-    >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install“以指定安装路径，默认安装路径为“/usr/local“。
-    >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
-    >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt“文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)“修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)“。
+    >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install”以指定安装路径，默认安装路径为“/usr/local”。
+    >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤5中OpenBLAS的安装路径。
+    >- 若出现“CMake 3.23.1 or higher is required.  You are running version 3.22.0”相关报错，可修改“/path/to/faiss/CMakeLists.txt”文件第21行内容，将“cmake\_minimum\_required\(VERSION 3.23.1 FATAL\_ERROR\)”修改为“cmake\_minimum\_required\(VERSION 3.22.0 FATAL\_ERROR\)”。
 
 ### v1.14.3
 
@@ -258,7 +262,7 @@
 
     >![表示说明的图片](public_sys-resources/icon-note.gif) **说明：**
     >鲲鹏优化补丁文件描述如下。
-    >- 0001-faiss\_1.14.3-optimize-rabitq.patch：基于v1.14.3版本的RabitQ索引优化补丁，保证精度，但不保证Top-K的值或顺序与开源完全一致。
+    >0001-faiss\_1.14.3-optimize-rabitq.patch：基于v1.14.3版本的RaBitQ索引优化补丁，保证精度，但不保证Top-K的值或顺序与开源完全一致。
 
 3. 安装Make、CMake、GCC。
 
@@ -274,7 +278,7 @@
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-5. Faiss依赖数学库，从[GitHub仓](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
+5. Faiss依赖数学库，从[GitHub](https://github.com/OpenMathLib/OpenBLAS.git)下载开源OpenBLAS源代码，标签为**v0.3.29**。保存在编译机器可访问的路径中，假设位于“/path/to/OpenBLAS-0.3.29“。
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
@@ -401,7 +405,7 @@
     make -C build install
     ```
     >
-    >![表示说明的图片](./public_sys-resources/icon-note.gif)**说明：**
+    >![表示说明的图片](./public_sys-resources/icon-note.gif) **说明：**
     >
     >- 编译时可通过添加编译选项 **-DCMAKE\_INSTALL\_PREFIX=/path/to/faiss/install**设置“/path/to/faiss/install”以指定安装路径，默认安装路径为“/usr/local”。
     >- 编译选项 **-DMKL\_LIBRARIES**需指定为步骤[5](#li880635723510)中OpenBLAS的安装路径。
@@ -470,15 +474,16 @@
     >- IVFFLAT算法：**make ivfflat\_test**
 
 4. 若是第一次执行，确保hnsw\_sift-128-euclidean.config文件中的“save\_or\_load”为“save”；后续执行时可改为“load”，使用构建好的图索引或检索器查询。
-5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量。
+5. 运行可执行文件。将OpenBLAS与Faiss动态库路径添加至环境变量LD_LIBRARY_PATH后运行测试。以下命令以OpenBLAS与Faiss的默认安装路径为例，若安装时指定了其他路径，请替换为实际的库文件路径。
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./hnsw_test hnsw sift-128-euclidean
     ```
 
-运行结果如下所示。
+   运行结果如下所示。
 
-<img src="figures/faiss-installation_guide.jpg" alt="faiss-installation_guide-运行结果" width="800"/>
+   <img src="figures/faiss-installation_guide.jpg" alt="faiss-installation_guide-运行结果" width="800"/>
 
 ## 修订记录
 

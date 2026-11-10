@@ -1,5 +1,7 @@
 # 特性介绍
 
+本文档介绍Faiss主要算法的逻辑结构与模块作用，涵盖索引层模块功能以及v1.8.0、v1.14.3版本的检索性能优化点，适用于需要了解Faiss特性与优化效果的用户。
+
 ## 架构介绍
 
 本节介绍Faiss主要算法的逻辑结构与所包含的模块含义及作用。
@@ -21,86 +23,36 @@ Faiss逻辑架构与功能模块如下所示。
 <img src="figures/Faiss逻辑结构图.png" alt="Faiss逻辑结构图" width="600"/>
 
 <a name="table1440914563559"></a>
-<table><thead align="left"><tr id="row10409145645519"><th class="cellrowborder" valign="top" width="50%" id="mcps1.1.3.1.1"><p id="p1949441225612"><a name="p1949441225612"></a><a name="p1949441225612"></a>模块名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="50%" id="mcps1.1.3.1.2"><p id="p249461210569"><a name="p249461210569"></a><a name="p249461210569"></a>功能描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row940925645518"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p194946128569"><a name="p194946128569"></a><a name="p194946128569"></a>C++ Interface</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p19494131211564"><a name="p19494131211564"></a><a name="p19494131211564"></a>Faiss算法的外部接口，Python wrapper通过此层调用底层实现</p>
-</td>
-</tr>
-<tr id="row04102561556"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p13494612185612"><a name="p13494612185612"></a><a name="p13494612185612"></a>IndexHNSW</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p1494141275615"><a name="p1494141275615"></a><a name="p1494141275615"></a>基于多层小世界图的索引实现，查询时从顶层快速定位逐层下探，兼顾搜索效率与召回率</p>
-</td>
-</tr>
-<tr id="row194101156165515"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p1549421213561"><a name="p1549421213561"></a><a name="p1549421213561"></a>IndexIVFFlat</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p184945129564"><a name="p184945129564"></a><a name="p184945129564"></a>倒排文件索引+Flat存储，先通过IVF聚类缩小候选范围，再对候选向量做精确距离计算</p>
-</td>
-</tr>
-<tr id="row12410185620555"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p13494171225615"><a name="p13494171225615"></a><a name="p13494171225615"></a>IndexIVFPQ</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p7494171275610"><a name="p7494171275610"></a><a name="p7494171275610"></a>倒排文件索引+乘积量化，对聚类后的残差向量进行PQ压缩，适合超大规模数据集</p>
-</td>
-</tr>
-<tr id="row1410115614559"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p1494181210560"><a name="p1494181210560"></a><a name="p1494181210560"></a>IndexPQFastScan / IndexIVFPQFastScan</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p849418121569"><a name="p849418121569"></a><a name="p849418121569"></a>PQ索引的SIMD加速版本，使用低比特 PQ+查找表（LUT）实现快速距离计算</p>
-</td>
-</tr>
-<tr id="row2410105685518"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p12494171225617"><a name="p12494171225617"></a><a name="p12494171225617"></a>IndexRefineFlat / PreTransformIndex</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p0495112175614"><a name="p0495112175614"></a><a name="p0495112175614"></a>两阶段检索：第一阶段用粗糙索引快速筛选候选集，第二阶段用Flat精确距离重排序；PreTransform支持PCA/OPQ预处理变换</p>
-</td>
-</tr>
-<tr id="row19410125616551"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p15495412135611"><a name="p15495412135611"></a><a name="p15495412135611"></a>HNSW graph (multi-layer)</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p24951912185616"><a name="p24951912185616"></a><a name="p24951912185616"></a>HNSW多层图结构的具体实现，上层稀疏用于快速跳跃，下层稠密用于精确搜索</p>
-</td>
-</tr>
-<tr id="row1790516495615"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p24951012125614"><a name="p24951012125614"></a><a name="p24951012125614"></a>IVF (nlist/nprobe, K-Means)</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p4495181214561"><a name="p4495181214561"></a><a name="p4495181214561"></a>倒排文件基础算法，通过K-Means将向量空间划分为nlist个cell，查询时搜索 nprobe个最近cell</p>
-</td>
-</tr>
-<tr id="row859311016564"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p1749512126567"><a name="p1749512126567"></a><a name="p1749512126567"></a>ProductQuantizer / OPQ / SQ</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p134953124568"><a name="p134953124568"></a><a name="p134953124568"></a>向量压缩技术：PQ将向量分段量化，OPQ是旋转优化的PQ，SQ是标量量化</p>
-</td>
-</tr>
-<tr id="row1321914912563"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p849581295616"><a name="p849581295616"></a><a name="p849581295616"></a>Measures (L2 / IP)</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p19495512135614"><a name="p19495512135614"></a><a name="p19495512135614"></a>提供L2欧氏距离和IP内积两种距离度量的具体实现</p>
-</td>
-</tr>
-<tr id="row17208117155612"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p2495141285611"><a name="p2495141285611"></a><a name="p2495141285611"></a>List Scanner (Flat / ADC / FastScan)</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p16495412105614"><a name="p16495412105614"></a><a name="p16495412105614"></a>列表扫描器：Flat做精确计算，ADC用于PQ非对称距离计算，FastScan用SIMD指令加速</p>
-</td>
-</tr>
-<tr id="row864515315561"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.1 "><p id="p2495191220565"><a name="p2495191220565"></a><a name="p2495191220565"></a>Transforms (PCA/OPQ/normalize)</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.1.3.1.2 "><p id="p1149541213566"><a name="p1149541213566"></a><a name="p1149541213566"></a>向量预处理变换，包括PCA降维、OPQ旋转优化、向量归一化等</p>
-</td>
-</tr>
-</tbody>
-</table>
+
+| 所属层 | 模块名称 | 功能描述 |
+| ---- | ---- | ---- |
+| 接口层 | C++ Interface | Faiss算法的外部接口，Python wrapper通过此层调用底层实现 |
+| 索引工厂层（算法抽象） | IndexHNSW | 基于多层小世界图的索引实现，查询时从顶层快速定位逐层下探，兼顾搜索效率与召回率 |
+| 索引工厂层（算法抽象） | IndexIVFFlat | 倒排文件索引+Flat存储，先通过IVF聚类缩小候选范围，再对候选向量做精确距离计算 |
+| 索引工厂层（算法抽象） | IndexIVFPQ | 倒排文件索引+乘积量化，对聚类后的残差向量进行PQ压缩，适合超大规模数据集 |
+| 索引工厂层（算法抽象） | IndexPQFastScan / IndexIVFPQFastScan | PQ索引的SIMD加速版本，使用低比特 PQ+查找表（LUT）实现快速距离计算 |
+| 索引工厂层（算法抽象） | IndexRefineFlat / PreTransformIndex | 两阶段检索：第一阶段用粗糙索引快速筛选候选集，第二阶段用Flat精确距离重排序；PreTransform支持PCA/OPQ预处理变换 |
+| 索引工厂层（基础算法） | HNSW graph (multi-layer) | HNSW多层图结构的具体实现，上层稀疏用于快速跳跃，下层稠密用于精确搜索 |
+| 索引工厂层（基础算法） | IVF (nlist/nprobe, K-Means) | 倒排文件基础算法，通过K-Means将向量空间划分为nlist个cell，查询时搜索 nprobe个最近cell |
+| 索引工厂层（基础算法） | ProductQuantizer / OPQ / SQ | 向量压缩技术：PQ将向量分段量化，OPQ是旋转优化的PQ，SQ是标量量化 |
+| 索引工厂层（基础算法） | Measures (L2 / IP) | 提供L2欧氏距离和IP内积两种距离度量的具体实现 |
+| 索引工厂层（基础算法） | List Scanner (Flat / ADC / FastScan) | 列表扫描器：Flat做精确计算，ADC用于PQ非对称距离计算，FastScan用SIMD指令加速 |
+| 索引工厂层（基础算法） | Transforms (PCA/OPQ/normalize) | 向量预处理变换，包括PCA降维、OPQ旋转优化、向量归一化等 |
+| 底层依赖 | intrinsics / ARM affinity | SIMD指令封装及鲲鹏（ARM）亲和优化实现，为距离计算等热点算子提供硬件加速 |
+| 底层依赖 | OS Wrapper | 操作系统相关能力的封装，如内存分配、线程与计时等 |
+| 底层依赖 | BLAS/LAPACK (training) | 基础线性代数库（如OpenBLAS），用于训练阶段的矩阵运算及批量距离计算 |
 
 ## 优化说明
 
-### v1.8.0
+### Faiss v1.8.0
 
 #### 全量优化
 
 | 优化点 | 说明|
 |--------|-----------|
-| 查表累和优化 | 查表累和算子是倒排索引与全量检索的热点算子，是计算瓶颈。距离扩展累加使用额外寄存器使指令展开度下降，同时引入额外计算。对内存数据进行重新排布，充分利用256位宽寄存器，减少临时寄存器开销，提升指令展开度，消除额外计算（数位扩展）。通过减少16个寄存器使用,使流水线利用率提升，降低计算时延。|
+| 查表累和优化 | 查表累和算子是倒排索引与全量检索的热点算子，是计算瓶颈。距离扩展累加使用额外寄存器使指令展开度下降，同时引入额外计算。对内存数据进行重新排布，充分利用256位宽寄存器，减少临时寄存器开销，提升指令展开度，消除额外计算（数位扩展）。通过减少16个寄存器使用，使流水线利用率提升，降低计算时延。|
 | 向量过滤压缩 | 过滤压缩在计算bitmap时中间步骤多，是计算瓶颈。中间数据多为无效数据，平均寄存器位宽利用率不足50%。利用SVE谓词与寄存器256位宽特性，省去中间步骤。|
-| 距离计算优化 | 在距离计算中，对查询向量的访问会重复多次，访存时延成为系统瓶颈。同时计算1个查询与多个底库向量间距离，减少查询向量的读取时延。|
+| 距离计算优化 | 在距离计算中，对查询向量的访问会重复多次，访存时延成为系统瓶颈。因此，优化实现改为一次批量计算1个查询向量与多个底库向量间的距离，从而减少查询向量的重复读取时延。|
 | 渐进式重排 | PQ是一种向量压缩的手段，可以减少内存的使用。但是4bit量化会导致精度有所下降，在PQ粗筛后需进行重排以找回损失的精度。重排时先用SQ8进行快速距离计算，然后使用FP32对最近的Top-N个距离进行精确计算，以提高计算效率。|
 | 内存数据重排 | 距离计算中，对底库向量的访存不连续。Cache Miss导致访存成为系统瓶颈。通过调整数据排布使访存流式进行，配合预取降低Cache Miss，降低访存时延。|
 
@@ -117,7 +69,7 @@ Faiss逻辑架构与功能模块如下所示。
 |--------|-----------|
 | 支持HNSW FP16接口 | FP16数据类型将每个向量分量的存储空间从FP32的4字节减少到2字节。这使得在构建HNSW索引时，所需的内存空间大幅降低，从而允许在有限的硬件资源下处理更大规模的向量数据集。同时，针对鲲鹏ARM架构，对FP16的距离计算算法进行优化，提升了图检索过程中的节点距离比较效率，减少内存占用。|
 
-### v1.14.3
+### Faiss v1.14.3
 
 #### IVFRaBitQFS优化
 

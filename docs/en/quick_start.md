@@ -1,5 +1,7 @@
 # Quick Start
 
+<!-- md-trans-meta sourceCommit=2645281edf8d8fc426bd4c872985b2c4cb3737ef translatedAt=2026-11-02T08:57:24.240Z pushedAt=2026-11-03T01:07:09.478Z -->
+
 This document provides straightforward guidance for quickly getting started with Faiss core features.
 
 ## Core Concepts
@@ -7,9 +9,7 @@ This document provides straightforward guidance for quickly getting started with
 The core of Faiss is the index, a structure specifically designed to store vectors and efficiently perform similarity searches.
 
 - Vectors: Open-source Faiss supports float32 vectors.
-
 - Index types: For beginners, IndexFlatL2 (an exhaustive search index that yields exact results with no approximation, making it ideal for learning) is recommended. You can try IndexIVFFlat (an approximate search index for faster speed) later.
-
 - Core workflow: Create an index → Add vectors to the index → Execute similarity search.
 
 ## Example
@@ -66,11 +66,12 @@ int main() {
 
 The expected output is as follows.
 
-<img src="figures/faiss-quick_start.jpg" alt="faiss-quick_start" width="600"/>
+<img src="figures/faiss-quick_start.jpg" alt="Run output of the IndexFlatL2 quick start example, showing that the index contains 10,000 vectors and the 4 nearest neighbors with their L2 distances for each of the 5 queries" width="600"/>
 
 ## Advanced Extension
 
 IndexIVFFlat: suitable for large datasets. The core mechanism is to cluster data before searching.
+`nlist` is the number of clusters formed during training (int; 100 in this example; it must be smaller than the number of training vectors; a larger value yields higher recall but increases training and memory overhead). `nprobe` is the number of clusters probed during query (int; 10 in this example; ranging from 1 to `nlist`; a larger value makes the results closer to exact search but increases query latency).
 
 ```cpp
 #include <faiss/IndexFlat.h>
@@ -123,10 +124,10 @@ int main() {
 
 The expected output is as follows.
 
-<img src="figures/faiss-advanced.jpg" alt="faiss-advanced" width="600"/>
+<img src="figures/faiss-advanced.jpg" alt="Run output of the IndexIVFFlat advanced example, showing the nearest neighbor indexes and L2 distances returned by approximate search for the same batch of query vectors" width="600"/>
 
 ## Change History
 
-| Issue | Date | Description |
-| ---- | ---- | -- |
+| Version | Date | Description |
+| --- | --- | --- |
 | 01 | 2026-09-30 | This is the first official release. |

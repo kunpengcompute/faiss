@@ -1,12 +1,14 @@
 # Installation Guide
 
-<!-- md-trans-meta sourceCommit=2b057fbbcdac81f9980a5b1e539eaeabee60a5e3 translatedAt=2026-10-23T08:58:40.115Z pushedAt=2026-10-26T01:07:09.484Z -->
+<!-- md-trans-meta sourceCommit=1bff20118dfa17d1bdd1a6bef30e25a96681758a translatedAt=2026-11-10T08:58:34.403Z pushedAt=2026-11-11T01:07:09.484Z -->
+
+This document describes how to compile and install Faiss on the Kunpeng platform, covering the installation and compilation of the Kunpeng optimization patches for v1.8.0 and v1.14.3, as well as compatibility verification with open-source Faiss. It is intended for users who deploy Faiss on the Kunpeng platform.
 
 ## Verified Environments
 
 To use Faiss smoothly and securely, ensure that your environment is one of the verified environments.
 
-**Table 1** Verified environments for Faiss<a id="verified-environments-for-faiss "></a>
+**Table 1** Verified environments for Faiss<a id="verified-environments-for-faiss"></a>
 
 <a name="table4692134313211"></a>
 <table><thead align="left"><tr id="row1169294312212"><th class="cellrowborder" valign="top" width="21.8%" id="mcps1.2.6.1.1"><p id="p12692144313211"><a name="p12692144313211"></a><a name="p12692144313211"></a>OS</p>
@@ -105,7 +107,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-5. Faiss depends on the math library. Download the open-source OpenBLAS source code from the [GitHub repository](https://github.com/OpenMathLib/OpenBLAS.git) using the **v0.3.29** tag. Save the file to a path accessible to the compiler, such as `/path/to/OpenBLAS-0.3.29`.
+5. Faiss depends on the math library. Download the open-source OpenBLAS source code from [GitHub](https://github.com/OpenMathLib/OpenBLAS.git) using the **v0.3.29** tag. Save the file to a path accessible to the compiler, such as `/path/to/OpenBLAS-0.3.29`.
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
@@ -241,7 +243,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     >![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
     >
     >- During compilation, you can add the compilation option `-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install` to specify the installation path `/path/to/faiss/install`. The default installation path is `/usr/local`.
-    >- The compilation option `-DMKL_LIBRARIES` must be set to the installation path of OpenBLAS in step [5](#li880635723510).
+    >- The compilation option `-DMKL_LIBRARIES` must be set to the installation path of OpenBLAS in step 5.
     >- If the message "CMake 3.23.1 or higher is required. You are running version 3.22.0" is displayed, modify line 21 in the `/path/to/faiss/CMakeLists.txt` file by changing `cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)` to `cmake_minimum_required(VERSION 3.22.0 FATAL_ERROR)`.
 
 ### v1.14.3
@@ -261,8 +263,8 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     ```
 
     >![icon-note](public_sys-resources/icon-note.gif) **NOTE:**
-    >The Kunpeng optimization patch files are described as follows.
-    >- `0001-faiss_1.14.3-optimize-rabitq.patch`: A RaBitQ index optimization patch based on v1.14.3, which ensures accuracy but does not guarantee that the Top-K values or order are fully consistent with the open-source version.
+    >The Kunpeng optimization patch file is described as follows.
+    >`0001-faiss_1.14.3-optimize-rabitq.patch`: A RaBitQ index optimization patch based on v1.14.3, which ensures accuracy but does not guarantee that the Top-K values or order are fully consistent with the open-source version.
 
 3. Install Make, CMake, and GCC.
 
@@ -278,7 +280,7 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
     export LD_LIBRARY_PATH=/opt/openEuler/gcc-toolset-12/root/usr/lib64/:$LD_LIBRARY_PATH
     ```
 
-5. Faiss depends on the math library. Download the open-source OpenBLAS source code from the [GitHub repository](https://github.com/OpenMathLib/OpenBLAS.git) using the **v0.3.29** tag. Save the file to a path accessible to the compiler, such as `/path/to/OpenBLAS-0.3.29`.
+5. Faiss depends on the math library. Download the open-source OpenBLAS source code from [GitHub](https://github.com/OpenMathLib/OpenBLAS.git) using the **v0.3.29** tag. Save the file to a path accessible to the compiler, such as `/path/to/OpenBLAS-0.3.29`.
 
     ```bash
     git clone --branch v0.3.29 --single-branch https://github.com/OpenMathLib/OpenBLAS.git
@@ -407,8 +409,8 @@ Obtain the Faiss open-source code from GitHub, install the necessary dependency 
 
     >![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
     >
-    >- During compilation, you can add the compilation option **-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install** to specify the installation path `/path/to/faiss/install`. The default installation path is `/usr/local`.
-    >- The compilation option **-DMKL_LIBRARIES** must be set to the installation path of OpenBLAS in step [5](#li880635723510).
+    >- During compilation, you can add the compilation option `-DCMAKE_INSTALL_PREFIX=/path/to/faiss/install` to specify the installation path `/path/to/faiss/install`. The default installation path is `/usr/local`.
+    >- The compilation option `-DMKL_LIBRARIES` must be set to the installation path of OpenBLAS in step 5.
     >- If the message "CMake 3.23.1 or higher is required. You are running version 3.22.0" is displayed, modify line 21 in the `/path/to/faiss/CMakeLists.txt` file by changing `cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)` to `cmake_minimum_required(VERSION 3.22.0 FATAL_ERROR)`.
 
 ## Compatibility Verification
@@ -474,7 +476,7 @@ This section describes how to verify the compatibility of the open-source Faiss 
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that <code>save_or_load</code> in the <code>hnsw_sift-128-euclidean.config</code> file is set to <code>save</code>. In subsequent runs, you can change it to <code>load</code> to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the `LD_LIBRARY_PATH` environment variable, and then run the test. The following commands use the default installation paths of OpenBLAS and Faiss as examples. If other paths were specified during installation, replace them with the actual library file paths.
 
     ```bash
     export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH

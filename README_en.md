@@ -1,6 +1,6 @@
 # Introduction to Faiss
 
-<!-- md-trans-meta sourceCommit=2645281edf8d8fc426bd4c872985b2c4cb3737ef translatedAt=2026-11-02T08:58:34.403Z pushedAt=2026-11-03T01:07:09.483Z -->
+<!-- md-trans-meta sourceCommit=1bff20118dfa17d1bdd1a6bef30e25a96681758a translatedAt=2026-11-10T08:58:34.403Z pushedAt=2026-11-11T01:07:09.484Z -->
 
 This document introduces Faiss, describes its similarity search and dense vector clustering capabilities, the indexing methods it provides, and Kunpeng optimizations such as FP16 and HNSW, and provides entry points to the learning documents and release notes. It is intended for users who need efficient vector retrieval with Faiss.
 

@@ -1,15 +1,17 @@
 # Introduction to Faiss
 
-<!-- md-trans-meta sourceCommit=3252f6f4ad8cff4fe9cdf3a334f2a6ab921d727a translatedAt=2026-10-23T08:58:34.403Z pushedAt=2026-10-26T01:07:09.483Z -->
+<!-- md-trans-meta sourceCommit=1bff20118dfa17d1bdd1a6bef30e25a96681758a translatedAt=2026-11-10T08:58:34.403Z pushedAt=2026-11-11T01:07:09.484Z -->
 
-[简体中文](./README.md) | English
+This document introduces Faiss, describes its similarity search and dense vector clustering capabilities, the indexing methods it provides, and Kunpeng optimizations such as FP16 and HNSW, and provides entry points to the learning documents and release notes. It is intended for users who need efficient vector retrieval with Faiss.
+
+[简体中文](./README.md)|English
 
 ## Latest Updates
 
 - [2026-09-30]: A RabitQ index optimization patch based on Faiss v1.14.3 is provided.
-- [2026.06.30]: The VisitedTable access flags are optimized by replacing the full memset reset with a generation-based flag similar to a hashset, reducing VisitedTable updates from O(N) to O(1). The 4-bit lookup operator is implemented using SVE2.
-- [2026.03.30]: Faiss provides a non-equivalence optimization patch and an equivalence optimization patch. The non-equivalence optimization patch further optimizes the IVFPQ algorithm and supports the HNSW FP16 interface.
-- [2025.12.30]: Faiss was released on the Gitcode platform, optimizing IVFFLAT, IVFPQ, IVFPQFS, PQFS, and HNSW.
+- [2026-06-30]: The VisitedTable access flags are optimized by replacing the full memset reset with a generation-based flag similar to a hashset, reducing VisitedTable updates from O(N) to O(1). The 4-bit lookup operator is implemented using SVE2.
+- [2026-03-30]: Faiss provides a non-equivalence optimization patch and an equivalence optimization patch. The non-equivalence optimization patch further optimizes the IVFPQ algorithm and supports the HNSW FP16 interface.
+- [2025-12-30]: Faiss was released on the Gitcode platform, optimizing IVFFlat, IVFPQ, IVFPQFS, PQFS, and HNSW.
 
 ## Project Introduction
 

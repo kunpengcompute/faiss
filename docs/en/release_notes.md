@@ -1,6 +1,8 @@
 # Release Notes
 
-<!-- md-trans-meta sourceCommit=c9b1501b6323556dfdb1efa80ea6654f1459b2ed translatedAt=2026-10-23T08:58:41.930Z pushedAt=2026-10-26T01:07:09.486Z -->
+<!-- md-trans-meta sourceCommit=1bff20118dfa17d1bdd1a6bef30e25a96681758a translatedAt=2026-11-10T08:58:34.403Z pushedAt=2026-11-11T01:07:09.484Z -->
+
+This document provides the version mapping information and update history of Faiss.
 
 ## Version Mapping
 
@@ -32,7 +34,7 @@
 
 ### OS, Compiler, and CPU
 
-**Table 1** Verified environments for Faiss<a id="verified-environments-for-faiss "></a>
+**Table 1** Verified environments for Faiss<a id="verified-environments-for-faiss"></a>
 
 <a name="table4692134313211"></a>
 <table><thead align="left"><tr id="row1169294312212"><th class="cellrowborder" valign="top" width="21.8%" id="mcps1.2.6.1.1"><p id="p12692144313211"><a name="p12692144313211"></a><a name="p12692144313211"></a>OS</p>
@@ -55,7 +57,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p1118821124015"><a name="p1118821124015"></a><a name="p1118821124015"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p18389155712168"><a name="p18389155712168"></a><a name="p18389155712168"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p18389155712168"><a name="p18389155712168"></a><a name="p18389155712168"></a>3.22.0 and later</p>
 </td>
 </tr>
 <td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.6.1.1 "><p id="p1321915499910"><a name="p1321915499910"></a><a name="p1321915499910"></a>Debian 12</p>
@@ -66,7 +68,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="17.34%" headers="mcps1.2.6.1.4 "><p id="p172198491297"><a name="p172198491297"></a><a name="p172198491297"></a>GCC 12.2.0 / LLVM 16.0.6</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p19219164917914"><a name="p19219164917914"></a><a name="p19219164917914"></a>CMake&gt;=3.25.1</p>
+<td class="cellrowborder" valign="top" width="27.250000000000004%" headers="mcps1.2.6.1.5 "><p id="p19219164917914"><a name="p19219164917914"></a><a name="p19219164917914"></a>3.25.1 and later</p>
 </td>
 <tr id="row159615141350"><td class="cellrowborder" valign="top" width="20.86%" headers="mcps1.2.6.1.1 "><p id="p179611141352"><a name="p179611141352"></a><a name="p179611141352"></a>openEuler 24.03 LTS SP3</p>
 </td>
@@ -76,7 +78,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="17.549999999999997%" headers="mcps1.2.6.1.4 "><p id="p496115148515"><a name="p496115148515"></a><a name="p496115148515"></a>GCC 12.3.1</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p109611114654"><a name="p109611114654"></a><a name="p109611114654"></a>CMake&gt;=3.22.0</p>
+<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p109611114654"><a name="p109611114654"></a><a name="p109611114654"></a>3.22.0 and later</p>
 </td>
 </tr>
 <tr id="row1837942531312"><td class="cellrowborder" valign="top" width="20.86%" headers="mcps1.2.6.1.1 "><p id="p1438015251131"><a name="p1438015251131"></a><a name="p1438015251131"></a>Debian 12</p>
@@ -87,7 +89,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="17.549999999999997%" headers="mcps1.2.6.1.4 "><p id="p821894241316"><a name="p821894241316"></a><a name="p821894241316"></a>GCC 12.2.0 / LLVM 16.0.6</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p1021810427131"><a name="p1021810427131"></a><a name="p1021810427131"></a>CMake&gt;=3.25.1</p>
+<td class="cellrowborder" valign="top" width="27.58%" headers="mcps1.2.6.1.5 "><p id="p1021810427131"><a name="p1021810427131"></a><a name="p1021810427131"></a>3.25.1 and later</p>
 </td>
 </tr>
 </tbody>
@@ -105,7 +107,7 @@ For usage precautions, see [Installation Guide](./installation_guide.md).
 
 **New Features<a name="section11862975"></a>**
 
-Provides a RabitQ index optimization patch based on Faiss v1.14.3.
+Provides a RaBitQ index optimization patch based on Faiss v1.14.3.
 
 **Modified Features<a name="section16450949161512"></a>**
 
@@ -129,7 +131,7 @@ None
 
 **New Features<a name="section11862975"></a>**
 
-Provides a non-equivalence optimization patch and an equivalence optimization patch. The non-equivalence optimization patch further optimizes the IVFPQ algorithm and supports the HNSW FP16 interface. The patch is released on Gitcode, and the code branch version is `v1.0.0`.
+Provides a non-equivalence optimization patch and an equivalence optimization patch. The non-equivalence optimization patch further optimizes the IVFPQ algorithm and supports the HNSW FP16 interface. The patch is released on GitCode, and the code branch version is `v1.0.0`.
 
 **Modified Features<a name="section16450949161512"></a>**
 
@@ -153,7 +155,7 @@ None
 
 **New Features<a name="section11862975"></a>**
 
-The Faiss library is added, and the code is open-sourced. Faiss can be used only after being compiled using the source code. The patch is released on the Gitcode platform, and the code branch version is `v1.8.0-2512`.
+The Faiss library is added, and the code is open-sourced. Faiss can be used only after being compiled using the source code. The patch is released on the GitCode platform, and the code branch version is `v1.8.0-2512`.
 
 **Modified Features<a name="section16450949161512"></a>**
 

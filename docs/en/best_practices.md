@@ -1,39 +1,41 @@
 # Best Practices
 
-<!-- md-trans-meta sourceCommit=2b057fbbcdac81f9980a5b1e539eaeabee60a5e3 translatedAt=2026-10-23T08:58:23.447Z pushedAt=2026-10-26T01:07:09.481Z -->
+<!-- md-trans-meta sourceCommit=1bff20118dfa17d1bdd1a6bef30e25a96681758a translatedAt=2026-11-10T08:58:34.403Z pushedAt=2026-11-11T01:07:09.484Z -->
+
+This document describes how to test Faiss on the Kunpeng platform after non-equivalence optimization, equivalence optimization, and HNSW FP16 support based on Faiss v1.8.0, as well as after the RaBitQ index optimization based on v1.14.3. It is intended for users who need to verify Faiss retrieval performance on the Kunpeng platform.
 
 ## v1.8.0
 
 ### Non-Equivalence Optimization
 
-This section describes how to test Faiss after full optimization based on Faiss v1.8.0 on the Kunpeng platform. The test depends on the Kunpeng full optimization patch file `0001-faiss_1.8.0-optimize-neq.patch`. The example uses the `sift-128-euclidean.hdf5` dataset, the Faiss (IVFPQ) algorithm, and a thread count of 32.
+This section describes how to test Faiss after non-equivalence optimization based on Faiss v1.8.0 on the Kunpeng platform. The test depends on the Kunpeng non-equivalence optimization patch file `0001-faiss_1.8.0-optimize-neq.patch`. The example uses the `sift-128-euclidean.hdf5` dataset, the Faiss (IVFPQ) algorithm, and a thread count of 32.
 
 **Obtaining the Dataset and Test Program <a name="section5124167418"></a>**
 
 1. Obtain the [test program](https://atomgit.com/openeuler/sra_test.git). The branch is `v2.1.0`. Assume that the program runs at the `/path/to/sra_test` directory. The full directory structure is as follows.
 
     ```text
-    ├── configs                                                   // Stores configuration files for the corresponding algorithms and datasets.
+    ├── configs                                                   // Configuration files for corresponding algorithms and datasets
           └── ivfpq
                 └── ivfpq_sift-128-euclidean.config 
-    ├── include                                                   // Stores header files for the test framework.
-          └── algo                                                // Definitions of each algorithm Index
+    ├── include                                                   // Header files for the test framework
+          └── algo                                                // Index definitions for each algorithm
           └── core                                                // Header files for data processing, test result processing, etc.
           └── framework                                           // Header files related to the test framework
-    ├── src                                                       // Stores source files corresponding to the test framework
+    ├── src                                                       // Source files for the test framework
           └── algo                                                // Adaptation layer for each algorithm
           └── bench                                               // Unified test files
-          └── core                                                // Data processing, test result processing, and other files
-          └── registry                                            // Algorithm factory registration
+          └── core                                                // Files for data processing, test result processing, etc.
+          └── registry                                            // Factory registration for each algorithm
     ├── Makefile                                                  // Compilation script file
     ├── test.sh                                                   // Test script
     ├── test_muti-numas.sh                                        // Parallel test script
-    ├── data                                                      // Stores datasets (manually create and place datasets here)
+    ├── data                                                      // Stores datasets (created manually; place datasets here)
           └── sift-128-euclidean.hdf5
     ├── indexes
-          └── ivfpq                                               // Stores built indexes (manually create)
-                └── sift.faiss                                    // Built index, generated when the executable file ivfpq_test is run and the save_or_load parameter in the dataset configuration file is set to save
-    └── ivfpq_test                                                // Executable file generated after compilation
+          └── ivfpq                                               // Stores the built indexes (created manually)
+                └── sift.faiss                                    // Built index, generated when ivfpq_test is run with the save_or_load parameter set to save in the dataset configuration file
+    └── ivfpq_test                                                // Executable generated after compilation
     ```
 
 2. <a name="li1673311431218"></a>Obtain the dataset and save it to <code>/path/to/sra_test/data</code>.
@@ -54,7 +56,7 @@ This section describes how to test Faiss after full optimization based on Faiss 
 2. Compile and install Faiss as described in [Installation Guide](./installation_guide.md).
 
    >![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
-   >For the Faiss test after full optimization, enable the macros related to Kunpeng optimization. The following uses `-DOPTI_IVFPQ=ON` for illustration.
+   >For the Faiss test after non-equivalence optimization, enable the macros related to Kunpeng optimization. The following uses `-DOPTI_IVFPQ=ON` for illustration.
 
 3. Build the executable file. Enter the Faiss installation path and the paths to other required dependencies as prompted by the command line. Note: Set `-DOPTI_IVFPQ` to `ON` as prompted. If `-DKRL` is set to `ON` in step 2, enable it here as well.
 
@@ -73,7 +75,7 @@ This section describes how to test Faiss after full optimization based on Faiss 
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `ivfpq_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the `LD_LIBRARY_PATH` environment variable, and then run the test. The following commands use the default installation paths of OpenBLAS and Faiss as examples. If other paths were specified during installation, replace them with the actual library file paths.
 
     ```bash
     export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
@@ -82,7 +84,7 @@ This section describes how to test Faiss after full optimization based on Faiss 
 
    The test result is as follows.
 
-   <img src="figures/faiss-best_practices-neq.jpg" alt="faiss-best_practices-neq" width="800"/>
+   <img src="figures/faiss-best_practices-neq.jpg" alt="Test result output of Faiss (IVFPQ) after non-equivalence optimization on the sift-128-euclidean dataset, showing query performance metrics and time consumption" width="800"/>
 
 ### Equivalence Optimization
 
@@ -93,27 +95,27 @@ This section describes how to test Faiss after equivalence optimization on the K
 1. Obtain the [test program](https://atomgit.com/openeuler/sra_test.git). The branch is `v2.1.0`. Assume that the program runs at the `/path/to/sra_test` directory. The full directory structure is as follows.
 
     ```text
-    ├── configs                                                   // Stores configuration files for corresponding algorithms and datasets.
+    ├── configs                                    // Configuration files for corresponding algorithms and datasets
           └── ivfpq
                 └── ivfpq_sift-128-euclidean.config 
-    ├── include                                                   // Stores header files for the test framework.
-          └── algo                                                // Index implementations for each algorithm.
-          └── core                                                // Header files for data processing, test result processing, etc.
-          └── framework                                           // Header files related to the test framework.
-    ├── src                                                       // Stores source files for the test framework
-          └── algo                                                // Algorithm adaptation layers
-          └── bench                                               // Unified test files
-          └── core                                                // Data processing, test result processing, and other files
-          └── registry                                            // Algorithm factory registration
-    ├── Makefile                                                  // Compilation script file.
-    ├── test.sh                                                   // Test script.
-    ├── test_muti-numas.sh                                        // Parallel test script.
-    ├── data                                                      // Stores datasets (needs to be manually created and datasets placed here).
+    ├── include                                    // Header files for the test framework
+          └── algo                                // Index definitions for each algorithm
+          └── core                               // Header files for data processing, test result processing, etc.
+          └── framework                         // Header files related to the test framework
+    ├── src                                    // Source files for the test framework
+          └── algo                            // Adaptation layer for each algorithm
+          └── bench                          // Unified test files
+          └── core                          // Files for data processing, test result processing, etc.
+          └── registry                     // Factory registration for each algorithm
+    ├── Makefile                          // Compilation script file
+    ├── test.sh                          // Test script
+    ├── test_muti-numas.sh              // Parallel test script
+    ├── data                           // Stores datasets (created manually; place datasets here)
           └── sift-128-euclidean.hdf5
     ├── indexes
-          └── ivfpq                                               // Stores built indexes (needs to be manually created).
-                └── sift.faiss                                    // The built index, generated when the executable file ivfpq_test is run and the save_or_load parameter in the dataset configuration file is set to save
-    └── ivfpq_test                                                // The executable file generated after compilation
+          └── ivfpq                   // Stores the built indexes (created manually)
+                └── sift.faiss       // Built index, generated when ivfpq_test is run with the save_or_load parameter set to save in the dataset configuration file
+    └── ivfpq_test                  // Executable generated after compilation
     ```
 
 2. Obtain the dataset and save it to `/path/to/sra_test/data`.
@@ -131,7 +133,7 @@ This section describes how to test Faiss after equivalence optimization on the K
     yum install hdf5 hdf5-devel numactl numactl-devel
     ```
 
-2. Install Faiss by referring to the [Installation Guide](./installation_guide.md).
+2. Compile and install Faiss by referring to the [Installation Guide](./installation_guide.md).
 
    > ![icon-note](./public_sys-resources/icon-note.gif)**NOTE:**
    >For the Faiss test after equivalence optimization, enable the macro related to Kunpeng optimization: `-DKRL=ON`.
@@ -153,7 +155,7 @@ This section describes how to test Faiss after equivalence optimization on the K
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `ivfpq_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the `LD_LIBRARY_PATH` environment variable, and then run the test. The following commands use the default installation paths of OpenBLAS and Faiss as examples. If other paths were specified during installation, replace them with the actual library file paths.
 
     ```bash
     export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
@@ -162,7 +164,7 @@ This section describes how to test Faiss after equivalence optimization on the K
 
    The test result is as follows.
 
-   <img src="figures/faiss-best_practices-eqv.jpg" alt="faiss-best_practices-eqv" width="800"/>
+   <img src="figures/faiss-best_practices-eqv.jpg" alt="Test result output of Faiss (IVFPQ) after equivalence optimization on the sift-128-euclidean dataset, showing query performance metrics corresponding to the non-equivalence optimization path" width="800"/>
 
 ### HNSW FP16 Support
 
@@ -173,27 +175,27 @@ This section describes how to test Faiss with HNSW FP16 interface support based 
 1. Obtain the [test program](https://atomgit.com/openeuler/sra_test.git). The branch is `v2.1.0`. Assume that the program runs at the `/path/to/sra_test` directory. The full directory structure is as follows.
 
     ```text
-    ├── configs                                                   // Store configuration files for the corresponding algorithms and datasets.
+    ├── configs                                                   // Configuration files for corresponding algorithms and datasets
           └── hnsw
                 └── hnsw_sift-128-euclidean.config 
-    ├── include                                                   // Store header files for the test framework.
-          └── algo                                                // Index definitions for each algorithm.
+    ├── include                                                   // Header files for the test framework
+          └── algo                                                // Index definitions for each algorithm
           └── core                                                // Header files for data processing, test result processing, etc.
-          └── framework                                           // Header files related to the test framework.
-    ├── src                                                       // Stores source files corresponding to the test framework.
-          └── algo                                                // Adaptation layer for each algorithm.
-          └── bench                                               // Unified test files.
-          └── core                                                // Files for data processing, test result processing, etc.
-          └── registry                                            // Registration of algorithm factories
+          └── framework                                           // Header files related to the test framework
+    ├── src                                                       // Source files for the test framework
+          └── algo                                                // Adaptation layer for each algorithm
+          └── bench                                               // Unified test files
+          └── core                                                // Files for data processing, test result processing, etc
+          └── registry                                            // Factory registration for each algorithm
     ├── Makefile                                                  // Compilation script file
     ├── test.sh                                                   // Test script
     ├── test_muti-numas.sh                                        // Parallel test script
-    ├── data                                                      // Stores datasets (must be manually created and populated with datasets).
+    ├── data                                                      // Stores datasets (created manually; place datasets here)
           └── sift-128-euclidean.hdf5
     ├── indexes
-          └── hnsw-fp16                                           // Stores built indexes (must be manually created).
-                └── sift.faiss                                    // A built index, generated when the executable file hnsw_test is run and the save_or_load parameter in the dataset configuration file is set to save.
-    └── hnsw_fp16_test                                            // The executable file generated after compilation.
+          └── hnsw-fp16                                           // Stores the built indexes (created manually)
+                └── sift.faiss                                    // Built index, generated when hnsw_test is run with the save_or_load parameter set to save in the dataset configuration file
+    └── hnsw_fp16_test                                            // Executable generated after compilation
     ```
 
 2. Obtain the dataset and save it to `/path/to/sra_test/data`.
@@ -229,7 +231,7 @@ This section describes how to test Faiss with HNSW FP16 interface support based 
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `hnsw_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the `LD_LIBRARY_PATH` environment variable, and then run the test. The following commands use the default installation paths of OpenBLAS and Faiss as examples. If other paths were specified during installation, replace them with the actual library file paths.
 
     ```bash
     export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
@@ -238,7 +240,7 @@ This section describes how to test Faiss with HNSW FP16 interface support based 
 
    The test result is as follows.
 
-   <img src="figures/faiss-best_practices-fp16.jpg" alt="faiss-best_practices-fp16" width="800"/>
+   <img src="figures/faiss-best_practices-fp16.jpg" alt="Test result output of Faiss with the HNSW FP16 interface supported, showing performance metrics of hnsw_fp16_test on the sift-128-euclidean dataset" width="800"/>
 
 ## v1.14.3
 
@@ -249,10 +251,10 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
 1. Obtain the [test program](https://atomgit.com/openeuler/sra_test.git). The branch is `v2.1.0`. Assume that the program runs at the `/path/to/sra_test` directory. The full directory structure is as follows.
 
     ```text
-    ├── configs                                                   // Stores configuration files for the corresponding algorithms and datasets.
+    ├── configs                                                   // Configuration files for corresponding algorithms and datasets
           └── ivfrabitqfs
                 └── ivfrabitqfs_sift-128-euclidean.config 
-    ├── include                                                   // Stores header files for the test framework.
+    ├── include                                                   // Header files for the test framework
           └── algo                                                // Index definitions for each algorithm
           └── core                                                // Header files for data processing, test result processing, etc.
           └── framework                                           // Header files related to the test framework
@@ -260,16 +262,16 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
           └── algo                                                // Adaptation layer for each algorithm
           └── bench                                               // Unified test files
           └── core                                                // Data processing, test result processing, and other files
-          └── registry                                            // Algorithm factory registration
+          └── registry                                            // Factory registration for each algorithm
     ├── Makefile                                                  // Compilation script file
     ├── test.sh                                                   // Test script
-    ├── test_muti-numas.sh                                        // Parallel test script.
-    ├── data                                                      // Store datasets (manually create and store datasets).
+    ├── test_muti-numas.sh                                        // Parallel test script
+    ├── data                                                      // Stores datasets (created manually; place datasets here)
           └── sift-128-euclidean.hdf5
     ├── indexes
-          └── ivfrabitqfs                                         // Store built indexes (manually create).
-                └── sift.faiss                                    // Built index, generated when running the executable file ivfrabitqfs_test with the save_or_load parameter in the dataset configuration file set to save.
-    └── ivfrabitqfs_test                                          // Executable file generated after compilation.
+          └── ivfrabitqfs                                         // Stores the built indexes (created manually)
+                └── sift.faiss                                    // Built index, generated when ivfrabitqfs_test is run with the save_or_load parameter set to save in the dataset configuration file
+    └── ivfrabitqfs_test                                          // Executable generated after compilation
     ```
 
 2. <a name="li1673311431218"></a>Obtain the dataset and save it to <code>/path/to/sra_test/data</code>.
@@ -305,7 +307,7 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
     >- IVFRabitQ algorithm: `make ivfrabitq_test`
 
 4. For the first run, ensure that `save_or_load` in the `ivfrabitqfs_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable LD_LIBRARY_PATH and run the test. The following commands use the default installation paths of OpenBLAS and Faiss as an example. If you specified other installation paths, replace them with the actual library paths.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the `LD_LIBRARY_PATH` environment variable, and then run the test. The following commands use the default installation paths of OpenBLAS and Faiss as examples. If other paths were specified during installation, replace them with the actual library file paths.
 
     ```bash
     export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
@@ -314,7 +316,7 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
 
    The test result is as follows.
 
-   <img src="figures/faiss-best_practices-1.14.3-rabitq.jpg" alt="faiss-best_practices-1.14.3-rabitq" width="800"/>
+   <img src="figures/faiss-best_practices-1.14.3-rabitq.jpg" alt="Test result output of Faiss (IVFRabitQFS) after RaBitQ index optimization on the sift-128-euclidean dataset, showing query performance metrics" width="800"/>
 
 ## Change History
 

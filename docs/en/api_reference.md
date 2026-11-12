@@ -1,6 +1,6 @@
 # API Reference
 
-<!-- md-trans-meta sourceCommit=2645281edf8d8fc426bd4c872985b2c4cb3737ef translatedAt=2026-11-02T08:59:31.746Z pushedAt=2026-11-03T01:07:09.487Z -->
+<!-- md-trans-meta sourceCommit=1bff20118dfa17d1bdd1a6bef30e25a96681758a translatedAt=2026-11-10T08:58:34.403Z pushedAt=2026-11-11T01:07:09.484Z -->
 
 This document describes the APIs that support FP16 in Faiss. Currently, only C++ FP16 APIs are provided, and open-source Python APIs remain unmodified with no new APIs added. While fully maintaining compatibility with the open-source C++ APIs of v1.8.0, support for the FP16 data type is added by leveraging the extension APIs of v1.13.2.
 
@@ -9,6 +9,7 @@ This document describes the APIs that support FP16 in Faiss. Currently, only C++
 - The extension APIs are named by appending the `_ex` suffix to the native API names.
 - Each extension API can automatically invoke the corresponding implementation based on the data type of the input parameter.
 - Currently, the extension APIs support only the FP16 data type. Any future requirements for other data types can also be supported and invoked through the extension APIs.
+- Required parameters: Parameters marked as optional with default values in the parameter description tables are optional. All other parameters are mandatory.
 
 Take the `add` function in `IndexHNSW.h` as an example.
 
@@ -125,7 +126,7 @@ Newly added constructor of IndexHNSW.
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p167876547339"><a name="p167876547339"></a><a name="p167876547339"></a>int</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p678775443311"><a name="p678775443311"></a><a name="p678775443311"></a>Maximum number of connections per node</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p678775443311"><a name="p678775443311"></a><a name="p678775443311"></a>Maximum number of connections per node. This parameter is optional in IndexHNSW(storage, ntype, M), and the default value is <code>32</code>.</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p19787654133320"><a name="p19787654133320"></a><a name="p19787654133320"></a>A positive integer greater than 1</p>
 </td>
@@ -136,7 +137,7 @@ Newly added constructor of IndexHNSW.
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p9787054203313"><a name="p9787054203313"></a><a name="p9787054203313"></a>Data type of the vector</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p187871954183315"><a name="p187871954183315"></a><a name="p187871954183315"></a>NumericType::Float16 and NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p187871954183315"><a name="p187871954183315"></a><a name="p187871954183315"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row126351746153315"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p8787165419332"><a name="p8787165419332"></a><a name="p8787165419332"></a>metric</p>
@@ -177,7 +178,7 @@ faiss::IndexHNSW index_with_storage(storage, faiss::NumericType::Float16);
 
 **API Definition<a name="section55611644173112"></a>**
 
-IndexHNSWFlat\(int d, int M, NumericType ntype = NumericType::Float32, MetricType metric = METRIC\_L2\);
+IndexHNSWFlat\(int d, int M, NumericType ntype = NumericType::Float16, MetricType metric = METRIC\_L2\);
 
 **Function<a name="section14731398326"></a>**
 
@@ -218,16 +219,16 @@ A newly added constructor for IndexHNSWFlat.
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p1851255163512"><a name="p1851255163512"></a><a name="p1851255163512"></a>NumericType</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p2512053351"><a name="p2512053351"></a><a name="p2512053351"></a>Data type of the vector</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p2512053351"><a name="p2512053351"></a><a name="p2512053351"></a>Data type of the vector. The default value in the API definition is <code>NumericType::Float16</code>. However, because this constructor has overload ambiguity with the open-source constructor <code>IndexHNSWFlat(int d, int M, MetricType metric = METRIC_L2)</code>, this parameter must be explicitly passed.</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p10512458359"><a name="p10512458359"></a><a name="p10512458359"></a>NumericType::Float16 and NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p10512458359"><a name="p10512458359"></a><a name="p10512458359"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row126351746153315"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p1451211510358"><a name="p1451211510358"></a><a name="p1451211510358"></a>metric</p>
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p13512252352"><a name="p13512252352"></a><a name="p13512252352"></a>MetricType</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p1551245163519"><a name="p1551245163519"></a><a name="p1551245163519"></a>Distance computation type</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p1551245163519"><a name="p1551245163519"></a><a name="p1551245163519"></a>Distance computation type. This parameter is optional, and the default value is <code>METRIC_L2</code>.</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p75120543512"><a name="p75120543512"></a><a name="p75120543512"></a>METRIC_L2 and METRIC_INNER_PRODUCT</p>
 </td>
@@ -239,6 +240,8 @@ A newly added constructor for IndexHNSWFlat.
 
 ```cpp
 // Create an FP16 IndexHNSWFlat index with a dimension of 128, a maximum of 32 connections per node, using inner product distance.
+int d = 128;
+int M = 32;
 faiss::IndexHNSWFlat index_fp16(d, M, faiss::NumericType::Float16, faiss::METRIC_INNER_PRODUCT);
 ```
 
@@ -289,7 +292,7 @@ Trains on a set of representative vectors.
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p7449143763519"><a name="p7449143763519"></a><a name="p7449143763519"></a>Data type of the vector</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p17449163753513"><a name="p17449163753513"></a><a name="p17449163753513"></a>NumericType::Float16 and NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p17449163753513"><a name="p17449163753513"></a><a name="p17449163753513"></a>NumericType::Float16</p>
 </td>
 </tr>
 </tbody>
@@ -359,7 +362,7 @@ Adds vectors to the index.
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p1379812514363"><a name="p1379812514363"></a><a name="p1379812514363"></a>Data type of the vector</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p8798165133619"><a name="p8798165133619"></a><a name="p8798165133619"></a>NumericType::Float16 and NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p8798165133619"><a name="p8798165133619"></a><a name="p8798165133619"></a>NumericType::Float16</p>
 </td>
 </tr>
 </tbody>
@@ -456,14 +459,14 @@ Queries the index for n d-dimensional vectors and returns up to k vectors. If fe
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p123911435360"><a name="p123911435360"></a><a name="p123911435360"></a>Data type of the vector</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p20239164317362"><a name="p20239164317362"></a><a name="p20239164317362"></a>NumericType::Float16 and NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p20239164317362"><a name="p20239164317362"></a><a name="p20239164317362"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row18824738123612"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p1023912434365"><a name="p1023912434365"></a><a name="p1023912434365"></a>params</p>
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p182392043163620"><a name="p182392043163620"></a><a name="p182392043163620"></a>const SearchParameters*</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p72392043163619"><a name="p72392043163619"></a><a name="p72392043163619"></a>Search parameter</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p72392043163619"><a name="p72392043163619"></a><a name="p72392043163619"></a>Search parameters. This parameter is optional, and the default value is <code>nullptr</code>, indicating that the search parameters of the index are used.</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p10239124312360"><a name="p10239124312360"></a><a name="p10239124312360"></a>None</p>
 </td>
@@ -568,14 +571,14 @@ Returns all vectors whose distance is less than the radius.
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p13874921193713"><a name="p13874921193713"></a><a name="p13874921193713"></a>Data type of the vector</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p19874421113720"><a name="p19874421113720"></a><a name="p19874421113720"></a>NumericType::Float16 and NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p19874421113720"><a name="p19874421113720"></a><a name="p19874421113720"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row6551517133719"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p16874421143713"><a name="p16874421143713"></a><a name="p16874421143713"></a>params</p>
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p1987442143715"><a name="p1987442143715"></a><a name="p1987442143715"></a>const SearchParameters*</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p58746212374"><a name="p58746212374"></a><a name="p58746212374"></a>Search parameter</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p58746212374"><a name="p58746212374"></a><a name="p58746212374"></a>Search parameters. This parameter is optional, and the default value is <code>nullptr</code>, indicating that the search parameters of the index are used.</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p787542133712"><a name="p787542133712"></a><a name="p787542133712"></a>None</p>
 </td>
@@ -665,7 +668,7 @@ Reconstructs a stored vector.
 </td>
 <td class="cellrowborder" valign="top" width="28.34%" headers="mcps1.1.5.1.3 "><p id="p143331548163712"><a name="p143331548163712"></a><a name="p143331548163712"></a>Data type of the vector</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.769999999999996%" headers="mcps1.1.5.1.4 "><p id="p153331348193717"><a name="p153331348193717"></a><a name="p153331348193717"></a>NumericType::Float16 and NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.769999999999996%" headers="mcps1.1.5.1.4 "><p id="p153331348193717"><a name="p153331348193717"></a><a name="p153331348193717"></a>NumericType::Float16</p>
 </td>
 </tr>
 </tbody>
@@ -751,7 +754,7 @@ Performs batch approximate nearest neighbor search at level 0 of the HNSW index.
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p11220848153813"><a name="p11220848153813"></a><a name="p11220848153813"></a>const storage_idx_t*</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p822034893817"><a name="p822034893817"></a><a name="p822034893817"></a>Precomputed nearest neighbor index array, providing the initial entry points for search.</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p822034893817"><a name="p822034893817"></a><a name="p822034893817"></a>Precomputed entry point index array, with a size of <code>n × nprobe</code>. Each query vector corresponds to <code>nprobe</code> entry points. If an index value is less than 0, the subsequent entry points of the query vector are ignored.</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p132201548113813"><a name="p132201548113813"></a><a name="p132201548113813"></a>None</p>
 </td>
@@ -760,7 +763,7 @@ Performs batch approximate nearest neighbor search at level 0 of the HNSW index.
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p1622064873815"><a name="p1622064873815"></a><a name="p1622064873815"></a>const float*</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p10220194853812"><a name="p10220194853812"></a><a name="p10220194853812"></a>Precomputed nearest neighbor distance array, corresponding to nearest, to reduce redundant computation.</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p10220194853812"><a name="p10220194853812"></a><a name="p10220194853812"></a>Precomputed entry point distance array, with a size of <code>n × nprobe</code>, in one-to-one correspondence with <code>nearest</code>.</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p192206482388"><a name="p192206482388"></a><a name="p192206482388"></a>None</p>
 </td>
@@ -789,14 +792,14 @@ Performs batch approximate nearest neighbor search at level 0 of the HNSW index.
 </td>
 <td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p102211948123815"><a name="p102211948123815"></a><a name="p102211948123815"></a>Data type of the vector</p>
 </td>
-<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p122211448193813"><a name="p122211448193813"></a><a name="p122211448193813"></a>NumericType::Float16 and NumericType::Float32</p>
+<td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p122211448193813"><a name="p122211448193813"></a><a name="p122211448193813"></a>NumericType::Float16</p>
 </td>
 </tr>
 <tr id="row840793719388"><td class="cellrowborder" valign="top" width="14.92%" headers="mcps1.1.5.1.1 "><p id="p322184812387"><a name="p322184812387"></a><a name="p322184812387"></a>nprobe</p>
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p192218481385"><a name="p192218481385"></a><a name="p192218481385"></a>int</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p822118484386"><a name="p822118484386"></a><a name="p822118484386"></a>Controls the search breadth, specifying the number of candidate nodes to explore at each level.</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p822118484386"><a name="p822118484386"></a><a name="p822118484386"></a>Number of entry points used by each query vector. This parameter is optional, and the default value is <code>1</code>.</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p82215484386"><a name="p82215484386"></a><a name="p82215484386"></a>Positive integer</p>
 </td>
@@ -805,7 +808,7 @@ Performs batch approximate nearest neighbor search at level 0 of the HNSW index.
 </td>
 <td class="cellrowborder" valign="top" width="17.97%" headers="mcps1.1.5.1.2 "><p id="p152211248123818"><a name="p152211248123818"></a><a name="p152211248123818"></a>int</p>
 </td>
-<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p12221194883815"><a name="p12221194883815"></a><a name="p12221194883815"></a>Search strategy identifier.</p>
+<td class="cellrowborder" valign="top" width="28.38%" headers="mcps1.1.5.1.3 "><p id="p12221194883815"><a name="p12221194883815"></a><a name="p12221194883815"></a>Search strategy identifier. This parameter is optional, and the default value is <code>1</code>. <code>1</code>: performs a search from each entry point separately. <code>2</code>: adds all entry points to the candidate queue and performs one search.</p>
 </td>
 <td class="cellrowborder" valign="top" width="38.73%" headers="mcps1.1.5.1.4 "><p id="p1622115480387"><a name="p1622115480387"></a><a name="p1622115480387"></a>1 and 2</p>
 </td>
@@ -829,13 +832,18 @@ std::vector<faiss::float16_t> query_data(n_query * d);
 // Set the number of results to return.
 int k = 4;
 
-// Prepare precomputed neighbor information (simplified here; precomputation is required in actual applications).
-std::vector<faiss::storage_idx_t> nearest(n_query);
-std::vector<float> nearest_d(n_query);
-// Populate the precomputed neighbor indices and distances...
+// Set the number of entry points for each query vector.
+int nprobe = 2;
+
+// Prepare precomputed entry point information with a size of n_query × nprobe (this is a simplification; in practice, it must be precomputed in advance).
+std::vector<faiss::storage_idx_t> nearest(n_query * nprobe);
+std::vector<float> nearest_d(n_query * nprobe);
+// Populate the precomputed entry point indexes and distances...
 for (int i = 0; i < n_query; i++) {
-    nearest[i] = 0; // Assume the initial neighbor of each query is index 0.
-    nearest_d[i] = 0.0f;
+    for (int j = 0; j < nprobe; j++) {
+        nearest[i * nprobe + j] = j; // Assume the entry points of each query are indexes 0 and 1.
+        nearest_d[i * nprobe + j] = 0.0f;
+    }
 }
 
 // Prepare memory for output results.
@@ -843,7 +851,6 @@ std::vector<float> distances(n_query * k);
 std::vector<faiss::idx_t> labels(n_query * k);
 
 // Call the search_level_0_ex API to perform search at level 0.
-int nprobe = 2;
 int search_type = 1;
 index.search_level_0_ex(n_query, query_data.data(), k, nearest.data(), nearest_d.data(), 
                        distances.data(), labels.data(), faiss::NumericType::Float16, 

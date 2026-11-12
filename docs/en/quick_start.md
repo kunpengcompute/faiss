@@ -1,6 +1,6 @@
 # Quick Start
 
-<!-- md-trans-meta sourceCommit=2645281edf8d8fc426bd4c872985b2c4cb3737ef translatedAt=2026-11-02T08:57:24.240Z pushedAt=2026-11-03T01:07:09.478Z -->
+<!-- md-trans-meta sourceCommit=1bff20118dfa17d1bdd1a6bef30e25a96681758a translatedAt=2026-11-10T08:58:34.403Z pushedAt=2026-11-11T01:07:09.484Z -->
 
 This document provides straightforward guidance for quickly getting started with Faiss core features.
 

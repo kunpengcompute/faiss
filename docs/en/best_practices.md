@@ -1,6 +1,6 @@
 # Best Practices
 
-<!-- md-trans-meta sourceCommit=2645281edf8d8fc426bd4c872985b2c4cb3737ef translatedAt=2026-11-02T08:58:23.447Z pushedAt=2026-11-03T01:07:09.481Z -->
+<!-- md-trans-meta sourceCommit=1bff20118dfa17d1bdd1a6bef30e25a96681758a translatedAt=2026-11-10T08:58:34.403Z pushedAt=2026-11-11T01:07:09.484Z -->
 
 This document describes how to test Faiss on the Kunpeng platform after non-equivalence optimization, equivalence optimization, and HNSW FP16 support based on Faiss v1.8.0, as well as after the RaBitQ index optimization based on v1.14.3. It is intended for users who need to verify Faiss retrieval performance on the Kunpeng platform.
 
@@ -75,9 +75,10 @@ This section describes how to test Faiss after non-equivalence optimization base
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `ivfpq_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the `LD_LIBRARY_PATH` environment variable, and then run the test. The following commands use the default installation paths of OpenBLAS and Faiss as examples. If other paths were specified during installation, replace them with the actual library file paths.
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
@@ -154,9 +155,10 @@ This section describes how to test Faiss after equivalence optimization on the K
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `ivfpq_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the `LD_LIBRARY_PATH` environment variable, and then run the test. The following commands use the default installation paths of OpenBLAS and Faiss as examples. If other paths were specified during installation, replace them with the actual library file paths.
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./ivfpq_test ivfpq sift-128-euclidean
     ```
 
@@ -229,9 +231,10 @@ This section describes how to test Faiss with HNSW FP16 interface support based 
     >- IVFFLAT: `make ivfflat_test`
 
 4. For the first run, ensure that `save_or_load` in the `hnsw_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the `LD_LIBRARY_PATH` environment variable, and then run the test. The following commands use the default installation paths of OpenBLAS and Faiss as examples. If other paths were specified during installation, replace them with the actual library file paths.
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./hnsw_fp16_test hnsw_fp16 sift-128-euclidean
     ```
 
@@ -304,9 +307,10 @@ This section describes how to test Faiss optimized based on Faiss v1.14.3 on the
     >- IVFRabitQ algorithm: `make ivfrabitq_test`
 
 4. For the first run, ensure that `save_or_load` in the `ivfrabitqfs_sift-128-euclidean.config` file is set to `save`. In subsequent runs, you can change it to `load` to use the built graph index or retriever for querying.
-5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the environment variable.
+5. Run the executable file. Add the OpenBLAS and Faiss dynamic library paths to the `LD_LIBRARY_PATH` environment variable, and then run the test. The following commands use the default installation paths of OpenBLAS and Faiss as examples. If other paths were specified during installation, replace them with the actual library file paths.
 
     ```bash
+    export LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     numactl -C 0-31 -m 0 ./ivfrabitqfs_test ivfrabitqfs sift-128-euclidean
     ```
 
